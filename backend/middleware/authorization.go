@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -11,15 +11,22 @@ import (
 
 func Authorization() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("Authorization middleware")
 		authHeader := c.GetHeader("Authorization")
+		const bearerPrefix = "Bearer "
 
-		if authHeader == "" {
+		if authHeader == "" || !strings.HasPrefix(authHeader, bearerPrefix) {
 			helper.Response(c, http.StatusUnauthorized, "Unauthorized", nil, nil)
 			c.Abort()
 			return
 		}
-		accessToken := authHeader[len("Bearer "):]
+
+		accessToken := strings.TrimSpace(authHeader[len(bearerPrefix):])
+		if accessToken == "" {
+			helper.Response(c, http.StatusUnauthorized, "Unauthorized", nil, nil)
+			c.Abort()
+			return
+		}
+
 		userID, err := helper.VerifyToken(accessToken)
 		if err != nil {
 			helper.Response(c, http.StatusUnauthorized, "Unauthorized", nil, nil)

@@ -2,13 +2,6 @@ package models
 
 import "gorm.io/gorm"
 
-const (
-	RESOURCE_TYPE_LINK  = 1
-	RESOURCE_TYPE_AUDIO = 2
-	RESOURCE_TYPE_VIDEO = 3
-	RESOURCE_TYPE_NOTES = 4
-)
-
 type Resources struct {
 	gorm.Model
 	ID     uint    `json:"resource_id" gorm:"primaryKey;autoIncrement:true"`

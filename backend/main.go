@@ -31,6 +31,7 @@ func main() {
 	})
 
 	routes.UserRoute(r.Group("/api"))
+	routes.TodoRoute(r.Group("/api"))
 
 	// Run server
 	r.Run(constants.APP_PORT)
