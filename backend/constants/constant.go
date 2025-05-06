@@ -3,7 +3,7 @@ package constants
 const (
 	APP_NAME    = "Fintrax"
 	APP_VERSION = "0.0.1"
-	APP_PORT    = ":8080"
+	APP_PORT    = ":80"
 )
 
 const (
@@ -13,4 +13,9 @@ const (
 	STATUS_CANCELLED   = 4
 	STATUS_DELETED     = 5
 	STATUS_COMPLETED   = 6
+)
+
+const (
+	FINANCE_TYPE_INCOME  = 1
+	FINANCE_TYPE_EXPENSE = 2
 )

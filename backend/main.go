@@ -9,6 +9,8 @@ import (
 
 	"fintrax-backend/constants"
 	"fintrax-backend/database"
+	"fintrax-backend/middleware"
+	"fintrax-backend/routes"
 )
 
 func main() {
@@ -17,23 +19,18 @@ func main() {
 
 	// Create router
 	r := gin.Default()
-
 	// CORS setup for React frontend
 	r.Use(cors.Default())
+
+	// Handle panic globally
+	r.Use(middleware.RecoveryMiddleware())
 
 	// Routes
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Welcome to %s API", constants.APP_NAME)})
 	})
 
-	// INCOME
-	// r.GET("/income", GetIncome)
-
-	// // EXPENSE
-	// r.POST("/expense", AddExpense)
-
-	// // TODO
-	// r.GET("/todos", GetTodos)
+	routes.UserRoute(r.Group("/api"))
 
 	// Run server
 	r.Run(constants.APP_PORT)
