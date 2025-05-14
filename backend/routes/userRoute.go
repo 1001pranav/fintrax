@@ -11,6 +11,9 @@ func UserRoute(router *gin.RouterGroup) {
 	{
 		uRoute.POST("/register", controllers.Register)
 		uRoute.POST("/login", controllers.Login)
+		uRoute.POST("/generate-otp", controllers.GenerateOTP)
+		uRoute.POST("/forgot-password", controllers.ForgotPassword)
+		uRoute.POST("/reset-password", controllers.ResetPassword)
 	}
 
 }

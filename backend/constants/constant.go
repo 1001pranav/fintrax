@@ -26,3 +26,9 @@ const (
 	RESOURCE_TYPE_VIDEO = 3
 	RESOURCE_TYPE_NOTES = 4
 )
+
+const (
+	MIN_OTP_LENGTH = 1000
+	MAX_OTP_LENGTH = 9999
+	MAX_OTP_TIME   = 5 // in minutes
+)

@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
+	"fintrax-backend/constants"
 	"fintrax-backend/database"
 	"fintrax-backend/helper"
 	"fintrax-backend/models"
@@ -14,7 +17,6 @@ type loginRequest struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password"  binding:"required"`
 }
-
 type loginResponse struct {
 	Token    string `json:"token"`
 	UserID   uint   `json:"user_id"`
@@ -34,6 +36,23 @@ type registerResponse struct {
 	Email    string `json:"email"`
 	Token    string `json:"token"`
 }
+type generateOTPRequest struct {
+	Email string `json:"email" binding:"required"`
+}
+type generateOTPResponse struct {
+	OTP uint `json:"otp"`
+}
+
+type forgotPasswordRequest struct {
+	Email    string `json:"email"  binding:"required"`
+	Password string `json:"password"  binding:"required"`
+	OTP      string `json:"otp"  binding:"required"`
+}
+type resetPasswordRequest struct {
+	Email       string `json:"email"  binding:"required"`
+	OldPassword string `json:"old_password"  binding:"required"`
+	NewPassword string `json:"new_password"  binding:"required"`
+}
 
 func Register(c *gin.Context) {
 	var req registerRequest
@@ -43,7 +62,8 @@ func Register(c *gin.Context) {
 	}
 
 	var user []models.Users
-	database.DB.Where("email = ?", req.Email).Or("username = ?", req.Username).Find(&user)
+	//.Or("username = ?", req.Username)
+	database.DB.Where("email = ?", req.Email).Find(&user)
 	if len(user) > 0 {
 		helper.Response(c, http.StatusConflict, "User already exists", nil, nil)
 		return
@@ -126,4 +146,90 @@ func Login(c *gin.Context) {
 	}
 
 	helper.Response(c, http.StatusOK, "Login successful", loginResponseHandler, nil)
+}
+
+func GenerateOTP(c *gin.Context) {
+	var req generateOTPRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.Response(c, http.StatusBadRequest, "Invalid request", nil, err.Error())
+		return
+	}
+
+	var user models.Users
+	database.DB.Where("email = ?", req.Email).First(&user)
+	if user.ID == 0 {
+		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
+		return
+	}
+
+	// Sending OTP via email is commented out for now
+	// err := helper.SendEmail(user.Email, "OTP for password reset", "Your OTP is: "+string(user.OTP))
+	// if err != nil {
+	// 	helper.Response(c, http.StatusInternalServerError, "Failed to send OTP", nil, err)
+	// 	return
+	// }
+	otp := rand.Intn(constants.MAX_OTP_LENGTH-constants.MIN_OTP_LENGTH) + constants.MIN_OTP_LENGTH
+
+	user.OTP = uint(otp)
+	user.OTPTime = time.Now()
+	database.DB.Save(&user)
+
+	response := generateOTPResponse{
+		OTP: uint(otp),
+	}
+	helper.Response(c, http.StatusOK, "OTP generated successfully", response, nil)
+}
+
+func ForgotPassword(c *gin.Context) {
+	var req forgotPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.Response(c, http.StatusBadRequest, "Invalid request", nil, err.Error())
+		return
+	}
+
+	var user models.Users
+	database.DB.Where("email = ?", req.Email).First(&user)
+	if user.ID == 0 {
+		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
+		return
+	}
+
+	hashedPassword, err := helper.HashPassword(req.Password)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to hash password", nil, err)
+		return
+	}
+	user.Password = hashedPassword
+	database.DB.Save(&user)
+	helper.Response(c, http.StatusOK, "Password updated successfully", nil, nil)
+}
+
+func ResetPassword(c *gin.Context) {
+	var req resetPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.Response(c, http.StatusBadRequest, "Invalid request", nil, err.Error())
+		return
+	}
+
+	var user models.Users
+	database.DB.Where("email = ?", req.Email).First(&user)
+	if user.ID == 0 {
+		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
+		return
+	}
+
+	validPassword := helper.CheckPasswordHash(req.OldPassword, user.Password)
+	if !validPassword {
+		helper.Response(c, http.StatusUnauthorized, "Invalid credentials", nil, nil)
+		return
+	}
+
+	hashedPassword, err := helper.HashPassword(req.NewPassword)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to hash password", nil, err)
+		return
+	}
+	user.Password = hashedPassword
+	database.DB.Save(&user)
+	helper.Response(c, http.StatusOK, "Password updated successfully", nil, nil)
 }

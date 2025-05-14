@@ -3,5 +3,7 @@
 export enum Screen {
     Login = "login",
     Register = "register",
-    Dashboard = "dashboard"
+    Dashboard = "dashboard",
+    ForgotPassword = "forgot-password",
+    ResetPassword = "reset-password"
 }

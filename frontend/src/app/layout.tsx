@@ -1,9 +1,16 @@
-import type { Metadata } from "next";;
+'use client';
 
-export const metadata: Metadata = {
-  title: "Fintrax - Finance, ToDo List, Roadmaps",
-  description:
-    "Fintrax is an all-in-one application which helps you to manage your Finances, ToDo List and Roadmaps.",
+import DynamicNavbar from "@/components/navbar";
+import { ScreenContextProvider } from "@/context/general";
+
+// This is a Client Component
+const ClientLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <ScreenContextProvider>
+      <DynamicNavbar />
+      {children}
+    </ScreenContextProvider>
+  );
 };
 
 export default function RootLayout({
@@ -12,12 +19,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
-        <html lang="en">
-          <body>
-            {children}
-          </body>
-        </html>
+    <html lang="en">
+      <body>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
+      </body>
+    </html>
   );
 }
-

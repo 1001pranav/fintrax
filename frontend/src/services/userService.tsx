@@ -1,18 +1,9 @@
 "use client";
 import { apiService } from "./apiService";
+import { UserLoginResponse } from "@/constants/interface";
 
-interface LoginResponse {
-    status: number;
-    message: string;
-    data: {
-        user_id: number;
-        email: string;
-        token: string;
-        username: string;
-    };
-}
-export function login<LoginResponse>(email: string, password: string): Promise<LoginResponse> {
-    return apiService.post("/api/user/login", {
+export function login(email: string, password: string): Promise<UserLoginResponse> {
+    return apiService.post<UserLoginResponse>("/api/user/login", {
         email,
         password,
     });
@@ -29,4 +20,18 @@ export function register<T,>(email: string, password: string, username: string):
         console.log("Error in register function: ", error);
         return Promise.reject(error);
     }
+}
+
+export function forgotPassword<T>(email: string): Promise<T> {
+    return apiService.post<T>("/api/user/generate-otp", {
+        email,
+    });
+} 
+
+export function resetPassword<T>(email: string, password: string, otp: string): Promise<T> {
+    return apiService.post<T>("/api/user/forgot-password", {
+        email,
+        password,
+        otp,
+    });
 }

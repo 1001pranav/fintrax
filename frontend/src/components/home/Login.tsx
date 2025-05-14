@@ -24,17 +24,14 @@ import {
     Paper,
     InputAdornment,
     IconButton,
-    Link
 } from "@mui/material";
 
 import InsightsIcon from '@mui/icons-material/Insights'; 
 import { login } from "@/services/userService";
 
 import  { constants, interfaces } from "@/constants";
-interface LoginProps {
-    setScreenStatus: React.Dispatch<React.SetStateAction<constants.Screen>>;
-}
-const Login: React.FC<LoginProps> = ({setScreenStatus}) => {
+
+const Login: React.FC<interfaces.LoginProps> = ({setScreenStatus}) => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [user, setUser] = useState<interfaces.LoginObject>({
@@ -90,7 +87,12 @@ const Login: React.FC<LoginProps> = ({setScreenStatus}) => {
                     fullWidth
                     margin="normal"
                     value={user.username}
-                    onChange={(e) => setUser({ ...user, username: e.target.value })}
+                    onChange={(e) => {
+                        setUser({ ...user, username: e.target.value });
+                        if (error) {
+                            setError(null);
+                        }
+                    }}
                     startAdornment={(
                         <InputAdornment position="start">
                         <EmailIcon sx={{ color: 'action.active' }} />
@@ -105,7 +107,12 @@ const Login: React.FC<LoginProps> = ({setScreenStatus}) => {
                     fullWidth
                     margin="normal"
                     value={user.password}
-                    onChange={(e) => setUser({ ...user, password: e.target.value })}
+                    onChange={(e) => {
+                        setUser({ ...user, password: e.target.value });
+                        if (error) {
+                            setError(null);
+                        }
+                    }}
                     startAdornment={(
                         <InputAdornment position="start">
                             <LockIcon sx={{ color: 'action.active' }} />
@@ -126,9 +133,11 @@ const Login: React.FC<LoginProps> = ({setScreenStatus}) => {
                     sx= {{ borderRadius: '12px' }}
                 />
                 <Box sx={ForgotPasswordContainer}>
-                    <Link href="#" variant="body2" sx={ForgotPassword}>
-                        Forgot password?
-                    </Link>
+                    <Button onClick={() => {
+                        setScreenStatus(constants.Screen.ForgotPassword)
+                    }} sx={ForgotPassword}>
+                        Forgot Password?
+                    </Button>
                 </Box>
                 <Button
                     type="submit"
@@ -145,7 +154,6 @@ const Login: React.FC<LoginProps> = ({setScreenStatus}) => {
                 <Typography variant="body2" align="center" color="text.secondary">
                     Don&apos;t have an account?{" "}
                     <Button onClick={() => {
-                    
                         setScreenStatus(constants.Screen.Register)
                     }} sx={RegisterButton}>
                         Sign Up
