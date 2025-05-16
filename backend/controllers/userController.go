@@ -83,6 +83,12 @@ func Register(c *gin.Context) {
 	var tx = database.DB.Begin()
 
 	tx.Create(&newUser)
+	var finance = models.Finance{
+		UserID:    newUser.ID,
+		Balance:   0,
+		TotalDebt: 0,
+	}
+	tx.Create(&finance)
 	token, err := helper.CreateToken(newUser.ID)
 	if err != nil {
 		helper.Response(c, http.StatusInternalServerError, "Failed to create token", nil, err)

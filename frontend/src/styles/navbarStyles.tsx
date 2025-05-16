@@ -142,7 +142,12 @@ export const navbarStyles = (theme: Theme): Styles => ({
         '&:before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0 },
     },
     userMenuPaper: {
-         '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1 },
+        '& .MuiAvatar-root': { 
+            width: 32, 
+            height: 32, 
+            ml: -0.5, 
+            mr: 1 
+        },
     },
     notificationsMenuPaper: {
          width: { xs: 300, sm: 340 }, maxHeight: 400,

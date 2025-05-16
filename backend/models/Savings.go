@@ -6,11 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type Finance struct {
+type Savings struct {
 	gorm.Model
-	ID        uint      `json:"finance_id" gorm:"primaryKey;autoIncrement:true"`
-	Balance   float64   `json:"balance"`
-	TotalDebt float64   `json:"total_debt"`
+	ID        uint      `json:"saving_id" gorm:"primaryKey;autoIncrement:true"`
+	Name      string    `json:"name"`
+	Amount    float64   `json:"amount"`
+	Rate      float64   `json:"rate"`
 	UserID    uint      `json:"user_id"`
 	User      Users     `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UpdatedAt time.Time `json:"updated_at"`

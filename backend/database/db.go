@@ -8,8 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"fintrax-backend/models"
+	// "fintrax-backend/models"
 )
 
 var DB *gorm.DB
@@ -35,16 +34,6 @@ func ConnectDatabase() {
 	}
 
 	fmt.Println("Database connected successfully!")
-
-	db.AutoMigrate(
-		&models.Todo{},
-		&models.Users{},
-		&models.Roadmap{},
-		&models.Notes{},
-		&models.Tag{},
-		&models.Resources{},
-		&models.Finance{},
-	)
 
 	DB = db
 }
