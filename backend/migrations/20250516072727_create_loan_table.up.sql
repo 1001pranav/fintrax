@@ -1,0 +1,13 @@
+CREATE TABLE loans (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    total_amount DECIMAL NOT NULL,
+    rate DECIMAL NOT NULL,
+    term INTEGER NOT NULL,
+    duration INTEGER NOT NULL,
+    premium_amount DECIMAL NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status INTEGER NOT NULL DEFAULT 1 CHECK (status >= 1 AND status <= 6)
+);
+    

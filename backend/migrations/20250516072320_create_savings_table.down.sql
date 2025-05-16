@@ -1,0 +1,1 @@
+DROP savings IF EXISTS CASCADE;

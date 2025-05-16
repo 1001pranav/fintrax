@@ -1,0 +1,1 @@
+DROP TABLE transactions IF EXISTS CASCADE;
