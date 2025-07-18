@@ -1,14 +1,15 @@
 "use client"
 
-import { 
-    ForgotPassword, 
-    ForgotPasswordContainer, 
-    LoginBox, 
-    LoginBoxContainer, 
-    LoginButton, 
-    LoginContainer, 
-    LoginTitle, 
-    RegisterButton 
+import {
+    ForgotPassword,
+    ForgotPasswordContainer,
+    LoginBox,
+    LoginBoxContainer,
+    LoginButton,
+    LoginContainer,
+    LoginTitle,
+    LoginTextField,
+    RegisterButton,
 } from "@/styles/home/login";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
@@ -81,7 +82,7 @@ const Login: React.FC<interfaces.LoginProps> = ({setScreenStatus}) => {
                     </Typography>
                 )}
                 <form onSubmit={handleLogin}>
-                <TextFieldComponent 
+                <TextFieldComponent
                     label="Email Address"
                     variant="outlined"
                     fullWidth
@@ -93,17 +94,17 @@ const Login: React.FC<interfaces.LoginProps> = ({setScreenStatus}) => {
                             setError(null);
                         }
                     }}
-                    startAdornment={(
+                    startAdornment={
                         <InputAdornment position="start">
-                        <EmailIcon sx={{ color: 'action.active' }} />
+                            <EmailIcon sx={{ color: 'action.active' }} />
                         </InputAdornment>
-                    )}
-                    inputPropsSx={{ borderRadius: '12px' }}
+                    }
+                    sx={LoginTextField}
                 />
                 <TextFieldComponent
                     label="Password"
                     variant="outlined"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     fullWidth
                     margin="normal"
                     value={user.password}
@@ -113,12 +114,12 @@ const Login: React.FC<interfaces.LoginProps> = ({setScreenStatus}) => {
                             setError(null);
                         }
                     }}
-                    startAdornment={(
+                    startAdornment={
                         <InputAdornment position="start">
                             <LockIcon sx={{ color: 'action.active' }} />
                         </InputAdornment>
-                    )}
-                    endAdornment = {(
+                    }
+                    endAdornment={
                         <InputAdornment position="end">
                             <IconButton
                                 aria-label="toggle password visibility"
@@ -129,8 +130,8 @@ const Login: React.FC<interfaces.LoginProps> = ({setScreenStatus}) => {
                                 {showPassword ? <VisibilityOff /> : <Visibility />}
                             </IconButton>
                         </InputAdornment>
-                    )}
-                    sx= {{ borderRadius: '12px' }}
+                    }
+                    sx={LoginTextField}
                 />
                 <Box sx={ForgotPasswordContainer}>
                     <Button onClick={() => {
