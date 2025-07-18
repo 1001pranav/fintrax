@@ -16,6 +16,14 @@ const (
 )
 
 const (
+	USER_STATUS_ACTIVE   = "Active"
+	USER_STATUS_INACTIVE = "Inactive"
+	USER_STATUS_BANNED   = "Banned"
+	USER_STATUS_DELETED  = "Deleted"
+	// USER_STATUS
+)
+
+const (
 	FINANCE_TYPE_INCOME  = 1
 	FINANCE_TYPE_EXPENSE = 2
 )
@@ -28,9 +36,10 @@ const (
 )
 
 const (
-	MIN_OTP_LENGTH = 1000
-	MAX_OTP_LENGTH = 9999
-	MAX_OTP_TIME   = 5 // in minutes
+	MIN_OTP_LENGTH        = 1000
+	MAX_OTP_LENGTH        = 9999
+	MAX_OTP_TIME          = 5 // in minutes
+	OTP_REGENERATION_TIME = 1 // in minutes
 )
 
 const (

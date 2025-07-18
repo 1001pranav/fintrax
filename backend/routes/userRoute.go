@@ -10,6 +10,7 @@ func UserRoute(router *gin.RouterGroup) {
 	uRoute := router.Group("/user")
 	{
 		uRoute.POST("/register", controllers.Register)
+		uRoute.POST("/verify-email", controllers.VerifyEmail)
 		uRoute.POST("/login", controllers.Login)
 		uRoute.POST("/generate-otp", controllers.GenerateOTP)
 		uRoute.POST("/forgot-password", controllers.ForgotPassword)

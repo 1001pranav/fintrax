@@ -79,6 +79,7 @@ func Register(c *gin.Context) {
 		Username: req.Username,
 		Email:    req.Email,
 		Password: hashedPassword,
+		Status:   constants.USER_STATUS_INACTIVE,
 	}
 	var tx = database.DB.Begin()
 
@@ -132,6 +133,15 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	if user.Status != constants.USER_STATUS_ACTIVE {
+
+		helper.Response(c, http.StatusForbidden, "Please verify Email first", nil, nil)
+		return
+	}
+	if req.Password == "" {
+		helper.Response(c, http.StatusForbidden, "Required Password to login", nil, nil)
+		return
+	}
 	validPassword := helper.CheckPasswordHash(req.Password, user.Password)
 	if !validPassword {
 		helper.Response(c, http.StatusUnauthorized, "Invalid credentials", nil, nil)
@@ -140,7 +150,7 @@ func Login(c *gin.Context) {
 
 	token, err := helper.CreateToken(user.ID)
 	if err != nil {
-		helper.Response(c, http.StatusInternalServerError, "Failed to create token", nil, err.Error())
+		helper.Response(c, http.StatusInternalServerError, "Failed to Login, Try again in sometime", nil, err.Error())
 		return
 	}
 
@@ -165,6 +175,18 @@ func GenerateOTP(c *gin.Context) {
 	database.DB.Where("email = ?", req.Email).First(&user)
 	if user.ID == 0 {
 		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
+		return
+	}
+	currentTime := time.Now()
+	timeDiff := currentTime.Sub(user.OTPTime)
+	if user.OTP != 0 && timeDiff > time.Duration(constants.OTP_REGENERATION_TIME)*time.Minute {
+		helper.Response(
+			c,
+			http.StatusTooManyRequests,
+			"OTP already generated, please wait before generating a new one",
+			nil,
+			nil,
+		)
 		return
 	}
 
@@ -197,6 +219,12 @@ func ForgotPassword(c *gin.Context) {
 	database.DB.Where("email = ?", req.Email).First(&user)
 	if user.ID == 0 {
 		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
+		return
+	}
+
+	if user.OTP == 0 || user.OTPTime.IsZero() ||
+		time.Now().After(user.OTPTime.Add(time.Duration(constants.MAX_OTP_TIME)*time.Minute)) {
+		helper.Response(c, http.StatusBadRequest, "OTP not generated or expired", nil, nil)
 		return
 	}
 
@@ -238,4 +266,38 @@ func ResetPassword(c *gin.Context) {
 	user.Password = hashedPassword
 	database.DB.Save(&user)
 	helper.Response(c, http.StatusOK, "Password updated successfully", nil, nil)
+}
+
+func VerifyEmail(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required"`
+		OTP   uint   `json:"OTP" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.Response(c, http.StatusBadRequest, "Invalid request", nil, err.Error())
+		return
+	}
+
+	var user models.Users
+	database.DB.Where("email = ?", req.Email).First(&user)
+	if user.ID == 0 {
+		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
+		return
+	}
+
+	if user.OTP == 0 ||
+		user.OTPTime.IsZero() ||
+		time.Now().After(user.OTPTime.Add(time.Duration(constants.MAX_OTP_TIME)*time.Minute)) {
+		helper.Response(c, http.StatusBadRequest, "OTP not generated or expired", nil, nil)
+		return
+	}
+	if user.OTP == 0 || uint(req.OTP) != user.OTP {
+		helper.Response(c, http.StatusBadRequest, "Invalid OTP", nil, nil)
+		return
+	}
+	user.Status = constants.USER_STATUS_ACTIVE
+	// user.IsVerified = true
+	database.DB.Save(&user)
+
+	helper.Response(c, http.StatusOK, "Email verified successfully", nil, nil)
 }

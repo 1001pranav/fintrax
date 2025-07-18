@@ -14,4 +14,6 @@ type Users struct {
 	Password string    `json:"password"`
 	OTP      uint      `json:"otp"`
 	OTPTime  time.Time `json:"otp_time"`
+	OTPTries int       `json:"otp_tries"` // Number of OTP tries
+	Status   string    `json:"status"`    // "active", "inactive", "banned", "notVerified"
 }

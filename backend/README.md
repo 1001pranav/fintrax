@@ -19,5 +19,7 @@ migrate -path backend/migrations
   -database "postgres://pranavrnayakn:@localhost:5432/fintrax_db?sslmode=disable" up
 ```
 
+#### Create new Migration File
+```migrate create -ext sql -dir backend/migrations```
 ## Run Backend
 `go run main.go`
