@@ -1,21 +1,17 @@
 package helper
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestHashAndCheckPassword(t *testing.T) {
-    password := "secret123"
-    hash, err := HashPassword(password)
-    if err != nil {
-        t.Fatalf("expected no error, got %v", err)
-    }
-    if len(hash) == 0 {
-        t.Fatalf("expected hash to be non-empty")
-    }
-    if !CheckPasswordHash(password, hash) {
-        t.Errorf("expected CheckPasswordHash to return true for correct password")
-    }
-    if CheckPasswordHash("wrongpassword", hash) {
-        t.Errorf("expected CheckPasswordHash to return false for incorrect password")
-    }
+	password := "secret"
+	hashed, err := HashPassword(password)
+	assert.NoError(t, err)
+	assert.NotEqual(t, password, hashed)
+	assert.True(t, CheckPasswordHash(password, hashed))
+	assert.False(t, CheckPasswordHash("wrong", hashed))
 }
 

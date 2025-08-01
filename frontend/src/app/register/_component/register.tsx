@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { LoginBackgroundEffect as BackgroundEffect } from '@/components/BackgroundEffect';
-import FormWrapper from '@/components/FormWrapper';
+import AuthWrapper from '@/components/AuthWrapper';
 import LoginHeader from '@/components/loginHeader';
 import InputField from '@/components/Fields/InputField';
 import SubmitButton from '@/components/Fields/Button';
@@ -69,11 +68,7 @@ const RegisterComponent: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-            <BackgroundEffect />
-
-            <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <FormWrapper>
+        <AuthWrapper>
                     <LoginHeader />
 
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -124,9 +119,7 @@ const RegisterComponent: React.FC = () => {
                             </p>
                         </div>
                     </form>
-                </FormWrapper>
-            </div>
-        </div>
+        </AuthWrapper>
     );
 };
 

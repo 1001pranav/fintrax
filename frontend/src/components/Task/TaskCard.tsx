@@ -3,6 +3,7 @@
 import { TASK_TAG_COLORS } from '@/constants/generalConstants';
 import { Task } from '@/constants/interfaces';
 import { useAppStore } from '@/lib/store';
+import SVGComponent from '../svg';
 
 interface TaskCardProps {
   task: Task;
@@ -78,18 +79,14 @@ export default function TaskCard({ task, isDragging }: TaskCardProps) {
       <div className="flex items-center justify-between text-xs text-white/50">
         {task.endDate && (
           <div className="flex items-center space-x-1">
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+            <SVGComponent svgType="calender" className="w-3 h-3" />
             <span>{formatDate(new Date(task.endDate))}</span>
           </div>
         )}
-        
+
         {task.subtasks && task.subtasks.length > 0 && (
           <div className="flex items-center space-x-1">
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
+            <SVGComponent svgType="task_logo" className="w-3 h-3" />
             <span>{task.subtasks.length}</span>
           </div>
         )}
