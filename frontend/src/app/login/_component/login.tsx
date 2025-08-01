@@ -1,8 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import {LoginBackgroundEffect as BackgroundEffect} from '@/components/BackgroundEffect';
-import FormWrapper  from '@/components/FormWrapper';
+import AuthWrapper from '@/components/AuthWrapper';
 import LoginHeader from '@/components/loginHeader';
 import InputField from '@/components/Fields/InputField';
 import SubmitButton from '@/components/Fields/Button';
@@ -66,13 +65,9 @@ export default function LoginComponent() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <BackgroundEffect />
-      
-      <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <FormWrapper>
+        <AuthWrapper>
           <LoginHeader />
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <InputField
@@ -103,9 +98,9 @@ export default function LoginComponent() {
                 Forgot password?
               </Link>
             </div>
-            
+
             <ErrorMessage errors={errors} />
-            
+
             <SubmitButton isLoading={isLoading} loadingText={"logging you in ...,"} submitText={`login in to ${APP_NAME}`}/>
             
             <div className="text-center">
@@ -120,8 +115,6 @@ export default function LoginComponent() {
               </p>
             </div>
           </form>
-        </FormWrapper>
-      </div>
-    </div>
+        </AuthWrapper>
     )
 }
