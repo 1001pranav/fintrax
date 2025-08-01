@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Tags, TaskFormData } from '@/constants/interfaces';
-import { SVG_VALUES } from '@/constants/svgConstant';
+import SVGComponent from '../svg';
 import { TASK_TAG_COLORS } from '@/constants/generalConstants';
 
 const priorityOptions = [
@@ -184,18 +184,14 @@ export default function TaskModal() {
                 onClick={handleDelete}
                 className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
               >
-                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={SVG_VALUES.delete} />
-                </svg>
+                <SVGComponent svgType="delete" className="w-5 h-5 text-red-400" />
               </button>
             )}
             <button
               onClick={handleClose}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <SVGComponent svgType="x" className="w-5 h-5 text-white/60" />
             </button>
           </div>
         </div>
@@ -392,9 +388,7 @@ export default function TaskModal() {
                         onClick={() => removeTag(tag.name)}
                         className="ml-2 hover:text-red-300 transition-colors"
                       >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <SVGComponent svgType="x" className="w-3 h-3" />
                       </button>
                     </span>
                   ))}

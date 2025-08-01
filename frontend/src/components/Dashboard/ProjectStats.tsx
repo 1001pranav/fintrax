@@ -1,6 +1,5 @@
 'use client';
 
-import { SVG_VALUES } from '@/constants/svgConstant';
 import { useAppStore } from '@/lib/store';
 import SVGComponent  from '../svg';
 
