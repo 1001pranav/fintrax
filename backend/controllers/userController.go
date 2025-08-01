@@ -177,9 +177,7 @@ func GenerateOTP(c *gin.Context) {
 		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
 		return
 	}
-	currentTime := time.Now()
-	timeDiff := currentTime.Sub(user.OTPTime)
-	if user.OTP != 0 && timeDiff > time.Duration(constants.OTP_REGENERATION_TIME)*time.Minute {
+	if user.OTP != 0 && time.Since(user.OTPTime) < time.Duration(constants.OTP_REGENERATION_TIME)*time.Minute {
 		helper.Response(
 			c,
 			http.StatusTooManyRequests,
@@ -196,7 +194,7 @@ func GenerateOTP(c *gin.Context) {
 	// 	helper.Response(c, http.StatusInternalServerError, "Failed to send OTP", nil, err)
 	// 	return
 	// }
-	otp := rand.Intn(constants.MAX_OTP_LENGTH-constants.MIN_OTP_LENGTH) + constants.MIN_OTP_LENGTH
+	otp := rand.Intn(constants.MAX_OTP_LENGTH-constants.MIN_OTP_LENGTH+1) + constants.MIN_OTP_LENGTH
 
 	user.OTP = uint(otp)
 	user.OTPTime = time.Now()
