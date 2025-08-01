@@ -1,6 +1,8 @@
 "use client"
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
+import ProjectModal from '@/components/Project/ProjectModelComponent';
+
 
 export default function ProjectPage() {
     // const params = useParams();
@@ -22,6 +24,8 @@ export default function ProjectPage() {
         <div className="flex h-screen bg-slate-900">
             <Sidebar />
             <MainContent />
+            <ProjectModal />
+            
         </div>
     );
 }

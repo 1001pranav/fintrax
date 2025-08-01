@@ -1,9 +1,9 @@
 'use client';
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
-import { TaskFormData } from '@/constants/interfaces';
+import { Tags, TaskFormData } from '@/constants/interfaces';
 import { SVG_VALUES } from '@/constants/svgConstant';
+import { TASK_TAG_COLORS } from '@/constants/generalConstants';
 
 const priorityOptions = [
   { value: 'low', label: 'Low', color: 'text-green-400' },
@@ -37,12 +37,34 @@ export default function TaskModal() {
     tags: [],
     notes: '',
     priority: 'medium',
-    status: 'todo'
+    status: 'todo',
+    parentTaskId: ''
   });
 
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, setTagInput] = useState<Tags>({ id: '', name: '', color: '' });
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [mainTaskInfo, setMainTaskInfo] = useState<string | null>(selectedTask?.parentTaskId || null);
   const isEditing = selectedTask?.id ? true : false;
 
+  const handleClose = useCallback(() => {
+    setTaskModalOpen(false);
+    setSelectedTask(null);
+    setFormData({
+      title: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+      tags: [],
+      notes: '',
+      priority: 'medium',
+      parentTaskId: '',
+      status: 'todo'
+    });
+    setMainTaskInfo(null);
+    setTagInput({ id: '', name: '', color: '' });
+    setShowColorPicker(false);
+  }, [setTaskModalOpen, setSelectedTask, setFormData, setTagInput]);
+  
   useEffect(() => {
     if (isTaskModalOpen && selectedTask) {
       setFormData({
@@ -53,10 +75,23 @@ export default function TaskModal() {
         tags: selectedTask.tags || [],
         notes: selectedTask.notes || '',
         priority: selectedTask.priority || 'medium',
-        status: selectedTask.status || 'todo'
+        status: selectedTask.status || 'todo',
+        parentTaskId: selectedTask.parentTaskId || ''
       });
     }
   }, [isTaskModalOpen, selectedTask]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    }
+    window.addEventListener('keydown', handleEscape);
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    }
+  }, [handleClose])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,25 +110,20 @@ export default function TaskModal() {
     } else {
       addTask(taskData);
     }
-    
+    if (mainTaskInfo && !selectedTask?.parentTaskId) {
+      const mainTask = useAppStore.getState().tasks.find(task => task.id === mainTaskInfo);
+      if (mainTask) {
+        taskData.parentTaskId = mainTaskInfo;
+      }
+    }
     handleClose();
   };
 
-  const handleClose = () => {
-    setTaskModalOpen(false);
-    setSelectedTask(null);
-    setFormData({
-      title: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-      tags: [],
-      notes: '',
-      priority: 'medium',
-      status: 'todo'
-    });
-    setTagInput('');
-  };
+  const handleMainTaskChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTaskId = e.target.value;
+    setFormData({ ...formData, parentTaskId: selectedTaskId || '' });
+    setMainTaskInfo(selectedTaskId ? selectedTaskId : null);
+  }
 
   const handleDelete = () => {
     if (selectedTask?.id && confirm('Are you sure you want to delete this task?')) {
@@ -102,20 +132,32 @@ export default function TaskModal() {
     }
   };
 
+  const handleColorSelect = (color: string) => {
+    setTagInput({ ...tagInput, color });
+    setShowColorPicker(false);
+  };
+
   const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+    if (tagInput.name.trim() && !formData.tags.some(tag => tag.name === tagInput.name.trim())) {
+      const newTag = {
+        ...tagInput,
+        name: tagInput.name.trim(),
+        color: tagInput.color || TASK_TAG_COLORS[0],
+        id: Date.now().toString()
+      };
       setFormData({
         ...formData,
-        tags: [...formData.tags, tagInput.trim()]
+        tags: [...formData.tags, newTag]
       });
-      setTagInput('');
+      setTagInput({ id: '', name: '', color: '' });
+      setShowColorPicker(false);
     }
   };
 
   const removeTag = (tagToRemove: string) => {
     setFormData({
       ...formData,
-      tags: formData.tags.filter(tag => tag !== tagToRemove)
+      tags: formData.tags.filter(tagInfo => tagInfo.name !== tagToRemove)
     });
   };
 
@@ -127,7 +169,7 @@ export default function TaskModal() {
   };
 
   if (!isTaskModalOpen) return null;
-
+  
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -213,8 +255,7 @@ export default function TaskModal() {
               </label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'todo' | 'in-progress' | 'done'
-                })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'todo' | 'in-progress' | 'done' })}
                 className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
               >
                 {statusOptions.map((option) => (
@@ -253,49 +294,113 @@ export default function TaskModal() {
             </div>
           </div>
 
+          {/* Task Dropdown Selection */}
+          <div>
+            <label className="block text-sm font-medium text-white/90 mb-2">
+              Select Main Task
+            </label>
+            <select
+              value={formData.parentTaskId}
+              onChange={(e) => handleMainTaskChange(e)}
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+            >
+              <option value="">-- Select a task --</option>
+              {useAppStore.getState().tasks
+                .filter((task) => task.projectId === selectedProject?.id)
+                .map((task) => (
+                  <option key={task.id} value={task.id} className="bg-gray-800">
+                    {task.title}
+                  </option>
+                ))}
+            </select>
+          </div>
+
           {/* Tags */}
           <div>
             <label className="block text-sm font-medium text-white/90 mb-2">
               Tags
             </label>
-            <div className="flex space-x-2 mb-2">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={handleTagKeyPress}
-                className="flex-1 px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
-                placeholder="Add a tag"
-              />
-              <button
-                type="button"
-                onClick={addTag}
-                className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-xl text-blue-300 hover:bg-blue-500/30 transition-colors"
-              >
-                Add
-              </button>
-            </div>
-            {formData.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm"
+            <div className="space-y-3">
+              {/* Tag Input Row */}
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={tagInput.name}
+                  onChange={(e) => setTagInput({ ...tagInput, name: e.target.value })}
+                  onKeyPress={handleTagKeyPress}
+                  className="flex-1 px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+                  placeholder="Add a tag"
+                />
+                
+                {/* Color Picker Button */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowColorPicker(!showColorPicker)}
+                    className="flex items-center justify-center w-12 h-10 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 transition-colors"
                   >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="ml-2 hover:text-red-300 transition-colors"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
+                    <div 
+                      className="w-6 h-6 rounded-full border-2 border-white/40"
+                      style={{ backgroundColor: tagInput.color || TASK_TAG_COLORS[0] }}
+                    />
+                  </button>
+                  
+                  {/* Color Picker Dropdown */}
+                  {showColorPicker && (
+                    <div className="absolute top-12 right-0 z-10 p-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl">
+                      <div className="grid grid-cols-4 gap-2">
+                        {TASK_TAG_COLORS.map((color, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => handleColorSelect(color)}
+                            className={`w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 ${
+                              tagInput.color === color
+                                ? "ring-2 ring-white ring-offset-2 ring-offset-transparent"
+                                : ""
+                            }`}
+                            style={{ backgroundColor: color }}
+                            title={color}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={addTag}
+                  className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-xl text-blue-300 hover:bg-blue-500/30 transition-colors"
+                >
+                  Add
+                </button>
               </div>
-            )}
+              
+              {/* Selected Tags Display */}
+              {formData.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="inline-flex items-center px-3 py-1 text-white rounded-lg text-sm"
+                      style={{ backgroundColor: tag?.color || TASK_TAG_COLORS[0] }}
+                    >
+                      {tag.name}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag.name)}
+                        className="ml-2 hover:text-red-300 transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Notes */}

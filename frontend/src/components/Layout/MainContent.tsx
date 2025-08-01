@@ -8,7 +8,7 @@ import TaskModal from '@/components/Task/TaskModel'
 ///'@/components/Task/TaskModal';
 import DashboardContent from '@/components/Dashboard/DashboardContent';
 import { Task } from '@/constants/interfaces';
-import { SVG_VALUES } from '@/constants/svgConstant';
+
 import SVGComponent from '../svg';
 
 export default function MainContent() {

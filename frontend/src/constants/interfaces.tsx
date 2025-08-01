@@ -24,13 +24,19 @@ export interface Project {
     taskCount?: number;
 }
 
+export interface Tags {
+    id: string;
+    name: string;
+    color: string;
+}
+
 export interface Task {
     id: string;
     title: string;
     description?: string;
     startDate?: Date;
     endDate?: Date;
-    tags: string[];
+    tags: Tags[];
     notes?: string;
     priority: 'low' | 'medium' | 'high';
     status: 'todo' | 'in-progress' | 'done';
@@ -45,7 +51,7 @@ export interface TaskFormData {
     description: string;
     startDate: string;
     endDate: string;
-    tags: string[];
+    tags: Tags[];
     notes: string;
     priority: 'low' | 'medium' | 'high';
     status: 'todo' | 'in-progress' | 'done';

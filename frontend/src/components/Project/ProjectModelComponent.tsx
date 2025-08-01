@@ -3,17 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
 import SVGComponent from "../svg";
+import { PROJECT_COLOR_OPTIONS } from "@/constants/generalConstants";
 
-const colorOptions = [
-    "#3B82F6",
-    "#10B981",
-    "#F59E0B",
-    "#EF4444",
-    "#8B5CF6",
-    "#06B6D4",
-    "#84CC16",
-    "#F97316",
-];
 
 export default function ProjectModal() {
     const {
@@ -28,7 +19,7 @@ export default function ProjectModal() {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        color: colorOptions[0],
+        color: PROJECT_COLOR_OPTIONS[0],
     });
 
     const isEditing = !!selectedProject;
@@ -44,7 +35,7 @@ export default function ProjectModal() {
             setFormData({
                 name: "",
                 description: "",
-                color: colorOptions[0],
+                color: PROJECT_COLOR_OPTIONS[0],
             });
         }
     }, [isProjectModalOpen, selectedProject]);
@@ -64,7 +55,7 @@ export default function ProjectModal() {
     const handleClose = () => {
         setProjectModalOpen(false);
         setSelectedProject(null);
-        setFormData({ name: "", description: "", color: colorOptions[0] });
+        setFormData({ name: "", description: "", color: PROJECT_COLOR_OPTIONS[0] });
     };
 
     if (!isProjectModalOpen) return null;
@@ -84,19 +75,6 @@ export default function ProjectModal() {
                             svgType={"x"}
                             className="w-5 h-5 text-white/60"
                         />
-                        {/* <svg
-                            className="w-5 h-5 text-white/60"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg> */}
                     </button>
                 </div>
 
@@ -137,7 +115,7 @@ export default function ProjectModal() {
                             Color
                         </label>
                         <div className="flex space-x-2">
-                            {colorOptions.map((color) => (
+                            {PROJECT_COLOR_OPTIONS.map((color) => (
                                 <button
                                     key={color}
                                     type="button"
@@ -149,6 +127,18 @@ export default function ProjectModal() {
                                     style={{ backgroundColor: color }}
                                 />
                             ))}
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-white/90 mb-2">
+                            Project Template
+                        </label>
+                        <div className="flex items-center space-x-3">
+                            <SVGComponent
+                                svgType={"task_logo"}
+                                className="w-8 h-8 text-white"
+                            />
+                            <span className="text-white/70">Task Icon</span>
                         </div>
                     </div>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { APP_NAME } from '@/constants/generalConstants';
 import { useAppStore } from '@/lib/store';
 
 export default function WelcomeHero() {
@@ -18,7 +19,7 @@ export default function WelcomeHero() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
-              Welcome to TaskFlow 👋
+              Welcome to {APP_NAME} 👋
             </h1>
             <p className="text-white/80 text-lg mb-4">
               Manage your projects and tasks with ease

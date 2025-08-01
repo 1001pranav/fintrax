@@ -62,17 +62,34 @@ export const useAppStore = create<AppState>((set, get) => ({
             description: 'Create wireframes and mockups for the new homepage',
             startDate: new Date(),
             endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            tags: ['design', 'frontend'],
+            tags:[{
+                id: '1',
+                name: 'design',
+                color: '#F59E0B'
+            }, {
+                id: '2',
+                name: 'frontend',
+                color: '#3B82F6'
+            }
+            ],
             priority: 'high',
             status: 'in-progress',
             projectId: '1',
-            createdDate: new Date()
+            createdDate: new Date(),
         },
         {
             id: '2',
             title: 'Implement Authentication',
             description: 'Set up user login and registration system',
-            tags: ['backend', 'security'],
+            tags: [{
+                id: '1',
+                name: 'backend',
+                color: '#F59E0B'
+            }, {
+                id: '2',
+                name: 'security',
+                color: '#EF4444'
+            }],
             priority: 'high',
             status: 'todo',
             projectId: '1', 
@@ -82,7 +99,15 @@ export const useAppStore = create<AppState>((set, get) => ({
             id: '3',
             title: 'Create Social Media Content',
             description: 'Develop content calendar for social platforms',
-            tags: ['content', 'social'],
+            tags: [{
+                id: '3',
+                name: 'marketing',
+                color: '#8B5CF6'
+            }, {
+                id: '4',
+                name: 'content',
+                color: '#06B6D4'
+            }],
             priority: 'medium',
             status: 'done',
             projectId: '2',

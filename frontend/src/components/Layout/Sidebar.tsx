@@ -54,8 +54,6 @@ export default function Sidebar() {
           
         ))}
       </div>
-
-      <ProjectModal />
     </div>
   );
 }

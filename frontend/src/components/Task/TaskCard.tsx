@@ -1,5 +1,6 @@
 'use client';
 
+import { TASK_TAG_COLORS } from '@/constants/generalConstants';
 import { Task } from '@/constants/interfaces';
 import { useAppStore } from '@/lib/store';
 
@@ -58,10 +59,11 @@ export default function TaskCard({ task, isDragging }: TaskCardProps) {
         <div className="flex flex-wrap gap-1 mb-3">
           {task.tags.slice(0, 3).map((tag) => (
             <span
-              key={tag}
-              className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-xs"
+              key={tag.name}
+              className="px-2 py-1 text-white rounded-lg text-xs"
+              style={{ backgroundColor: tag.color || TASK_TAG_COLORS[0] }} // Default to blue if no color
             >
-              {tag}
+              {tag.name}
             </span>
           ))}
           {task.tags.length > 3 && (
