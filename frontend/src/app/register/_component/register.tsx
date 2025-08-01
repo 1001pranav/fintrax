@@ -8,6 +8,7 @@ import InputField from '@/components/Fields/InputField';
 import SubmitButton from '@/components/Fields/Button';
 import ErrorMessage from '@/components/Message/ErrorMessage';
 import { RegisterState } from '@/constants/interfaces';
+import { api } from '@/lib/api';
 
 const RegisterComponent: React.FC = () => {
     const [formData, setFormData] = useState<RegisterState>({
@@ -49,15 +50,12 @@ const RegisterComponent: React.FC = () => {
         setIsLoading(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 200));
-
-            // Handle successful login here
-            console.log('Login successful:', formData);
-
-        } catch (_error) {
-            console.error('Login failed:', _error);
-            setErrors(['Login failed. Please check your credentials and try again.']);
+            const data = await api.register(formData);
+            console.log('Registration successful:', data);
+        } catch (_error: unknown) {
+            console.error('Registration failed:', _error);
+            const message = _error instanceof Error ? _error.message : 'Registration failed. Please check your credentials and try again.';
+            setErrors([message]);
         } finally {
             setIsLoading(false);
         }
