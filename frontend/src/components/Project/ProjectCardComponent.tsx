@@ -1,7 +1,6 @@
 "use client"
 
 import { Project } from '@/constants/interfaces';
-import { SVG_VALUES } from '@/constants/svgConstant';
 import { useAppStore } from '@/lib/store';
 import { useEffect, useState } from 'react';
 import SVGComponent from '../svg';
@@ -71,9 +70,6 @@ export default function ProjectCard({ project, isSelected, onClick }: ProjectCar
               svgType={"delete"}
               className="w-4 h-4 text-red-400"
             />
-            {/* <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={SVG_VALUES.delete} />
-            </svg> */}
           </button>
         </div>
       </div>

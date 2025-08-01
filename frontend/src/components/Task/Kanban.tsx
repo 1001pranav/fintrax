@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import TaskCard from '@/components/Task/TaskCard';
 import { Task } from '@/constants/interfaces';
-import { SVG_VALUES } from '@/constants/svgConstant';
 import SVGComponent from '../svg';
 
 const columns = [
@@ -22,13 +21,10 @@ export default function KanbanBoard() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            {/* <svg className="w-8 h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={SVG_VALUES.kanban_logo} />
-            </svg> */}
             <SVGComponent
               svgType={"kanban_logo"}
               className="w-8 h-8 text-white/40"
-            /> 
+            />
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">Select a Project</h3>
           <p className="text-white/60">Choose a project from the sidebar to view tasks</p>
@@ -115,9 +111,7 @@ export default function KanbanBoard() {
                   onClick={() => handleAddTask(column.id as Task['status'])}
                   className="p-1 hover:bg-white/10 rounded-lg transition-colors"
                 >
-                  <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+                  <SVGComponent svgType="plus" className="w-4 h-4 text-white/60" />
                 </button>
               </div>
 
@@ -139,9 +133,7 @@ export default function KanbanBoard() {
                 
                 {tasks.length === 0 && (
                   <div className="text-center py-8 text-white/40">
-                    <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
+                    <SVGComponent svgType="task_logo" className="w-12 h-12 mx-auto mb-3" />
                     <p className="text-sm">No tasks yet</p>
                     <button
                       onClick={() => handleAddTask(column.id as Task['status'])}
