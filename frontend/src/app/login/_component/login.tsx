@@ -8,6 +8,7 @@ import InputField from '@/components/Fields/InputField';
 import SubmitButton from '@/components/Fields/Button';
 import ErrorMessage from '@/components/Message/ErrorMessage';
 import { APP_NAME } from '@/constants/generalConstants';
+import { api } from '@/lib/api';
 
 export default function LoginComponent() {
     const [formData, setFormData] = useState({
@@ -47,14 +48,11 @@ export default function LoginComponent() {
             setIsLoading(true)
         
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 200))
-            
-            // Handle successful login here
-            console.log('Login successful:', formData)
-        
-        } catch (error) {
-            setErrors(['Login failed. Please check your credentials and try again.'])
+            const data = await api.login(formData)
+            console.log('Login successful:', data)
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Login failed. Please check your credentials and try again.'
+            setErrors([message])
         } finally {
             setIsLoading(false)
         }

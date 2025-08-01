@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LoginBackgroundEffect as BackgroundEffect } from "@/components/BackgroundEffect";
 import { ResetPasswordFormData } from "@/app/reset-password/constant/instances";
 import FormWrapper from "@/components/FormWrapper";
@@ -10,6 +11,7 @@ import SubmitButton from "@/components/Fields/Button";
 import ErrorMessage from "@/components/Message/ErrorMessage";
 import { OTP_LENGTH } from "@/constants/generalConstants";
 import OTPField from "@/components/Fields/otpField";
+import { api } from "@/lib/api";
 
 export default function ResetComponent() {
   const [formData, setFormData] = useState<ResetPasswordFormData>({
@@ -25,6 +27,7 @@ export default function ResetComponent() {
   const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [otpComplete, setOtpComplete] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const router = useRouter();
 
   const validateOtp = () => {
     const newErrors: string[] = [];
@@ -95,7 +98,7 @@ export default function ResetComponent() {
       } else {
         setErrors(["Invalid OTP. Please try again."]);
       }
-    } catch (error) {
+    } catch (_error) {
       setErrors(["OTP verification failed. Please try again."]);
     } finally {
       setIsVerifyingOtp(false);
@@ -107,8 +110,11 @@ export default function ResetComponent() {
     setErrors([]);
 
     try {
-      // Simulate API call for resending OTP
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const email = typeof window !== 'undefined' ? localStorage.getItem('resetEmail') : null;
+      if (!email) {
+        throw new Error('Missing email. Please request a new OTP.');
+      }
+      await api.generateOtp(email);
 
       // Reset OTP state
       setFormData((prev) => ({ ...prev, otp: "" }));
@@ -128,8 +134,9 @@ export default function ResetComponent() {
       }, 1000);
 
       console.log("OTP resent successfully");
-    } catch (error) {
-      setErrors(["Failed to resend OTP. Please try again."]);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to resend OTP. Please try again.";
+      setErrors([message]);
     } finally {
       setIsResendingOtp(false);
     }
@@ -147,29 +154,6 @@ export default function ResetComponent() {
     return newErrors;
   };
   
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const validationErrors = validateForm();
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-    setErrors([]);
-    setIsLoading(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      // Handle successful login here
-      console.log("reset password successful:", formData);
-    } catch (error) {
-      setErrors(["Login failed. Please check your credentials and try again."]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear errors when user starts typing
@@ -195,18 +179,15 @@ export default function ResetComponent() {
     setIsLoading(true);
 
     try {
-      // Simulate API call for password reset
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Handle successful password reset here
-      console.log("Password reset successful:", {
-        otp: formData.otp,
-        password: formData.password,
-      });
-
-      // You might want to redirect to login page or show success message
-    } catch (error) {
-      setErrors(["Password reset failed. Please try again."]);
+      const email = typeof window !== 'undefined' ? localStorage.getItem('resetEmail') : null;
+      if (!email) {
+        throw new Error('Missing email. Please request a new OTP.');
+      }
+      await api.resetPassword({ email, password: formData.password, otp: formData.otp });
+      router.push('/login');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Password reset failed. Please try again.';
+      setErrors([message]);
     } finally {
       setIsLoading(false);
     }

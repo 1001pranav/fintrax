@@ -2,21 +2,24 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {LoginBackgroundEffect } from '@/components/BackgroundEffect';
 import FormWrapper  from '@/components/FormWrapper';
 import LoginHeader from '@/components/loginHeader';
 import InputField from '@/components/Fields/InputField';
 import SubmitButton from '@/components/Fields/Button';
 import ErrorMessage from '@/components/Message/ErrorMessage';
+import { api } from '@/lib/api';
 
 export default function ForgetPasswordComponent() {
     const [formData, setFormData] = useState({
         email: '',
         // rememberMe: false
     });
-    
+
     const [errors, setErrors] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
     const validateForm = () => {
         const newErrors: string[] = []
         
@@ -41,14 +44,14 @@ export default function ForgetPasswordComponent() {
             setIsLoading(true)
         
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 200))
-            
-            // Handle successful login here
-            console.log('Login successful:', formData)
-        
-        } catch (error) {
-            setErrors(['Login failed. Please check your credentials and try again.'])
+            await api.generateOtp(formData.email)
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('resetEmail', formData.email)
+            }
+            router.push('/reset-password')
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Failed to send OTP. Please try again.'
+            setErrors([message])
         } finally {
             setIsLoading(false)
         }
