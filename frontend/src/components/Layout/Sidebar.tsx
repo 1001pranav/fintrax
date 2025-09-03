@@ -1,9 +1,9 @@
 'use client';
 
 import { useAppStore } from '@/lib/store';
-import ProjectCard from '@/components/Project/ProjectCardComponent';
-import ProjectModal from '@/components/Project/ProjectModelComponent';
+import ProjectCard from '@/components/Project/ProjectCardComponent';3
 import SVGComponent from '../svg';
+import { APP_NAME } from '@/constants/generalConstants';
 
 export default function Sidebar() {
   const { projects, selectedProject, setSelectedProject, setProjectModalOpen } = useAppStore();
@@ -17,8 +17,8 @@ export default function Sidebar() {
             <SVGComponent className='w-6 h-6 text-white' svgType={"task_logo"} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">TaskFlow</h1>
-            <p className="text-white/60 text-sm">Project Management</p>
+            <h1 className="text-xl font-bold text-white">{APP_NAME.toUpperCase()}</h1>
+            <p className="text-white/60 text-sm">Project, Finance, Goal Managements</p>
           </div>
         </div>
 

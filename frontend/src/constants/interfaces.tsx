@@ -1,5 +1,7 @@
 "use client"
 
+import React from 'react';
+
 export interface RegisterState {
     username: string;
     email: string;
@@ -22,6 +24,7 @@ export interface Project {
     createdDate: Date;
     coverImage?: string;
     taskCount?: number;
+    status?: string; // Optional status field
 }
 
 export interface Tags {
@@ -56,4 +59,11 @@ export interface TaskFormData {
     priority: 'low' | 'medium' | 'high';
     status: 'todo' | 'in-progress' | 'done';
     parentTaskId?: string;
+}
+
+export interface SettingsDropdownProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSaveAsTemplate: () => void;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }

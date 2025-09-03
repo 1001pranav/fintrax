@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
 import SVGComponent from "../svg";
-import { PROJECT_COLOR_OPTIONS } from "@/constants/generalConstants";
+import { PROJECT_COLOR_OPTIONS, PROJECT_STATUS_OPTIONS } from "@/constants/generalConstants";
+import { stat } from "fs";
 
 
 export default function ProjectModal() {
@@ -20,6 +21,7 @@ export default function ProjectModal() {
         name: "",
         description: "",
         color: PROJECT_COLOR_OPTIONS[0],
+        status: PROJECT_STATUS_OPTIONS[0],
     });
 
     const isEditing = !!selectedProject;
@@ -30,12 +32,14 @@ export default function ProjectModal() {
                 name: selectedProject.name,
                 description: selectedProject.description,
                 color: selectedProject.color,
+                status: selectedProject.status || PROJECT_STATUS_OPTIONS[0],
             });
         } else if (isProjectModalOpen) {
             setFormData({
                 name: "",
                 description: "",
                 color: PROJECT_COLOR_OPTIONS[0],
+                status: PROJECT_STATUS_OPTIONS[0],
             });
         }
     }, [isProjectModalOpen, selectedProject]);
@@ -55,7 +59,12 @@ export default function ProjectModal() {
     const handleClose = () => {
         setProjectModalOpen(false);
         setSelectedProject(null);
-        setFormData({ name: "", description: "", color: PROJECT_COLOR_OPTIONS[0] });
+        setFormData({ 
+            name: "", 
+            description: "", 
+            color: PROJECT_COLOR_OPTIONS[0], 
+            status: PROJECT_STATUS_OPTIONS[0] 
+        });
     };
 
     if (!isProjectModalOpen) return null;
@@ -141,7 +150,24 @@ export default function ProjectModal() {
                             <span className="text-white/70">Task Icon</span>
                         </div>
                     </div>
-
+                    <div>
+                        <label className="block text-sm font-medium text-white/90 mb-2">
+                            Status
+                        </label>
+                        <select
+                            value={formData.status || PROJECT_STATUS_OPTIONS[0]}
+                            onChange={(e) =>
+                                setFormData({ ...formData, status: e.target.value })
+                            }
+                            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+                        >
+                            {PROJECT_STATUS_OPTIONS.map((status, index) => (
+                                <option key={index} value={status} className="text-black">
+                                    {status}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <div className="flex space-x-3 pt-4">
                         <button
                             type="button"

@@ -25,3 +25,11 @@ export const TASK_TAG_COLORS: string[] = [
   "#9CA3AF", // Gray-400
   "#475569"  // Slate-600
 ];
+
+export const PROJECT_STATUS_OPTIONS: string[] = [
+  "Not Started",
+  "In Progress",
+  "Completed",
+  "On Hold",
+  "Cancelled"
+];
