@@ -19,12 +19,12 @@ func GetDashboard(c *gin.Context) {
 
 	var finance models.Finance
 	var todos []models.Todo
-	var roadmap []models.Roadmap
+	var roadmap []models.Todo
 
 	db := database.DB
 	db.Where("user_id = ?", userID).First(&finance)
 	db.Where("user_id = ? AND is_roadmap = ?", userID, false).Find(&todos)
-	db.Where("user_id = ? AND is_roadmap = ? AND is_active = ?", userID, true, true).Find(&roadmap)
+	db.Where("user_id = ? AND is_roadmap = ? AND status <= ?", userID, true, 2).Find(&roadmap)
 
 	dashboard := gin.H{
 		"total_balance":   finance.Balance,
