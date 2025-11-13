@@ -246,3 +246,28 @@ func DeleteTransaction(c *gin.Context) {
 
 	helper.Response(c, http.StatusOK, "Transaction deleted successfully", nil, nil)
 }
+
+// GetTransactionSummary provides aggregated transaction data by type and category
+func GetTransactionSummary(c *gin.Context) {
+	userID, isExists := c.Get("user_id")
+	if !isExists {
+		helper.Response(c, http.StatusUnauthorized, "Unauthorized", nil, nil)
+		return
+	}
+
+	// Get summary by type and category
+	var summary []struct {
+		Type     uint    `json:"type"`
+		Category string  `json:"category"`
+		Total    float64 `json:"total"`
+		Count    int64   `json:"count"`
+	}
+
+	database.DB.Model(&models.Transactions{}).
+		Select("type, category, SUM(amount) as total, COUNT(*) as count").
+		Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).
+		Group("type, category").
+		Scan(&summary)
+
+	helper.Response(c, http.StatusOK, "Transaction summary fetched successfully", summary, nil)
+}

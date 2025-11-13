@@ -32,6 +32,10 @@ type Todo struct {
 	RoadmapID *uint   `json:"roadmap_id" gorm:"default:NULL;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Roadmap   Roadmap `gorm:"foreignKey:RoadmapID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 
+	// Project relationship
+	ProjectID *uint   `json:"project_id" gorm:"default:NULL;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Project   Project `gorm:"foreignKey:ProjectID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+
 	// Resources relationship
 	Resources []Resources `json:"resources" gorm:"foreignKey:TodoID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 

@@ -31,15 +31,13 @@ func GetFinance(c *gin.Context) {
 	}
 
 	var finance models.Finance
-	result := database.DB.Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).First(&finance)
-
-	if result.Error != nil {
+	if err := database.DB.Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).First(&finance).Error; err != nil {
 		// If no finance record exists, create one with default values
 		finance = models.Finance{
-			UserID:    uint(userID.(int)),
 			Balance:   0,
 			TotalDebt: 0,
-			Status:    constants.STATUS_NOT_STARTED,
+			UserID:    uint(userID.(int)),
+			Status:    1,
 		}
 		database.DB.Create(&finance)
 	}
@@ -50,7 +48,6 @@ func GetFinance(c *gin.Context) {
 		TotalDebt: finance.TotalDebt,
 		UserID:    finance.UserID,
 	}
-
 	helper.Response(c, http.StatusOK, "Finance data fetched successfully", response, nil)
 }
 
@@ -69,19 +66,16 @@ func UpdateFinance(c *gin.Context) {
 	}
 
 	var finance models.Finance
-	result := database.DB.Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).First(&finance)
-
-	if result.Error != nil {
-		// Create new finance record if it doesn't exist
+	if err := database.DB.Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).First(&finance).Error; err != nil {
+		// If no finance record exists, create one
 		finance = models.Finance{
-			UserID:    uint(userID.(int)),
 			Balance:   req.Balance,
 			TotalDebt: req.TotalDebt,
-			Status:    constants.STATUS_NOT_STARTED,
+			UserID:    uint(userID.(int)),
+			Status:    1,
 		}
 		database.DB.Create(&finance)
 	} else {
-		// Update existing record
 		finance.Balance = req.Balance
 		finance.TotalDebt = req.TotalDebt
 		database.DB.Save(&finance)
@@ -93,6 +87,43 @@ func UpdateFinance(c *gin.Context) {
 		TotalDebt: finance.TotalDebt,
 		UserID:    finance.UserID,
 	}
+	helper.Response(c, http.StatusOK, "Finance updated successfully", response, nil)
+}
 
-	helper.Response(c, http.StatusOK, "Finance data updated successfully", response, nil)
+// GetFinanceSummary retrieves comprehensive financial summary for the authenticated user
+func GetFinanceSummary(c *gin.Context) {
+	userID, isExists := c.Get("user_id")
+	if !isExists {
+		helper.Response(c, http.StatusUnauthorized, "Unauthorized", nil, nil)
+		return
+	}
+
+	var finance models.Finance
+	database.DB.Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).First(&finance)
+
+	// Calculate total savings
+	var totalSavings float64
+	database.DB.Model(&models.Savings{}).Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).Select("COALESCE(SUM(amount), 0)").Scan(&totalSavings)
+
+	// Calculate total loans
+	var totalLoans float64
+	database.DB.Model(&models.Loans{}).Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).Select("COALESCE(SUM(total_amount), 0)").Scan(&totalLoans)
+
+	// Calculate income and expenses from transactions
+	var totalIncome float64
+	var totalExpense float64
+	database.DB.Model(&models.Transactions{}).Where("user_id = ? AND type = ? AND status != ?", userID, 1, constants.STATUS_DELETED).Select("COALESCE(SUM(amount), 0)").Scan(&totalIncome)
+	database.DB.Model(&models.Transactions{}).Where("user_id = ? AND type = ? AND status != ?", userID, 2, constants.STATUS_DELETED).Select("COALESCE(SUM(amount), 0)").Scan(&totalExpense)
+
+	summary := gin.H{
+		"balance":       finance.Balance,
+		"total_debt":    finance.TotalDebt,
+		"total_savings": totalSavings,
+		"total_loans":   totalLoans,
+		"total_income":  totalIncome,
+		"total_expense": totalExpense,
+		"net_worth":     finance.Balance + totalSavings - finance.TotalDebt - totalLoans,
+	}
+
+	helper.Response(c, http.StatusOK, "Finance summary fetched successfully", summary, nil)
 }

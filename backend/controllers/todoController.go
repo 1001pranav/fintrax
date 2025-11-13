@@ -21,6 +21,8 @@ type todoRequest struct {
 	EndDate     time.Time `json:"end_date"`
 	Status      uint      `json:"status" binding:"gte=1,lte=6" default:"1"`
 	ParentID    *uint     `json:"parent_id" default:"0"`
+	ProjectID   *uint     `json:"project_id"`
+	RoadmapID   *uint     `json:"roadmap_id"`
 }
 type todoResponse struct {
 	Title       string    `json:"title" binding:"required"`
@@ -32,6 +34,8 @@ type todoResponse struct {
 	EndDate     time.Time `json:"end_date"`
 	Status      uint      `json:"status" binding:"gte=1,lte=6" default:"1"`
 	ParentID    *uint     `json:"parent_id" default:"0"`
+	ProjectID   *uint     `json:"project_id"`
+	RoadmapID   *uint     `json:"roadmap_id"`
 	ID          uint      `json:"task_id"`
 }
 
@@ -58,6 +62,8 @@ func CreateToDo(c *gin.Context) {
 		EndDate:     req.EndDate,
 		Status:      req.Status,
 		ParentID:    req.ParentID,
+		ProjectID:   req.ProjectID,
+		RoadmapID:   req.RoadmapID,
 		UserID:      uint(userID.(int)),
 	}
 	var tx = database.DB.Begin()
@@ -75,6 +81,8 @@ func CreateToDo(c *gin.Context) {
 		EndDate:     todo.EndDate,
 		Status:      todo.Status,
 		ParentID:    todo.ParentID,
+		ProjectID:   todo.ProjectID,
+		RoadmapID:   todo.RoadmapID,
 		ID:          todo.ID,
 	}
 	helper.Response(c, http.StatusCreated, "Todo created successfully", response, nil)
@@ -82,7 +90,20 @@ func CreateToDo(c *gin.Context) {
 
 func GetAllToDos(c *gin.Context) {
 	var todos []models.Todo
-	database.DB.Where("status != ?", constants.STATUS_DELETED).Find(&todos)
+	query := database.DB.Where("status != ?", constants.STATUS_DELETED)
+
+	// Support filtering by project_id
+	if projectID := c.Query("project_id"); projectID != "" {
+		query = query.Where("project_id = ?", projectID)
+	}
+
+	// Support filtering by roadmap_id
+	if roadmapID := c.Query("roadmap_id"); roadmapID != "" {
+		query = query.Where("roadmap_id = ?", roadmapID)
+	}
+
+	query.Find(&todos)
+
 	response := make([]todoResponse, len(todos))
 	for i, todo := range todos {
 		response[i] = todoResponse{
@@ -95,6 +116,8 @@ func GetAllToDos(c *gin.Context) {
 			EndDate:     todo.EndDate,
 			Status:      todo.Status,
 			ParentID:    todo.ParentID,
+			ProjectID:   todo.ProjectID,
+			RoadmapID:   todo.RoadmapID,
 			ID:          todo.ID,
 		}
 	}
@@ -115,6 +138,8 @@ func GetToDo(c *gin.Context) {
 		EndDate:     todo.EndDate,
 		Status:      todo.Status,
 		ParentID:    todo.ParentID,
+		ProjectID:   todo.ProjectID,
+		RoadmapID:   todo.RoadmapID,
 		ID:          todo.ID,
 	}
 	helper.Response(c, http.StatusOK, "Todo fetched successfully", response, nil)
@@ -162,6 +187,12 @@ func UpdateToDo(c *gin.Context) {
 	if req.ParentID != todo.ParentID {
 		todo.ParentID = req.ParentID
 	}
+	if req.ProjectID != todo.ProjectID {
+		todo.ProjectID = req.ProjectID
+	}
+	if req.RoadmapID != todo.RoadmapID {
+		todo.RoadmapID = req.RoadmapID
+	}
 	database.DB.Save(&todo)
 	response := todoResponse{
 		ID:          todo.ID,
@@ -174,6 +205,8 @@ func UpdateToDo(c *gin.Context) {
 		EndDate:     todo.EndDate,
 		Status:      todo.Status,
 		ParentID:    todo.ParentID,
+		ProjectID:   todo.ProjectID,
+		RoadmapID:   todo.RoadmapID,
 	}
 	helper.Response(c, http.StatusOK, "Todo updated successfully", response, nil)
 }

@@ -54,7 +54,15 @@ func main() {
 	routes.UserRoute(r.Group("/api"))
 	routes.TodoRoute(r.Group("/api"))
 	routes.DashboardRoutes(r.Group("/api"))
+	routes.ProjectRoute(r.Group("/api"))
 	routes.FinanceRoute(r.Group("/api"))
+	routes.TransactionRoute(r.Group("/api"))
+	routes.SavingsRoute(r.Group("/api"))
+	routes.LoansRoute(r.Group("/api"))
+	routes.RoadmapRoute(r.Group("/api"))
+	routes.TagRoute(r.Group("/api"))
+	routes.ResourceRoute(r.Group("/api"))
+	routes.NoteRoute(r.Group("/api"))
 
 	// Run server
 	r.Run(constants.APP_PORT)
