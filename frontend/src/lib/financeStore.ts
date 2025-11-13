@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { api, FinanceSummary, Transaction, Savings, Loan } from './api';
 
 interface FinancialItem {
     name: string;
@@ -8,6 +9,8 @@ interface FinancialItem {
 
 interface SavingsGoal extends FinancialItem {
     target: number;
+    rate?: number;
+    id?: number;
 }
 
 interface FinancialData {
@@ -38,16 +41,29 @@ interface FinanceStore {
     timeFilter: 'monthly' | 'quarterly' | 'yearly';
     selectedMonth: number;
     selectedYear: number;
-    
+
     // Financial Data
     financialData: FinancialData;
-    
+    balance: number;
+    netWorth: number;
+
+    // Loading & Error States
+    isLoading: boolean;
+    error: string | null;
+
     // Actions
     setTimeFilter: (filter: 'monthly' | 'quarterly' | 'yearly') => void;
     setSelectedMonth: (month: number) => void;
     setSelectedYear: (year: number) => void;
     updateFinancialData: (data: Partial<FinancialData>) => void;
-    
+
+    // API Actions
+    fetchFinanceSummary: () => Promise<void>;
+    fetchTransactions: () => Promise<void>;
+    fetchSavings: () => Promise<void>;
+    fetchLoans: () => Promise<void>;
+    updateBalance: (balance: number, totalDebt: number) => Promise<void>;
+
     // Computed
     getNetWorth: () => number;
 }
@@ -57,54 +73,34 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
     timeFilter: 'monthly',
     selectedMonth: new Date().getMonth(),
     selectedYear: new Date().getFullYear(),
-    
+    balance: 0,
+    netWorth: 0,
+    isLoading: false,
+    error: null,
+
     financialData: {
         income: {
-        total: 8500,
-        growth: 12.5,
-        sources: [
-            { name: 'Salary', amount: 6500, category: 'primary' },
-            { name: 'Freelance', amount: 1200, category: 'secondary' },
-            { name: 'Investments', amount: 500, category: 'passive' },
-            { name: 'Side Business', amount: 300, category: 'business' },
-            { name: 'Rental Income', amount: 200, category: 'passive' }
-        ]
+            total: 0,
+            growth: 0,
+            sources: []
         },
         expenses: {
-        total: 5200,
-        growth: -3.2,
-        items: [
-            { name: 'Rent', amount: 1800, category: 'housing' },
-            { name: 'Groceries', amount: 600, category: 'food' },
-            { name: 'Transportation', amount: 400, category: 'transport' },
-            { name: 'Utilities', amount: 350, category: 'utilities' },
-            { name: 'Entertainment', amount: 300, category: 'lifestyle' }
-        ]
+            total: 0,
+            growth: 0,
+            items: []
         },
         savings: {
-        total: 12500,
-        growth: 18.7,
-        goals: [
-            { name: 'Emergency Fund', amount: 5000, target: 10000, category: 'emergency' },
-            { name: 'Vacation Fund', amount: 2500, target: 5000, category: 'travel' },
-            { name: 'New Car', amount: 3000, target: 15000, category: 'purchase' },
-            { name: 'Investment Portfolio', amount: 1500, target: 20000, category: 'investment' },
-            { name: 'Home Deposit', amount: 500, target: 50000, category: 'property' }
-        ]
+            total: 0,
+            growth: 0,
+            goals: []
         },
         debts: {
-        total: 3200,
-        growth: -15.4,
-        items: [
-            { name: 'Credit Card', amount: 1200, category: 'credit' },
-            { name: 'Student Loan', amount: 1500, category: 'education' },
-            { name: 'Personal Loan', amount: 500, category: 'personal' },
-            { name: 'Medical Bills', amount: 0, category: 'medical' },
-            { name: 'Auto Loan', amount: 0, category: 'auto' }
-        ]
+            total: 0,
+            growth: 0,
+            items: []
         }
     },
-    
+
     // Actions
     setTimeFilter: (filter) => set({ timeFilter: filter }),
     setSelectedMonth: (month) => set({ selectedMonth: month }),
@@ -112,10 +108,182 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
     updateFinancialData: (data) => set((state) => ({
         financialData: { ...state.financialData, ...data }
     })),
-    
+
+    // Fetch comprehensive finance summary from backend
+    fetchFinanceSummary: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await api.finance.getSummary();
+            const summary: FinanceSummary = response.data;
+
+            set({
+                balance: summary.balance,
+                netWorth: summary.net_worth,
+                financialData: {
+                    income: {
+                        total: summary.total_income,
+                        growth: 0, // Calculate growth separately if needed
+                        sources: [] // Populate from transactions if needed
+                    },
+                    expenses: {
+                        total: summary.total_expense,
+                        growth: 0,
+                        items: []
+                    },
+                    savings: {
+                        total: summary.total_savings,
+                        growth: 0,
+                        goals: []
+                    },
+                    debts: {
+                        total: summary.total_debt + summary.total_loans,
+                        growth: 0,
+                        items: []
+                    }
+                },
+                isLoading: false
+            });
+
+            // Fetch detailed data
+            await Promise.all([
+                get().fetchTransactions(),
+                get().fetchSavings(),
+                get().fetchLoans()
+            ]);
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to fetch finance summary',
+                isLoading: false
+            });
+        }
+    },
+
+    // Fetch transactions and categorize as income/expenses
+    fetchTransactions: async () => {
+        try {
+            const response = await api.transactions.getAll();
+            const transactions: Transaction[] = response.data;
+
+            const incomeSources: FinancialItem[] = [];
+            const expenseItems: FinancialItem[] = [];
+
+            transactions.forEach(transaction => {
+                const item: FinancialItem = {
+                    name: transaction.source,
+                    amount: transaction.amount,
+                    category: transaction.category || 'other'
+                };
+
+                if (transaction.type === 1) { // Income
+                    incomeSources.push(item);
+                } else if (transaction.type === 2) { // Expense
+                    expenseItems.push(item);
+                }
+            });
+
+            set((state) => ({
+                financialData: {
+                    ...state.financialData,
+                    income: {
+                        ...state.financialData.income,
+                        sources: incomeSources
+                    },
+                    expenses: {
+                        ...state.financialData.expenses,
+                        items: expenseItems
+                    }
+                }
+            }));
+        } catch (error) {
+            console.error('Failed to fetch transactions:', error);
+        }
+    },
+
+    // Fetch savings goals
+    fetchSavings: async () => {
+        try {
+            const response = await api.savings.getAll();
+            const savingsList: Savings[] = response.data;
+
+            const savingsGoals: SavingsGoal[] = savingsList.map(saving => ({
+                id: saving.saving_id,
+                name: saving.name,
+                amount: saving.amount,
+                target: saving.amount * 2, // You might want to add target to backend model
+                category: 'savings',
+                rate: saving.rate
+            }));
+
+            set((state) => ({
+                financialData: {
+                    ...state.financialData,
+                    savings: {
+                        ...state.financialData.savings,
+                        goals: savingsGoals
+                    }
+                }
+            }));
+        } catch (error) {
+            console.error('Failed to fetch savings:', error);
+        }
+    },
+
+    // Fetch loans and add to debts
+    fetchLoans: async () => {
+        try {
+            const response = await api.loans.getAll();
+            const loansList: Loan[] = response.data;
+
+            const loanItems: FinancialItem[] = loansList.map(loan => ({
+                name: loan.name,
+                amount: loan.total_amount,
+                category: 'loan'
+            }));
+
+            set((state) => ({
+                financialData: {
+                    ...state.financialData,
+                    debts: {
+                        ...state.financialData.debts,
+                        items: loanItems
+                    }
+                }
+            }));
+        } catch (error) {
+            console.error('Failed to fetch loans:', error);
+        }
+    },
+
+    // Update balance and debt
+    updateBalance: async (balance: number, totalDebt: number) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.finance.update({ balance, total_debt: totalDebt });
+            set({
+                balance,
+                financialData: {
+                    ...get().financialData,
+                    debts: {
+                        ...get().financialData.debts,
+                        total: totalDebt
+                    }
+                },
+                isLoading: false
+            });
+            // Refresh summary after update
+            await get().fetchFinanceSummary();
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to update balance',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
     // Computed Values
     getNetWorth: () => {
-        const { financialData } = get();
-        return financialData.savings.total - financialData.debts.total;
+        const { netWorth } = get();
+        return netWorth;
     }
 }));

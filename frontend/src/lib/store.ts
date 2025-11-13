@@ -1,7 +1,7 @@
 "use client";
 import { create } from 'zustand';
 import { Project, Task } from '@/constants/interfaces';
-
+import { api, Project as ApiProject, CreateProjectData } from './api';
 
 interface AppState {
     projects: Project[];
@@ -11,51 +11,49 @@ interface AppState {
     isTaskModalOpen: boolean;
     isProjectModalOpen: boolean;
     currentView: 'kanban' | 'calendar';
-    
+    isLoading: boolean;
+    error: string | null;
+
     // Project actions
-    addProject: (project: Omit<Project, 'id' | 'createdDate'>) => void;
-    updateProject: (id: string, updates: Partial<Project>) => void;
-    deleteProject: (id: string) => void;
+    fetchProjects: () => Promise<void>;
+    addProject: (project: Omit<Project, 'id' | 'createdDate'>) => Promise<void>;
+    updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
+    deleteProject: (id: string) => Promise<void>;
     setSelectedProject: (project: Project | null) => void;
-    
+
     // Task actions
     addTask: (task: Omit<Task, 'id' | 'createdDate'>) => void;
     updateTask: (id: string, updates: Partial<Task>) => void;
     deleteTask: (id: string) => void;
     moveTask: (taskId: string, newStatus: Task['status']) => void;
     setSelectedTask: (task: Task | null) => void;
-    
+
     // UI actions
     setTaskModalOpen: (open: boolean) => void;
     setProjectModalOpen: (open: boolean) => void;
     setCurrentView: (view: 'kanban' | 'calendar') => void;
-    
+
     // Utility functions
     getTasksByProject: (projectId: string) => Task[];
     getTasksByStatus: (projectId: string, status: Task['status']) => Task[];
 }
 
+// Helper function to convert API project to frontend project format
+const convertApiProject = (apiProject: ApiProject): Project => ({
+    id: apiProject.project_id.toString(),
+    name: apiProject.name,
+    description: apiProject.description,
+    color: apiProject.color,
+    createdDate: new Date(apiProject.created_at),
+    coverImage: apiProject.cover_image,
+    taskCount: apiProject.task_count,
+    status: apiProject.status === 1 ? 'active' : apiProject.status === 2 ? 'archived' : 'deleted'
+});
 
 export const useAppStore = create<AppState>((set, get) => ({
-    projects: [
-        {
-            id: '1',
-            name: 'Web Development',
-            description: 'Frontend and backend development tasks',
-            color: '#3B82F6',
-            createdDate: new Date(),
-            taskCount: 8
-        },
-        {
-            id: '2', 
-            name: 'Marketing Campaign',
-            description: 'Q4 marketing initiatives and campaigns',
-            color: '#10B981',
-            createdDate: new Date(),
-            taskCount: 5
-        }
-    ],
+    projects: [],
     tasks: [
+        // Keep mock tasks for now - these will be managed through the todo API separately
         {
             id: '1',
             title: 'Design Homepage Layout',
@@ -92,7 +90,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             }],
             priority: 'high',
             status: 'todo',
-            projectId: '1', 
+            projectId: '1',
             createdDate: new Date()
         },
         {
@@ -119,31 +117,99 @@ export const useAppStore = create<AppState>((set, get) => ({
     isTaskModalOpen: false,
     isProjectModalOpen: false,
     currentView: 'kanban',
+    isLoading: false,
+    error: null,
 
-    addProject: (projectData) => set((state) => {
-        const newProject: Project = {
-        ...projectData,
-        id: Date.now().toString(),
-        createdDate: new Date(),
-        taskCount: 0
-        };
-        return { projects: [...state.projects, newProject] };
-    }),
+    // Fetch projects from backend
+    fetchProjects: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await api.projects.getAll();
+            const projects = response.data.map(convertApiProject);
+            set({ projects, isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to fetch projects',
+                isLoading: false
+            });
+        }
+    },
 
-    updateProject: (id, updates) => set((state) => ({
-        projects: state.projects.map(project => 
-        project.id === id ? { ...project, ...updates } : project
-        )
-    })),
+    // Add project with backend API
+    addProject: async (projectData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const createData: CreateProjectData = {
+                name: projectData.name,
+                description: projectData.description,
+                color: projectData.color,
+                cover_image: projectData.coverImage,
+            };
+            const response = await api.projects.create(createData);
+            const newProject = convertApiProject(response.data);
+            set((state) => ({
+                projects: [...state.projects, newProject],
+                isLoading: false
+            }));
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to add project',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
 
-    deleteProject: (id) => set((state) => ({
-        projects: state.projects.filter(project => project.id !== id),
-        tasks: state.tasks.filter(task => task.projectId !== id),
-        selectedProject: state.selectedProject?.id === id ? null : state.selectedProject
-    })),
+    // Update project with backend API
+    updateProject: async (id, updates) => {
+        set({ isLoading: true, error: null });
+        try {
+            const updateData: Partial<CreateProjectData> = {
+                ...(updates.name && { name: updates.name }),
+                ...(updates.description && { description: updates.description }),
+                ...(updates.color && { color: updates.color }),
+                ...(updates.coverImage && { cover_image: updates.coverImage }),
+            };
+            const response = await api.projects.update(parseInt(id), updateData);
+            const updatedProject = convertApiProject(response.data);
+            set((state) => ({
+                projects: state.projects.map(project =>
+                    project.id === id ? updatedProject : project
+                ),
+                isLoading: false
+            }));
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to update project',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Delete project with backend API
+    deleteProject: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.projects.delete(parseInt(id));
+            set((state) => ({
+                projects: state.projects.filter(project => project.id !== id),
+                tasks: state.tasks.filter(task => task.projectId !== id),
+                selectedProject: state.selectedProject?.id === id ? null : state.selectedProject,
+                isLoading: false
+            }));
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to delete project',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
 
     setSelectedProject: (project) => set({ selectedProject: project }),
 
+    // Task actions (keeping mock implementation for now - will be connected to todo API separately)
     addTask: (taskData) => set((state) => {
         const newTask: Task = {
         ...taskData,
@@ -154,7 +220,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     }),
 
     updateTask: (id, updates) => set((state) => ({
-        tasks: state.tasks.map(task => 
+        tasks: state.tasks.map(task =>
         task.id === id ? { ...task, ...updates } : task
         )
     })),
@@ -165,7 +231,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
     moveTask: (taskId, newStatus) => set((state) => ({
-        tasks: state.tasks.map(task => 
+        tasks: state.tasks.map(task =>
         task.id === taskId ? { ...task, status: newStatus } : task
         )
     })),
