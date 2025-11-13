@@ -54,6 +54,7 @@ func main() {
 	routes.UserRoute(r.Group("/api"))
 	routes.TodoRoute(r.Group("/api"))
 	routes.DashboardRoutes(r.Group("/api"))
+	routes.FinanceRoute(r.Group("/api"))
 
 	// Run server
 	r.Run(constants.APP_PORT)
