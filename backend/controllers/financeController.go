@@ -22,6 +22,7 @@ type financeResponse struct {
 	UserID    uint    `json:"user_id"`
 }
 
+// GetFinance retrieves the finance overview for the authenticated user
 func GetFinance(c *gin.Context) {
 	userID, isExists := c.Get("user_id")
 	if !isExists {
@@ -50,6 +51,7 @@ func GetFinance(c *gin.Context) {
 	helper.Response(c, http.StatusOK, "Finance data fetched successfully", response, nil)
 }
 
+// UpdateFinance updates the finance overview for the authenticated user
 func UpdateFinance(c *gin.Context) {
 	userID, isExists := c.Get("user_id")
 	if !isExists {
@@ -88,6 +90,7 @@ func UpdateFinance(c *gin.Context) {
 	helper.Response(c, http.StatusOK, "Finance updated successfully", response, nil)
 }
 
+// GetFinanceSummary retrieves comprehensive financial summary for the authenticated user
 func GetFinanceSummary(c *gin.Context) {
 	userID, isExists := c.Get("user_id")
 	if !isExists {
@@ -109,17 +112,17 @@ func GetFinanceSummary(c *gin.Context) {
 	// Calculate income and expenses from transactions
 	var totalIncome float64
 	var totalExpense float64
-	database.DB.Model(&models.Transactions{}).Where("type = ? AND status != ?", 1, constants.STATUS_DELETED).Select("COALESCE(SUM(amount), 0)").Scan(&totalIncome)
-	database.DB.Model(&models.Transactions{}).Where("type = ? AND status != ?", 2, constants.STATUS_DELETED).Select("COALESCE(SUM(amount), 0)").Scan(&totalExpense)
+	database.DB.Model(&models.Transactions{}).Where("user_id = ? AND type = ? AND status != ?", userID, 1, constants.STATUS_DELETED).Select("COALESCE(SUM(amount), 0)").Scan(&totalIncome)
+	database.DB.Model(&models.Transactions{}).Where("user_id = ? AND type = ? AND status != ?", userID, 2, constants.STATUS_DELETED).Select("COALESCE(SUM(amount), 0)").Scan(&totalExpense)
 
 	summary := gin.H{
-		"balance":        finance.Balance,
-		"total_debt":     finance.TotalDebt,
-		"total_savings":  totalSavings,
-		"total_loans":    totalLoans,
-		"total_income":   totalIncome,
-		"total_expense":  totalExpense,
-		"net_worth":      finance.Balance + totalSavings - finance.TotalDebt - totalLoans,
+		"balance":       finance.Balance,
+		"total_debt":    finance.TotalDebt,
+		"total_savings": totalSavings,
+		"total_loans":   totalLoans,
+		"total_income":  totalIncome,
+		"total_expense": totalExpense,
+		"net_worth":     finance.Balance + totalSavings - finance.TotalDebt - totalLoans,
 	}
 
 	helper.Response(c, http.StatusOK, "Finance summary fetched successfully", summary, nil)

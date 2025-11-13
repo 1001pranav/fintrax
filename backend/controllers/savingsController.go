@@ -13,8 +13,9 @@ import (
 
 type savingsRequest struct {
 	Name   string  `json:"name" binding:"required"`
-	Amount float64 `json:"amount" binding:"required,gt=0"`
-	Rate   float64 `json:"rate"`
+	Amount float64 `json:"amount" binding:"required,gte=0"`
+	Rate   float64 `json:"rate" binding:"gte=0"`
+	Status uint    `json:"status" binding:"gte=1,lte=6"`
 }
 
 type savingsResponse struct {
@@ -23,10 +24,12 @@ type savingsResponse struct {
 	Amount    float64   `json:"amount"`
 	Rate      float64   `json:"rate"`
 	UserID    uint      `json:"user_id"`
-	UpdatedAt time.Time `json:"updated_at"`
 	Status    uint      `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// CreateSavings creates a new savings goal for the authenticated user
 func CreateSavings(c *gin.Context) {
 	var req savingsRequest
 
@@ -41,12 +44,17 @@ func CreateSavings(c *gin.Context) {
 		return
 	}
 
-	savings := models.Savings{
+	// Set default status if not provided
+	if req.Status == 0 {
+		req.Status = constants.STATUS_NOT_STARTED
+	}
+
+	var savings = models.Savings{
 		Name:   req.Name,
 		Amount: req.Amount,
 		Rate:   req.Rate,
 		UserID: uint(userID.(int)),
-		Status: 1,
+		Status: req.Status,
 	}
 
 	tx := database.DB.Begin()
@@ -63,12 +71,15 @@ func CreateSavings(c *gin.Context) {
 		Amount:    savings.Amount,
 		Rate:      savings.Rate,
 		UserID:    savings.UserID,
-		UpdatedAt: savings.UpdatedAt,
 		Status:    savings.Status,
+		CreatedAt: savings.CreatedAt,
+		UpdatedAt: savings.UpdatedAt,
 	}
+
 	helper.Response(c, http.StatusCreated, "Savings created successfully", response, nil)
 }
 
+// GetAllSavings retrieves all savings goals for the authenticated user
 func GetAllSavings(c *gin.Context) {
 	userID, isExists := c.Get("user_id")
 	if !isExists {
@@ -77,7 +88,9 @@ func GetAllSavings(c *gin.Context) {
 	}
 
 	var savings []models.Savings
-	database.DB.Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).Find(&savings)
+	database.DB.Where("user_id = ? AND status != ?", userID, constants.STATUS_DELETED).
+		Order("created_at DESC").
+		Find(&savings)
 
 	response := make([]savingsResponse, len(savings))
 	for i, saving := range savings {
@@ -87,13 +100,16 @@ func GetAllSavings(c *gin.Context) {
 			Amount:    saving.Amount,
 			Rate:      saving.Rate,
 			UserID:    saving.UserID,
-			UpdatedAt: saving.UpdatedAt,
 			Status:    saving.Status,
+			CreatedAt: saving.CreatedAt,
+			UpdatedAt: saving.UpdatedAt,
 		}
 	}
+
 	helper.Response(c, http.StatusOK, "Savings fetched successfully", response, nil)
 }
 
+// GetSavings retrieves a specific savings goal by ID
 func GetSavings(c *gin.Context) {
 	id := c.Param("id")
 	userID, isExists := c.Get("user_id")
@@ -103,7 +119,10 @@ func GetSavings(c *gin.Context) {
 	}
 
 	var savings models.Savings
-	if err := database.DB.Where("id = ? AND user_id = ? AND status != ?", id, userID, constants.STATUS_DELETED).First(&savings).Error; err != nil {
+	result := database.DB.Where("id = ? AND user_id = ? AND status != ?", id, userID, constants.STATUS_DELETED).
+		First(&savings)
+
+	if result.Error != nil {
 		helper.Response(c, http.StatusNotFound, "Savings not found", nil, nil)
 		return
 	}
@@ -114,12 +133,15 @@ func GetSavings(c *gin.Context) {
 		Amount:    savings.Amount,
 		Rate:      savings.Rate,
 		UserID:    savings.UserID,
-		UpdatedAt: savings.UpdatedAt,
 		Status:    savings.Status,
+		CreatedAt: savings.CreatedAt,
+		UpdatedAt: savings.UpdatedAt,
 	}
+
 	helper.Response(c, http.StatusOK, "Savings fetched successfully", response, nil)
 }
 
+// UpdateSavings updates a specific savings goal by ID
 func UpdateSavings(c *gin.Context) {
 	id := c.Param("id")
 	userID, isExists := c.Get("user_id")
@@ -135,19 +157,20 @@ func UpdateSavings(c *gin.Context) {
 	}
 
 	var savings models.Savings
-	if err := database.DB.Where("id = ? AND user_id = ? AND status != ?", id, userID, constants.STATUS_DELETED).First(&savings).Error; err != nil {
+	result := database.DB.Where("id = ? AND user_id = ? AND status != ?", id, userID, constants.STATUS_DELETED).
+		First(&savings)
+
+	if result.Error != nil {
 		helper.Response(c, http.StatusNotFound, "Savings not found", nil, nil)
 		return
 	}
 
-	if req.Name != "" {
-		savings.Name = req.Name
-	}
-	if req.Amount > 0 {
-		savings.Amount = req.Amount
-	}
-	if req.Rate >= 0 {
-		savings.Rate = req.Rate
+	// Update fields
+	savings.Name = req.Name
+	savings.Amount = req.Amount
+	savings.Rate = req.Rate
+	if req.Status != 0 {
+		savings.Status = req.Status
 	}
 
 	database.DB.Save(&savings)
@@ -158,12 +181,15 @@ func UpdateSavings(c *gin.Context) {
 		Amount:    savings.Amount,
 		Rate:      savings.Rate,
 		UserID:    savings.UserID,
-		UpdatedAt: savings.UpdatedAt,
 		Status:    savings.Status,
+		CreatedAt: savings.CreatedAt,
+		UpdatedAt: savings.UpdatedAt,
 	}
+
 	helper.Response(c, http.StatusOK, "Savings updated successfully", response, nil)
 }
 
+// DeleteSavings soft deletes a savings goal by ID
 func DeleteSavings(c *gin.Context) {
 	id := c.Param("id")
 	userID, isExists := c.Get("user_id")
@@ -173,7 +199,10 @@ func DeleteSavings(c *gin.Context) {
 	}
 
 	var savings models.Savings
-	if err := database.DB.Where("id = ? AND user_id = ? AND status != ?", id, userID, constants.STATUS_DELETED).First(&savings).Error; err != nil {
+	result := database.DB.Where("id = ? AND user_id = ? AND status != ?", id, userID, constants.STATUS_DELETED).
+		First(&savings)
+
+	if result.Error != nil {
 		helper.Response(c, http.StatusNotFound, "Savings not found", nil, nil)
 		return
 	}
@@ -183,5 +212,5 @@ func DeleteSavings(c *gin.Context) {
 	savings.DeletedAt.Valid = true
 	database.DB.Save(&savings)
 
-	helper.Response(c, http.StatusOK, "Savings deleted successfully", &savings, nil)
+	helper.Response(c, http.StatusOK, "Savings deleted successfully", nil, nil)
 }
