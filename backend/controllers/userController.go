@@ -3,6 +3,7 @@ package controllers
 import (
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -75,11 +76,16 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// Generate OTP for email verification
+	otp := rand.Intn(constants.MAX_OTP_LENGTH-constants.MIN_OTP_LENGTH+1) + constants.MIN_OTP_LENGTH
+
 	var newUser = models.Users{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: hashedPassword,
 		Status:   constants.USER_STATUS_INACTIVE,
+		OTP:      uint(otp),
+		OTPTime:  time.Now(),
 	}
 	var tx = database.DB.Begin()
 
@@ -90,6 +96,16 @@ func Register(c *gin.Context) {
 		TotalDebt: 0,
 	}
 	tx.Create(&finance)
+
+	// Send OTP verification email
+	emailBody := "Welcome to Fintrax!\n\nYour OTP for email verification is: " + strconv.Itoa(otp) + "\n\nThis OTP is valid for " + strconv.Itoa(constants.MAX_OTP_TIME) + " minutes.\n\nPlease verify your email to start using Fintrax."
+	err = helper.SendEmail(newUser.Email, "Fintrax - Verify Your Email", emailBody)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "User created but failed to send verification email", nil, err.Error())
+		tx.Rollback()
+		return
+	}
+
 	token, err := helper.CreateToken(newUser.ID)
 	if err != nil {
 		helper.Response(c, http.StatusInternalServerError, "Failed to create token", nil, err)
@@ -188,22 +204,24 @@ func GenerateOTP(c *gin.Context) {
 		return
 	}
 
-	// Sending OTP via email is commented out for now
-	// err := helper.SendEmail(user.Email, "OTP for password reset", "Your OTP is: "+string(user.OTP))
-	// if err != nil {
-	// 	helper.Response(c, http.StatusInternalServerError, "Failed to send OTP", nil, err)
-	// 	return
-	// }
 	otp := rand.Intn(constants.MAX_OTP_LENGTH-constants.MIN_OTP_LENGTH+1) + constants.MIN_OTP_LENGTH
 
 	user.OTP = uint(otp)
 	user.OTPTime = time.Now()
 	database.DB.Save(&user)
 
+	// Send OTP via email
+	emailBody := "Your OTP for password reset is: " + strconv.Itoa(otp) + "\n\nThis OTP is valid for " + strconv.Itoa(constants.MAX_OTP_TIME) + " minutes.\n\nIf you did not request this, please ignore this email."
+	err := helper.SendEmail(user.Email, "Fintrax - OTP for Password Reset", emailBody)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to send OTP email", nil, err.Error())
+		return
+	}
+
 	response := generateOTPResponse{
 		OTP: uint(otp),
 	}
-	helper.Response(c, http.StatusOK, "OTP generated successfully", response, nil)
+	helper.Response(c, http.StatusOK, "OTP sent to your email successfully", response, nil)
 }
 
 func ForgotPassword(c *gin.Context) {

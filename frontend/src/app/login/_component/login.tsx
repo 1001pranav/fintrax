@@ -8,6 +8,7 @@ import SubmitButton from '@/components/Fields/Button';
 import ErrorMessage from '@/components/Message/ErrorMessage';
 import { APP_NAME } from '@/constants/generalConstants';
 import { api } from '@/lib/api';
+import { validateEmail, validatePassword, sanitizeInput } from '@/utils/validation';
 
 export default function LoginComponent() {
     const [formData, setFormData] = useState({
@@ -19,35 +20,41 @@ export default function LoginComponent() {
     const [isLoading, setIsLoading] = useState(false);
     const validateForm = () => {
         const newErrors: string[] = []
-        
-        if (!formData.email) {
-        newErrors.push('Email is required')
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.push('Please enter a valid email address')
+
+        // Validate email
+        const emailValidation = validateEmail(formData.email);
+        if (!emailValidation.isValid) {
+            newErrors.push(...emailValidation.errors);
         }
-        
-        if (!formData.password) {
-        newErrors.push('Password is required')
-        } else if (formData.password.length < 6) {
-        newErrors.push('Password must be at least 6 characters long')
+
+        // Validate password (lenient for login)
+        const passwordValidation = validatePassword(formData.password, false);
+        if (!passwordValidation.isValid) {
+            newErrors.push(...passwordValidation.errors);
         }
-        
+
         return newErrors
     }
     const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const validationErrors = validateForm()
         if (validationErrors.length > 0) {
             setErrors(validationErrors)
             return
         }
-        
+
             setErrors([])
             setIsLoading(true)
-        
+
         try {
-            const data = await api.login(formData)
+            // Sanitize form data before sending
+            const sanitizedData = {
+                email: sanitizeInput(formData.email),
+                password: formData.password, // Don't sanitize password
+            };
+
+            const data = await api.login(sanitizedData)
             console.log('Login successful:', data)
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Login failed. Please check your credentials and try again.'

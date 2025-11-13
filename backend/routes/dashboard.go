@@ -8,7 +8,7 @@ import (
 )
 
 func DashboardRoutes(router *gin.RouterGroup) {
-	dRoute := router.Group("/dashboard", middleware.Authorization())
+	dRoute := router.Group("/dashboard", middleware.RateLimitGeneral(), middleware.Authorization())
 	{
 		dRoute.GET("/", controllers.GetDashboard)
 	}

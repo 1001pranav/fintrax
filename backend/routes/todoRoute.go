@@ -8,7 +8,7 @@ import (
 )
 
 func TodoRoute(router *gin.RouterGroup) {
-	tRoute := router.Group("/todo", middleware.Authorization())
+	tRoute := router.Group("/todo", middleware.RateLimitGeneral(), middleware.Authorization())
 	{
 		tRoute.POST("/", controllers.CreateToDo)
 		tRoute.GET("/", controllers.GetAllToDos)

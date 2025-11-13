@@ -2,6 +2,7 @@ package routes
 
 import (
 	"fintrax-backend/controllers"
+	"fintrax-backend/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,12 +10,17 @@ import (
 func UserRoute(router *gin.RouterGroup) {
 	uRoute := router.Group("/user")
 	{
-		uRoute.POST("/register", controllers.Register)
-		uRoute.POST("/verify-email", controllers.VerifyEmail)
-		uRoute.POST("/login", controllers.Login)
-		uRoute.POST("/generate-otp", controllers.GenerateOTP)
-		uRoute.POST("/forgot-password", controllers.ForgotPassword)
-		uRoute.POST("/reset-password", controllers.ResetPassword)
+		// Apply strict rate limiting to auth endpoints
+		uRoute.POST("/register", middleware.RateLimitAuth(), controllers.Register)
+		uRoute.POST("/verify-email", middleware.RateLimitAuth(), controllers.VerifyEmail)
+		uRoute.POST("/login", middleware.RateLimitAuth(), controllers.Login)
+
+		// Apply OTP-specific rate limiting (more restrictive)
+		uRoute.POST("/generate-otp", middleware.RateLimitOTP(), controllers.GenerateOTP)
+
+		// Apply auth rate limiting to password endpoints
+		uRoute.POST("/forgot-password", middleware.RateLimitAuth(), controllers.ForgotPassword)
+		uRoute.POST("/reset-password", middleware.RateLimitAuth(), controllers.ResetPassword)
 	}
 
 }

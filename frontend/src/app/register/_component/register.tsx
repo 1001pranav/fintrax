@@ -8,6 +8,7 @@ import SubmitButton from '@/components/Fields/Button';
 import ErrorMessage from '@/components/Message/ErrorMessage';
 import { RegisterState } from '@/constants/interfaces';
 import { api } from '@/lib/api';
+import { validateEmail, validatePassword, validateUsername, sanitizeInput } from '@/utils/validation';
 
 const RegisterComponent: React.FC = () => {
     const [formData, setFormData] = useState<RegisterState>({
@@ -21,16 +22,22 @@ const RegisterComponent: React.FC = () => {
     const validateForm = (): string[] => {
         const newErrors: string[] = [];
 
-        if (!formData.email) {
-            newErrors.push('Email is required');
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.push('Please enter a valid email address');
+        // Validate username
+        const usernameValidation = validateUsername(formData.username);
+        if (!usernameValidation.isValid) {
+            newErrors.push(...usernameValidation.errors);
         }
 
-        if (!formData.password) {
-            newErrors.push('Password is required');
-        } else if (formData.password.length < 6) {
-            newErrors.push('Password must be at least 6 characters long');
+        // Validate email
+        const emailValidation = validateEmail(formData.email);
+        if (!emailValidation.isValid) {
+            newErrors.push(...emailValidation.errors);
+        }
+
+        // Validate password (use lenient mode for now, can change to strict)
+        const passwordValidation = validatePassword(formData.password, false);
+        if (!passwordValidation.isValid) {
+            newErrors.push(...passwordValidation.errors);
         }
 
         return newErrors;
@@ -49,7 +56,14 @@ const RegisterComponent: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const data = await api.register(formData);
+            // Sanitize form data before sending
+            const sanitizedData = {
+                username: sanitizeInput(formData.username),
+                email: sanitizeInput(formData.email),
+                password: formData.password, // Don't sanitize password
+            };
+
+            const data = await api.register(sanitizedData);
             console.log('Registration successful:', data);
         } catch (_error: unknown) {
             console.error('Registration failed:', _error);
