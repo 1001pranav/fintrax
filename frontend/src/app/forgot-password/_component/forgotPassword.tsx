@@ -9,6 +9,7 @@ import InputField from '@/components/Fields/InputField';
 import SubmitButton from '@/components/Fields/Button';
 import ErrorMessage from '@/components/Message/ErrorMessage';
 import { api } from '@/lib/api';
+import { validateEmail, sanitizeInput } from '@/utils/validation';
 
 export default function ForgetPasswordComponent() {
     const [formData, setFormData] = useState({
@@ -21,31 +22,33 @@ export default function ForgetPasswordComponent() {
     const router = useRouter();
     const validateForm = () => {
         const newErrors: string[] = []
-        
-        if (!formData.email) {
-        newErrors.push('Email is required')
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.push('Please enter a valid email address')
+
+        // Validate email
+        const emailValidation = validateEmail(formData.email);
+        if (!emailValidation.isValid) {
+            newErrors.push(...emailValidation.errors);
         }
-        
+
         return newErrors
     }
     const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const validationErrors = validateForm()
         if (validationErrors.length > 0) {
             setErrors(validationErrors)
             return
         }
-        
+
             setErrors([])
             setIsLoading(true)
-        
+
         try {
-            await api.generateOtp(formData.email)
+            // Sanitize email before sending
+            const sanitizedEmail = sanitizeInput(formData.email);
+            await api.generateOtp(sanitizedEmail)
             if (typeof window !== 'undefined') {
-                localStorage.setItem('resetEmail', formData.email)
+                localStorage.setItem('resetEmail', sanitizedEmail)
             }
             router.push('/reset-password')
         } catch (error: unknown) {
