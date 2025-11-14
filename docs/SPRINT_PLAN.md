@@ -449,13 +449,13 @@
 7. Time range selector (6 months, 1 year, all time)
 
 **Acceptance Criteria:**
-- [ ] Chart shows income and expense lines
-- [ ] X-axis shows time periods clearly
-- [ ] Y-axis shows currency amounts
-- [ ] Tooltips show exact values on hover
-- [ ] Net savings highlighted
-- [ ] Range selector works
-- [ ] Handles missing data gracefully
+- [x] Chart shows income and expense lines
+- [x] X-axis shows time periods clearly
+- [x] Y-axis shows currency amounts
+- [x] Tooltips show exact values on hover
+- [x] Net savings highlighted
+- [x] Range selector works
+- [x] Handles missing data gracefully
 
 **Dependencies:** US-2.1, US-1.3
 **Risk:** Low

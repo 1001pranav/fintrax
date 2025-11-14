@@ -224,3 +224,168 @@ export const getTimePeriodLabel = (period: TimePeriod): string => {
       return 'This Month';
   }
 };
+
+/**
+ * Income/Expense trend data point
+ */
+export interface IncomeTrendData {
+  period: string; // formatted date label (e.g., "Jan 2024", "2024-01")
+  income: number;
+  expense: number;
+  netSavings: number;
+  date: Date; // for sorting
+}
+
+/**
+ * Aggregate transactions by month for trend charts
+ */
+export const aggregateTransactionsByMonth = (
+  transactions: Transaction[]
+): IncomeTrendData[] => {
+  if (transactions.length === 0) {
+    return [];
+  }
+
+  // Group transactions by year-month
+  const monthMap = new Map<string, { income: number; expense: number }>();
+
+  transactions.forEach((transaction) => {
+    const date = new Date(transaction.date);
+    const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+    const existing = monthMap.get(yearMonth) || { income: 0, expense: 0 };
+
+    if (transaction.type === 1) {
+      // Income
+      existing.income += transaction.amount;
+    } else if (transaction.type === 2) {
+      // Expense
+      existing.expense += transaction.amount;
+    }
+
+    monthMap.set(yearMonth, existing);
+  });
+
+  // Convert to array and format
+  const result: IncomeTrendData[] = Array.from(monthMap.entries()).map(
+    ([yearMonth, data]) => {
+      const [year, month] = yearMonth.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+
+      return {
+        period: formatMonthLabel(date),
+        income: data.income,
+        expense: data.expense,
+        netSavings: data.income - data.expense,
+        date,
+      };
+    }
+  );
+
+  // Sort by date ascending
+  result.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  return result;
+};
+
+/**
+ * Format month label for display
+ */
+const formatMonthLabel = (date: Date): string => {
+  const monthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+};
+
+/**
+ * Process income/expense trend data for line chart with time filtering
+ */
+export const processIncomeTrendData = (
+  transactions: Transaction[],
+  timePeriod: TimePeriod = 'last-6-months',
+  customRange?: DateRange
+): IncomeTrendData[] => {
+  // Get date range for the period
+  const dateRange = getDateRangeForPeriod(timePeriod, customRange);
+
+  // Filter transactions by date range
+  const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
+
+  // Aggregate by month
+  const aggregated = aggregateTransactionsByMonth(filteredTransactions);
+
+  // Fill in missing months with zero values for continuity
+  if (aggregated.length > 0) {
+    return fillMissingMonths(aggregated, dateRange);
+  }
+
+  return aggregated;
+};
+
+/**
+ * Fill in missing months with zero values for chart continuity
+ */
+const fillMissingMonths = (
+  data: IncomeTrendData[],
+  dateRange: DateRange
+): IncomeTrendData[] => {
+  if (data.length === 0) {
+    return data;
+  }
+
+  const startDate = new Date(dateRange.startDate);
+  const endDate = new Date(dateRange.endDate);
+
+  const result: IncomeTrendData[] = [];
+  const dataMap = new Map(
+    data.map((item) => [
+      `${item.date.getFullYear()}-${String(item.date.getMonth() + 1).padStart(2, '0')}`,
+      item,
+    ])
+  );
+
+  // Iterate through each month in the range
+  let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const lastDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+
+  while (currentDate <= lastDate) {
+    const yearMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+
+    const existing = dataMap.get(yearMonth);
+    if (existing) {
+      result.push(existing);
+    } else {
+      // Add zero values for missing months
+      result.push({
+        period: formatMonthLabel(currentDate),
+        income: 0,
+        expense: 0,
+        netSavings: 0,
+        date: new Date(currentDate),
+      });
+    }
+
+    // Move to next month
+    currentDate.setMonth(currentDate.getMonth() + 1);
+  }
+
+  return result;
+};
+
+/**
+ * Format number for compact display (e.g., 1.2K, 1.5M)
+ */
+export const formatCompactNumber = (value: number): string => {
+  if (value >= 10000000) {
+    return `${(value / 10000000).toFixed(1)}Cr`;
+  }
+  if (value >= 100000) {
+    return `${(value / 100000).toFixed(1)}L`;
+  }
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(1)}K`;
+  }
+  return value.toFixed(0);
+};
