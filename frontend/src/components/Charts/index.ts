@@ -48,6 +48,8 @@ export type { IncomeTrendChartProps } from './IncomeTrendChart';
 export { default as NetWorthChart } from './NetWorthChart';
 export type { NetWorthChartProps } from './NetWorthChart';
 
+export { default as TaskStatusChart } from './TaskStatusChart';
+
 // Theme and constants
 export {
   CHART_COLORS,

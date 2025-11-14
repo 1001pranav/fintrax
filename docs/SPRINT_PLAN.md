@@ -668,13 +668,13 @@
 7. Display project metadata
 
 **Acceptance Criteria:**
-- [ ] Project page shows correct project data
-- [ ] Task count by status accurate
-- [ ] Priority distribution chart works
-- [ ] Timeline shows task dates
-- [ ] Recent changes visible
-- [ ] Charts update when tasks change
-- [ ] Back to projects navigation works
+- [x] Project page shows correct project data
+- [x] Task count by status accurate
+- [x] Priority distribution chart works
+- [x] Timeline shows task dates
+- [x] Recent changes visible
+- [x] Charts update when tasks change
+- [x] Back to projects navigation works
 
 **Dependencies:** US-2.1, US-2.6
 **Risk:** Medium
