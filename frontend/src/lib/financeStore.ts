@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api, FinanceSummary, Transaction, Savings, Loan } from './api';
+import { api, FinanceSummary, Transaction, Savings, Loan, CreateTransactionData } from './api';
 
 interface FinancialItem {
     name: string;
@@ -46,6 +46,7 @@ interface FinanceStore {
     financialData: FinancialData;
     balance: number;
     netWorth: number;
+    transactions: Transaction[];
 
     // Loading & Error States
     isLoading: boolean;
@@ -63,6 +64,8 @@ interface FinanceStore {
     fetchSavings: () => Promise<void>;
     fetchLoans: () => Promise<void>;
     updateBalance: (balance: number, totalDebt: number) => Promise<void>;
+    createTransaction: (data: CreateTransactionData) => Promise<void>;
+    deleteTransaction: (id: number) => Promise<void>;
 
     // Computed
     getNetWorth: () => number;
@@ -75,6 +78,7 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
     selectedYear: new Date().getFullYear(),
     balance: 0,
     netWorth: 0,
+    transactions: [],
     isLoading: false,
     error: null,
 
@@ -182,6 +186,7 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
             });
 
             set((state) => ({
+                transactions,
                 financialData: {
                     ...state.financialData,
                     income: {
@@ -275,6 +280,46 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         } catch (error) {
             set({
                 error: error instanceof Error ? error.message : 'Failed to update balance',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Create a new transaction
+    createTransaction: async (data: CreateTransactionData) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.transactions.create(data);
+            // Refresh all financial data after creating transaction
+            await Promise.all([
+                get().fetchTransactions(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to create transaction',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Delete a transaction
+    deleteTransaction: async (id: number) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.transactions.delete(id);
+            // Refresh all financial data after deleting transaction
+            await Promise.all([
+                get().fetchTransactions(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to delete transaction',
                 isLoading: false
             });
             throw error;
