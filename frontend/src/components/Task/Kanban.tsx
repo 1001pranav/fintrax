@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import { useTodoStore } from '@/lib/todoStore';
 import TaskCard from '@/components/Task/TaskCard';
+import TagManagement from '@/components/Task/TagManagement';
 import { Task } from '@/constants/interfaces';
 import SVGComponent from '../svg';
 
@@ -23,15 +24,20 @@ export default function KanbanBoard() {
     isLoading,
     error,
     clearError,
+    tags,
+    fetchTags,
   } = useTodoStore();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
+  const [isTagManagementOpen, setIsTagManagementOpen] = useState(false);
 
-  // Fetch todos when project is selected
+  // Fetch todos and tags when project is selected
   useEffect(() => {
     if (selectedProject) {
       fetchTodos(parseInt(selectedProject.id));
+      fetchTags();
     }
-  }, [selectedProject, fetchTodos]);
+  }, [selectedProject, fetchTodos, fetchTags]);
 
   if (!selectedProject) {
     return (
@@ -103,11 +109,17 @@ export default function KanbanBoard() {
     setTaskModalOpen(true);
   };
 
+  // Filter tasks by selected tag
+  const filterTasksByTag = (tasks: Task[]) => {
+    if (!selectedTagFilter) return tasks;
+    return tasks.filter(task => task.tags.some(tag => tag.id === selectedTagFilter));
+  };
+
   return (
     <div className="h-full p-6">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
             <div
               className="w-4 h-4 rounded-full"
@@ -118,7 +130,51 @@ export default function KanbanBoard() {
               <p className="text-white/60">{selectedProject.description}</p>
             </div>
           </div>
+
+          {/* Manage Tags Button */}
+          <button
+            onClick={() => setIsTagManagementOpen(true)}
+            className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-xl text-purple-300 hover:bg-purple-500/30 transition-colors flex items-center space-x-2"
+          >
+            <SVGComponent svgType="settings" className="w-4 h-4" />
+            <span>Manage Tags</span>
+          </button>
         </div>
+
+        {/* Tag Filter */}
+        {tags.length > 0 && (
+          <div className="flex items-center space-x-2 overflow-x-auto pb-2">
+            <span className="text-sm text-white/60 whitespace-nowrap">Filter by tag:</span>
+            <button
+              onClick={() => setSelectedTagFilter(null)}
+              className={`px-3 py-1 rounded-lg text-sm transition-colors whitespace-nowrap ${
+                selectedTagFilter === null
+                  ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50'
+                  : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10'
+              }`}
+            >
+              All Tasks
+            </button>
+            {tags.map((tag) => (
+              <button
+                key={tag.id}
+                onClick={() => setSelectedTagFilter(tag.id)}
+                className={`px-3 py-1 rounded-lg text-sm transition-colors whitespace-nowrap ${
+                  selectedTagFilter === tag.id
+                    ? 'border-2'
+                    : 'border border-white/20 hover:border-white/40'
+                }`}
+                style={{
+                  backgroundColor: selectedTagFilter === tag.id ? tag.color : 'rgba(255, 255, 255, 0.05)',
+                  color: selectedTagFilter === tag.id ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                  borderColor: selectedTagFilter === tag.id ? tag.color : undefined,
+                }}
+              >
+                {tag.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Error Message */}
@@ -156,7 +212,8 @@ export default function KanbanBoard() {
       {/* Kanban Columns */}
       <div className="grid grid-cols-3 gap-6 h-[calc(100%-120px)]">
         {columns.map((column) => {
-          const tasks = getTasksByStatus(selectedProject.id, column.id as Task['status']);
+          const allTasks = getTasksByStatus(selectedProject.id, column.id as Task['status']);
+          const tasks = filterTasksByTag(allTasks);
           
           return (
             <div
@@ -214,6 +271,12 @@ export default function KanbanBoard() {
           );
         })}
       </div>
+
+      {/* Tag Management Modal */}
+      <TagManagement
+        isOpen={isTagManagementOpen}
+        onClose={() => setIsTagManagementOpen(false)}
+      />
     </div>
   );
 }

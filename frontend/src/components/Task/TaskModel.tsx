@@ -31,7 +31,11 @@ export default function TaskModal() {
     createTask,
     updateTask,
     deleteTask,
-    todos
+    todos,
+    tags,
+    fetchTags,
+    createTag,
+    isLoadingTags,
   } = useTodoStore();
 
   const [formData, setFormData] = useState<TaskFormData>({
@@ -48,8 +52,16 @@ export default function TaskModal() {
 
   const [tagInput, setTagInput] = useState<Tags>({ id: '', name: '', color: '' });
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [mainTaskInfo, setMainTaskInfo] = useState<string | null>(selectedTask?.parentTaskId || null);
   const isEditing = selectedTask?.id ? true : false;
+
+  // Fetch tags when modal opens
+  useEffect(() => {
+    if (isTaskModalOpen) {
+      fetchTags();
+    }
+  }, [isTaskModalOpen, fetchTags]);
 
   const handleClose = useCallback(() => {
     setTaskModalOpen(false);
@@ -154,20 +166,30 @@ export default function TaskModal() {
     setShowColorPicker(false);
   };
 
-  const addTag = () => {
-    if (tagInput.name.trim() && !formData.tags.some(tag => tag.name === tagInput.name.trim())) {
-      const newTag = {
-        ...tagInput,
-        name: tagInput.name.trim(),
-        color: tagInput.color || TASK_TAG_COLORS[0],
-        id: Date.now().toString()
-      };
+  const addTagFromDropdown = (tag: Tags) => {
+    if (!formData.tags.some(t => t.id === tag.id)) {
       setFormData({
         ...formData,
-        tags: [...formData.tags, newTag]
+        tags: [...formData.tags, tag]
       });
-      setTagInput({ id: '', name: '', color: '' });
-      setShowColorPicker(false);
+    }
+    setShowTagDropdown(false);
+  };
+
+  const createAndAddTag = async () => {
+    if (tagInput.name.trim()) {
+      try {
+        const color = tagInput.color || TASK_TAG_COLORS[0];
+        await createTag(tagInput.name.trim(), color);
+
+        // After creating, fetch tags again to get the new tag with ID
+        await fetchTags();
+
+        setTagInput({ id: '', name: '', color: '' });
+        setShowColorPicker(false);
+      } catch (error) {
+        console.error('Failed to create tag:', error);
+      }
     }
   };
 
@@ -181,9 +203,12 @@ export default function TaskModal() {
   const handleTagKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addTag();
+      createAndAddTag();
     }
   };
+
+  // Get available tags (exclude already selected tags)
+  const availableTags = tags.filter(tag => !formData.tags.some(t => t.id === tag.id));
 
   if (!isTaskModalOpen) return null;
   
@@ -334,7 +359,48 @@ export default function TaskModal() {
               Tags
             </label>
             <div className="space-y-3">
-              {/* Tag Input Row */}
+              {/* Tag Selector & Create Row */}
+              <div className="flex space-x-2">
+                {/* Tag Dropdown Selector */}
+                <div className="relative flex-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white text-left hover:bg-white/10 transition-colors flex items-center justify-between"
+                  >
+                    <span className="text-white/70">Select existing tag...</span>
+                    <SVGComponent svgType="chevron-down" className="w-4 h-4 text-white/60" />
+                  </button>
+
+                  {/* Tag Dropdown */}
+                  {showTagDropdown && (
+                    <div className="absolute top-12 left-0 right-0 z-10 max-h-48 overflow-y-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl">
+                      {isLoadingTags ? (
+                        <div className="p-4 text-white/60 text-center text-sm">Loading tags...</div>
+                      ) : availableTags.length > 0 ? (
+                        availableTags.map((tag) => (
+                          <button
+                            key={tag.id}
+                            type="button"
+                            onClick={() => addTagFromDropdown(tag)}
+                            className="w-full px-4 py-2 text-left hover:bg-white/10 transition-colors flex items-center space-x-2"
+                          >
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: tag.color }}
+                            />
+                            <span className="text-white text-sm">{tag.name}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="p-4 text-white/60 text-center text-sm">No tags available</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Create New Tag Row */}
               <div className="flex space-x-2">
                 <input
                   type="text"
@@ -342,9 +408,9 @@ export default function TaskModal() {
                   onChange={(e) => setTagInput({ ...tagInput, name: e.target.value })}
                   onKeyPress={handleTagKeyPress}
                   className="flex-1 px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
-                  placeholder="Add a tag"
+                  placeholder="Create new tag..."
                 />
-                
+
                 {/* Color Picker Button */}
                 <div className="relative">
                   <button
@@ -352,12 +418,12 @@ export default function TaskModal() {
                     onClick={() => setShowColorPicker(!showColorPicker)}
                     className="flex items-center justify-center w-12 h-10 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 transition-colors"
                   >
-                    <div 
+                    <div
                       className="w-6 h-6 rounded-full border-2 border-white/40"
                       style={{ backgroundColor: tagInput.color || TASK_TAG_COLORS[0] }}
                     />
                   </button>
-                  
+
                   {/* Color Picker Dropdown */}
                   {showColorPicker && (
                     <div className="absolute top-12 right-0 z-10 p-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl">
@@ -380,13 +446,14 @@ export default function TaskModal() {
                     </div>
                   )}
                 </div>
-                
+
                 <button
                   type="button"
-                  onClick={addTag}
-                  className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-xl text-blue-300 hover:bg-blue-500/30 transition-colors"
+                  onClick={createAndAddTag}
+                  disabled={isLoadingTags || !tagInput.name.trim()}
+                  className="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-xl text-green-300 hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add
+                  Create
                 </button>
               </div>
               

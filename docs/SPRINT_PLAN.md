@@ -620,14 +620,14 @@
 7. Add tag CRUD operations
 
 **Acceptance Criteria:**
-- [ ] Tags load from backend
-- [ ] Can assign multiple tags to task
-- [ ] Tags display on task cards with colors
-- [ ] Tag filter works in task view
-- [ ] Can create new tags
-- [ ] Can edit tag names/colors
-- [ ] Can delete unused tags
-- [ ] Tag changes reflect immediately
+- [x] Tags load from backend
+- [x] Can assign multiple tags to task
+- [x] Tags display on task cards with colors
+- [x] Tag filter works in task view
+- [x] Can create new tags
+- [x] Can edit tag names/colors
+- [x] Can delete unused tags
+- [x] Tag changes reflect immediately
 
 **Dependencies:** US-2.6
 **Risk:** Low
