@@ -1,1 +1,57 @@
 @import "tailwindcss";
+
+/* React Calendar Timeline Styles */
+.react-calendar-timeline .rct-header-root {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.react-calendar-timeline .rct-dateHeader {
+  color: #374151;
+  font-weight: 500;
+}
+
+.react-calendar-timeline .rct-sidebar-header {
+  background: #f3f4f6;
+  border-right: 1px solid #e5e7eb;
+}
+
+.react-calendar-timeline .rct-sidebar-row {
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  color: #374151;
+  font-weight: 500;
+}
+
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-even,
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.react-calendar-timeline .rct-item {
+  border-radius: 4px;
+  cursor: move;
+}
+
+.react-calendar-timeline .rct-item:hover {
+  opacity: 0.9;
+}
+
+.react-calendar-timeline .rct-item.rct-item-overflow-left:before,
+.react-calendar-timeline .rct-item.rct-item-overflow-right:after {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile responsive timeline */
+@media (max-width: 768px) {
+  .roadmap-timeline .react-calendar-timeline {
+    font-size: 12px;
+  }
+
+  .react-calendar-timeline .rct-sidebar {
+    width: 80px !important;
+  }
+}

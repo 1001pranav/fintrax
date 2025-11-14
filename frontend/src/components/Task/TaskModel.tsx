@@ -5,6 +5,7 @@ import { useTodoStore } from '@/lib/todoStore';
 import { Tags, TaskFormData } from '@/constants/interfaces';
 import SVGComponent from '../svg';
 import { TASK_TAG_COLORS } from '@/constants/generalConstants';
+import ResourceList from './Resources/ResourceList';
 
 const priorityOptions = [
   { value: 'low', label: 'Low', color: 'text-green-400' },
@@ -494,6 +495,18 @@ export default function TaskModal() {
               rows={3}
             />
           </div>
+
+          {/* Resources - Only show for existing tasks */}
+          {isEditing && selectedTask?.task_id && (
+            <div className="border-t border-white/10 pt-4">
+              <ResourceList
+                todoId={selectedTask.task_id}
+                onResourcesChange={() => {
+                  // Optionally refresh task data if needed
+                }}
+              />
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex space-x-3 pt-4">
