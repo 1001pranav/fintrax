@@ -527,12 +527,12 @@
 6. Fetch dashboard data from `/dashboard` endpoint
 
 **Acceptance Criteria:**
-- [ ] Dashboard shows 2-3 key charts
-- [ ] Charts load without blocking page render
-- [ ] Layout responsive on all screens
-- [ ] Data fetches from backend dashboard API
-- [ ] Charts refresh when data updates
-- [ ] Loading skeletons during data fetch
+- [x] Dashboard shows 2-3 key charts
+- [x] Charts load without blocking page render
+- [x] Layout responsive on all screens
+- [x] Data fetches from backend dashboard API
+- [x] Charts refresh when data updates
+- [x] Loading skeletons during data fetch
 
 **Dependencies:** US-2.2, US-2.3, US-2.4
 **Risk:** Low
