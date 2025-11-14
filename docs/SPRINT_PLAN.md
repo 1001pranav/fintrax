@@ -758,13 +758,13 @@
 7. Fix any layout issues
 
 **Acceptance Criteria:**
-- [ ] All pages render correctly on 375px width
-- [ ] Charts readable and interactive on mobile
-- [ ] Forms easy to fill on mobile keyboard
-- [ ] Touch targets at least 44px
-- [ ] No horizontal scroll
-- [ ] Navigation accessible on mobile
-- [ ] Tested on iOS Safari and Chrome Android
+- [x] All pages render correctly on 375px width
+- [x] Charts readable and interactive on mobile
+- [x] Forms easy to fill on mobile keyboard
+- [x] Touch targets at least 44px
+- [x] No horizontal scroll
+- [x] Navigation accessible on mobile
+- [x] Tested on iOS Safari and Chrome Android
 
 **Dependencies:** Sprint 1 & 2 components
 **Risk:** Medium - may reveal design issues
