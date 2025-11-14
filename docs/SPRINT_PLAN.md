@@ -996,13 +996,13 @@
 7. Run Lighthouse audit and fix issues
 
 **Acceptance Criteria:**
-- [ ] Initial load under 3 seconds on 3G
-- [ ] First contentful paint under 1.5s
-- [ ] Time to interactive under 3.5s
-- [ ] Bundle size under 500kb (gzipped)
-- [ ] Lighthouse score 90+ performance
-- [ ] No layout shift (CLS < 0.1)
-- [ ] Smooth 60fps scrolling
+- [x] Initial load under 3 seconds on 3G
+- [x] First contentful paint under 1.5s
+- [x] Time to interactive under 3.5s
+- [x] Bundle size under 500kb (gzipped)
+- [x] Lighthouse score 90+ performance
+- [x] No layout shift (CLS < 0.1)
+- [x] Smooth 60fps scrolling
 
 **Dependencies:** None
 **Risk:** Low
