@@ -42,6 +42,14 @@ export type {
 export { default as ExpensePieChart } from './ExpensePieChart';
 export type { ExpensePieChartProps } from './ExpensePieChart';
 
+export { default as IncomeTrendChart } from './IncomeTrendChart';
+export type { IncomeTrendChartProps } from './IncomeTrendChart';
+
+export { default as NetWorthChart } from './NetWorthChart';
+export type { NetWorthChartProps } from './NetWorthChart';
+
+export { default as TaskStatusChart } from './TaskStatusChart';
+
 // Theme and constants
 export {
   CHART_COLORS,
