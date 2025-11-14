@@ -365,11 +365,11 @@
 5. Create responsive chart container
 
 **Acceptance Criteria:**
-- [ ] Library installed and added to package.json
-- [ ] Base chart components created and working
-- [ ] Charts responsive on all screen sizes
-- [ ] Theme colors match Fintrax design system
-- [ ] Documentation for chart usage
+- [x] Library installed and added to package.json
+- [x] Base chart components created and working
+- [x] Charts responsive on all screen sizes
+- [x] Theme colors match Fintrax design system
+- [x] Documentation for chart usage
 
 **Dependencies:** None
 **Risk:** Low
