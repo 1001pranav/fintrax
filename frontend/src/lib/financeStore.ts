@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { api, FinanceSummary, Transaction, Savings, Loan, CreateTransactionData, CreateSavingsData, CreateLoanData } from './api';
+import { toast } from './useToast';
 
 interface FinancialItem {
     name: string;
@@ -167,10 +168,9 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchLoans()
             ]);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to fetch finance summary',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch finance summary';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
         }
     },
 
@@ -310,11 +310,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success('Transaction created successfully');
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to create transaction',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create transaction';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -330,11 +330,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success('Transaction deleted successfully');
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to delete transaction',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete transaction';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -350,11 +350,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success(`Savings goal "${data.name}" created successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to create savings goal',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create savings goal';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -370,11 +370,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success(`Savings goal "${data.name || 'Savings'}" updated successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to update savings goal',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update savings goal';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -390,11 +390,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success('Savings goal deleted successfully');
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to delete savings goal',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete savings goal';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -410,11 +410,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success(`Loan "${data.name}" created successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to create loan',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create loan';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -430,11 +430,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success(`Loan "${data.name || 'Loan'}" updated successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to update loan',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update loan';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -450,11 +450,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
+            toast.success('Loan deleted successfully');
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to delete loan',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete loan';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },

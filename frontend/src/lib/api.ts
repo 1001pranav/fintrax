@@ -1,21 +1,68 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
-type RequestOptions = RequestInit & { skipJsonParse?: boolean };
+type RequestOptions = RequestInit & { skipJsonParse?: boolean; maxRetries?: number };
+
+// Utility function to delay execution
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Retry logic with exponential backoff
+async function fetchWithRetry<T>(
+  url: string,
+  options: RequestInit,
+  maxRetries: number = 3
+): Promise<Response> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+
+      // If successful or client error (4xx), return immediately
+      if (res.ok || (res.status >= 400 && res.status < 500)) {
+        return res;
+      }
+
+      // Server error (5xx) - retry
+      lastError = new Error(`Server error: ${res.status}`);
+
+      // Don't retry on last attempt
+      if (attempt < maxRetries) {
+        const delayMs = Math.min(1000 * Math.pow(2, attempt), 5000); // Max 5 seconds
+        await delay(delayMs);
+      }
+    } catch (error) {
+      // Network error - retry
+      lastError = error instanceof Error ? error : new Error('Network error');
+
+      // Don't retry on last attempt
+      if (attempt < maxRetries) {
+        const delayMs = Math.min(1000 * Math.pow(2, attempt), 5000); // Max 5 seconds
+        await delay(delayMs);
+      }
+    }
+  }
+
+  throw lastError || new Error('Request failed after retries');
+}
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { skipJsonParse, headers, ...rest } = options;
+  const { skipJsonParse, maxRetries = 3, headers, ...rest } = options;
 
   // Get token from localStorage
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...headers,
+  const res = await fetchWithRetry(
+    `${API_BASE_URL}${path}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...headers,
+      },
+      ...rest,
     },
-    ...rest,
-  });
+    maxRetries
+  );
 
   if (!res.ok) {
     let message = res.statusText;

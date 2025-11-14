@@ -831,13 +831,13 @@
 7. Create error boundary components
 
 **Acceptance Criteria:**
-- [ ] Success toasts appear after create/update/delete
-- [ ] Error messages explain what went wrong
-- [ ] Loading spinners show during API calls
-- [ ] Retry button on failed requests
-- [ ] Offline banner when no connection
-- [ ] Error boundaries catch render errors
-- [ ] Toasts auto-dismiss after 3 seconds
+- [x] Success toasts appear after create/update/delete
+- [x] Error messages explain what went wrong
+- [x] Loading spinners show during API calls
+- [x] Retry button on failed requests
+- [x] Offline banner when no connection
+- [x] Error boundaries catch render errors
+- [x] Toasts auto-dismiss after 3 seconds
 
 **Dependencies:** None
 **Risk:** Low

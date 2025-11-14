@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { Project, Task } from '@/constants/interfaces';
 import { api, Project as ApiProject, CreateProjectData } from './api';
+import { toast } from './useToast';
 
 interface AppState {
     projects: Project[];
@@ -128,10 +129,9 @@ export const useAppStore = create<AppState>((set, get) => ({
             const projects = response.data.map(convertApiProject);
             set({ projects, isLoading: false });
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to fetch projects',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch projects';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
         }
     },
 
@@ -151,11 +151,11 @@ export const useAppStore = create<AppState>((set, get) => ({
                 projects: [...state.projects, newProject],
                 isLoading: false
             }));
+            toast.success(`Project "${projectData.name}" created successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to add project',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to add project';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -178,11 +178,11 @@ export const useAppStore = create<AppState>((set, get) => ({
                 ),
                 isLoading: false
             }));
+            toast.success(`Project "${updates.name || 'Project'}" updated successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to update project',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update project';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -198,11 +198,11 @@ export const useAppStore = create<AppState>((set, get) => ({
                 selectedProject: state.selectedProject?.id === id ? null : state.selectedProject,
                 isLoading: false
             }));
+            toast.success('Project deleted successfully');
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to delete project',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete project';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -210,25 +210,32 @@ export const useAppStore = create<AppState>((set, get) => ({
     setSelectedProject: (project) => set({ selectedProject: project }),
 
     // Task actions (keeping mock implementation for now - will be connected to todo API separately)
-    addTask: (taskData) => set((state) => {
+    addTask: (taskData) => {
         const newTask: Task = {
-        ...taskData,
-        id: Date.now().toString(),
-        createdDate: new Date()
+            ...taskData,
+            id: Date.now().toString(),
+            createdDate: new Date()
         };
-        return { tasks: [...state.tasks, newTask] };
-    }),
+        set((state) => ({ tasks: [...state.tasks, newTask] }));
+        toast.success(`Task "${taskData.title}" created successfully`);
+    },
 
-    updateTask: (id, updates) => set((state) => ({
-        tasks: state.tasks.map(task =>
-        task.id === id ? { ...task, ...updates } : task
-        )
-    })),
+    updateTask: (id, updates) => {
+        set((state) => ({
+            tasks: state.tasks.map(task =>
+                task.id === id ? { ...task, ...updates } : task
+            )
+        }));
+        toast.success(`Task "${updates.title || 'Task'}" updated successfully`);
+    },
 
-    deleteTask: (id) => set((state) => ({
-        tasks: state.tasks.filter(task => task.id !== id && task.parentTaskId !== id),
-        selectedTask: state.selectedTask?.id === id ? null : state.selectedTask
-    })),
+    deleteTask: (id) => {
+        set((state) => ({
+            tasks: state.tasks.filter(task => task.id !== id && task.parentTaskId !== id),
+            selectedTask: state.selectedTask?.id === id ? null : state.selectedTask
+        }));
+        toast.success('Task deleted successfully');
+    },
 
     moveTask: (taskId, newStatus) => set((state) => ({
         tasks: state.tasks.map(task =>
