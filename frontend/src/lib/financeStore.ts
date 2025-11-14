@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api, FinanceSummary, Transaction, Savings, Loan, CreateTransactionData } from './api';
+import { api, FinanceSummary, Transaction, Savings, Loan, CreateTransactionData, CreateSavingsData } from './api';
 
 interface FinancialItem {
     name: string;
@@ -66,6 +66,11 @@ interface FinanceStore {
     updateBalance: (balance: number, totalDebt: number) => Promise<void>;
     createTransaction: (data: CreateTransactionData) => Promise<void>;
     deleteTransaction: (id: number) => Promise<void>;
+
+    // Savings Actions
+    createSavings: (data: CreateSavingsData) => Promise<void>;
+    updateSavings: (id: number, data: Partial<CreateSavingsData>) => Promise<void>;
+    deleteSavings: (id: number) => Promise<void>;
 
     // Computed
     getNetWorth: () => number;
@@ -214,7 +219,7 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 id: saving.saving_id,
                 name: saving.name,
                 amount: saving.amount,
-                target: saving.amount * 2, // You might want to add target to backend model
+                target: saving.target_amount,
                 category: 'savings',
                 rate: saving.rate
             }));
@@ -320,6 +325,66 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         } catch (error) {
             set({
                 error: error instanceof Error ? error.message : 'Failed to delete transaction',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Create a new savings goal
+    createSavings: async (data: CreateSavingsData) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.savings.create(data);
+            // Refresh all financial data after creating savings
+            await Promise.all([
+                get().fetchSavings(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to create savings goal',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Update a savings goal
+    updateSavings: async (id: number, data: Partial<CreateSavingsData>) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.savings.update(id, data);
+            // Refresh all financial data after updating savings
+            await Promise.all([
+                get().fetchSavings(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to update savings goal',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Delete a savings goal
+    deleteSavings: async (id: number) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.savings.delete(id);
+            // Refresh all financial data after deleting savings
+            await Promise.all([
+                get().fetchSavings(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to delete savings goal',
                 isLoading: false
             });
             throw error;
