@@ -157,6 +157,7 @@ export interface Savings {
   saving_id: number;
   name: string;
   amount: number;
+  target_amount: number;
   rate: number;
   user_id: number;
   updated_at: string;
@@ -166,6 +167,7 @@ export interface Savings {
 export interface CreateSavingsData {
   name: string;
   amount: number;
+  target_amount: number;
   rate?: number;
 }
 

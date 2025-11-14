@@ -12,21 +12,23 @@ import (
 )
 
 type savingsRequest struct {
-	Name   string  `json:"name" binding:"required"`
-	Amount float64 `json:"amount" binding:"required,gte=0"`
-	Rate   float64 `json:"rate" binding:"gte=0"`
-	Status uint    `json:"status" binding:"gte=1,lte=6"`
+	Name         string  `json:"name" binding:"required"`
+	Amount       float64 `json:"amount" binding:"required,gte=0"`
+	TargetAmount float64 `json:"target_amount" binding:"required,gte=0"`
+	Rate         float64 `json:"rate" binding:"gte=0"`
+	Status       uint    `json:"status" binding:"gte=1,lte=6"`
 }
 
 type savingsResponse struct {
-	ID        uint      `json:"saving_id"`
-	Name      string    `json:"name"`
-	Amount    float64   `json:"amount"`
-	Rate      float64   `json:"rate"`
-	UserID    uint      `json:"user_id"`
-	Status    uint      `json:"status"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           uint      `json:"saving_id"`
+	Name         string    `json:"name"`
+	Amount       float64   `json:"amount"`
+	TargetAmount float64   `json:"target_amount"`
+	Rate         float64   `json:"rate"`
+	UserID       uint      `json:"user_id"`
+	Status       uint      `json:"status"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 // CreateSavings creates a new savings goal for the authenticated user
@@ -50,11 +52,12 @@ func CreateSavings(c *gin.Context) {
 	}
 
 	var savings = models.Savings{
-		Name:   req.Name,
-		Amount: req.Amount,
-		Rate:   req.Rate,
-		UserID: uint(userID.(int)),
-		Status: req.Status,
+		Name:         req.Name,
+		Amount:       req.Amount,
+		TargetAmount: req.TargetAmount,
+		Rate:         req.Rate,
+		UserID:       uint(userID.(int)),
+		Status:       req.Status,
 	}
 
 	tx := database.DB.Begin()
@@ -66,14 +69,15 @@ func CreateSavings(c *gin.Context) {
 	tx.Commit()
 
 	response := savingsResponse{
-		ID:        savings.ID,
-		Name:      savings.Name,
-		Amount:    savings.Amount,
-		Rate:      savings.Rate,
-		UserID:    savings.UserID,
-		Status:    savings.Status,
-		CreatedAt: savings.CreatedAt,
-		UpdatedAt: savings.UpdatedAt,
+		ID:           savings.ID,
+		Name:         savings.Name,
+		Amount:       savings.Amount,
+		TargetAmount: savings.TargetAmount,
+		Rate:         savings.Rate,
+		UserID:       savings.UserID,
+		Status:       savings.Status,
+		CreatedAt:    savings.CreatedAt,
+		UpdatedAt:    savings.UpdatedAt,
 	}
 
 	helper.Response(c, http.StatusCreated, "Savings created successfully", response, nil)
@@ -95,14 +99,15 @@ func GetAllSavings(c *gin.Context) {
 	response := make([]savingsResponse, len(savings))
 	for i, saving := range savings {
 		response[i] = savingsResponse{
-			ID:        saving.ID,
-			Name:      saving.Name,
-			Amount:    saving.Amount,
-			Rate:      saving.Rate,
-			UserID:    saving.UserID,
-			Status:    saving.Status,
-			CreatedAt: saving.CreatedAt,
-			UpdatedAt: saving.UpdatedAt,
+			ID:           saving.ID,
+			Name:         saving.Name,
+			Amount:       saving.Amount,
+			TargetAmount: saving.TargetAmount,
+			Rate:         saving.Rate,
+			UserID:       saving.UserID,
+			Status:       saving.Status,
+			CreatedAt:    saving.CreatedAt,
+			UpdatedAt:    saving.UpdatedAt,
 		}
 	}
 
@@ -128,14 +133,15 @@ func GetSavings(c *gin.Context) {
 	}
 
 	response := savingsResponse{
-		ID:        savings.ID,
-		Name:      savings.Name,
-		Amount:    savings.Amount,
-		Rate:      savings.Rate,
-		UserID:    savings.UserID,
-		Status:    savings.Status,
-		CreatedAt: savings.CreatedAt,
-		UpdatedAt: savings.UpdatedAt,
+		ID:           savings.ID,
+		Name:         savings.Name,
+		Amount:       savings.Amount,
+		TargetAmount: savings.TargetAmount,
+		Rate:         savings.Rate,
+		UserID:       savings.UserID,
+		Status:       savings.Status,
+		CreatedAt:    savings.CreatedAt,
+		UpdatedAt:    savings.UpdatedAt,
 	}
 
 	helper.Response(c, http.StatusOK, "Savings fetched successfully", response, nil)
@@ -168,6 +174,7 @@ func UpdateSavings(c *gin.Context) {
 	// Update fields
 	savings.Name = req.Name
 	savings.Amount = req.Amount
+	savings.TargetAmount = req.TargetAmount
 	savings.Rate = req.Rate
 	if req.Status != 0 {
 		savings.Status = req.Status
@@ -176,14 +183,15 @@ func UpdateSavings(c *gin.Context) {
 	database.DB.Save(&savings)
 
 	response := savingsResponse{
-		ID:        savings.ID,
-		Name:      savings.Name,
-		Amount:    savings.Amount,
-		Rate:      savings.Rate,
-		UserID:    savings.UserID,
-		Status:    savings.Status,
-		CreatedAt: savings.CreatedAt,
-		UpdatedAt: savings.UpdatedAt,
+		ID:           savings.ID,
+		Name:         savings.Name,
+		Amount:       savings.Amount,
+		TargetAmount: savings.TargetAmount,
+		Rate:         savings.Rate,
+		UserID:       savings.UserID,
+		Status:       savings.Status,
+		CreatedAt:    savings.CreatedAt,
+		UpdatedAt:    savings.UpdatedAt,
 	}
 
 	helper.Response(c, http.StatusOK, "Savings updated successfully", response, nil)
