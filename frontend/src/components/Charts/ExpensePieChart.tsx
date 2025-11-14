@@ -147,11 +147,11 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
 
   // Time period selector
   const TimePeriodSelector = () => (
-    <div className="flex items-center space-x-2">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
       <select
         value={timePeriod}
         onChange={(e) => handleTimePeriodChange(e.target.value as TimePeriod)}
-        className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+        className="min-h-[44px] bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all touch-manipulation"
       >
         <option value="this-month">This Month</option>
         <option value="last-month">Last Month</option>
@@ -162,14 +162,14 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
       </select>
 
       {showCustomDatePicker && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <input
             type="date"
             onChange={(e) => {
               const endDate = customRange?.endDate || new Date().toISOString().split('T')[0];
               handleCustomDateChange(e.target.value, endDate);
             }}
-            className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="flex-1 min-h-[44px] bg-white/10 border border-white/20 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 touch-manipulation"
           />
           <span className="text-white/60 text-sm">to</span>
           <input
@@ -178,7 +178,7 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
               const startDate = customRange?.startDate || new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
               handleCustomDateChange(startDate, e.target.value);
             }}
-            className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="flex-1 min-h-[44px] bg-white/10 border border-white/20 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 touch-manipulation"
           />
         </div>
       )}
@@ -207,8 +207,8 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
               cy="50%"
               labelLine={false}
               label={renderLabel}
-              outerRadius={120}
-              innerRadius={60}
+              outerRadius={window.innerWidth < 640 ? 80 : 120}
+              innerRadius={window.innerWidth < 640 ? 40 : 60}
               fill="#8884d8"
               dataKey="amount"
               nameKey="category"
@@ -224,8 +224,9 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
               verticalAlign="bottom"
               height={36}
               iconType="circle"
+              wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
               formatter={(value: string) => (
-                <span style={{ color: CHART_COLORS.text.primary, fontSize: '12px' }}>
+                <span style={{ color: CHART_COLORS.text.primary, fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
                   {value}
                 </span>
               )}
@@ -236,24 +237,24 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
 
       {/* Summary Legend */}
       {expenseData.length > 0 && (
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
           {expenseData.map((item, index) => (
             <div
               key={index}
-              className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all"
+              className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 active:bg-white/15 transition-all touch-manipulation"
             >
               <div className="flex items-center space-x-2 mb-1">
                 <div
-                  className="w-3 h-3 rounded-full"
+                  className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-white/80 text-xs font-medium">{item.category}</span>
+                <span className="text-white/80 text-xs font-medium truncate">{item.category}</span>
               </div>
               <div className="text-white font-bold text-sm">
                 {formatCurrency(item.amount)}
               </div>
               <div className="text-white/60 text-xs">
-                {formatPercentage(item.percentage)} • {item.count} transactions
+                {formatPercentage(item.percentage)} • {item.count} {item.count === 1 ? 'transaction' : 'transactions'}
               </div>
             </div>
           ))}

@@ -45,21 +45,21 @@ export default function FinancePage() {
     <div className="flex h-screen bg-slate-900">
       <Sidebar />
       <div className="flex-1 overflow-hidden">
-        <div className="h-full p-6 overflow-y-auto">
+        <div className="h-full p-4 sm:p-6 overflow-y-auto">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-3xl font-bold text-white">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">
                 Financial Dashboard
               </h1>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105"
+                className="w-full sm:w-auto min-h-[44px] px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 touch-manipulation"
               >
                 + Add Transaction
               </button>
             </div>
-            <p className="text-white/60">
+            <p className="text-white/60 text-sm sm:text-base">
               Track your income, expenses, savings, and debts at a glance
             </p>
           </div>
@@ -132,12 +132,12 @@ export default function FinancePage() {
               </div>
 
               {/* Quick Actions */}
-              <div className="mt-8">
-                <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="mt-6 sm:mt-8">
+                <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 transition-all duration-200 text-left group"
+                    className="min-h-[88px] bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 active:bg-white/15 transition-all duration-200 text-left group touch-manipulation"
                   >
                     <div className="text-blue-400 mb-2">
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -152,7 +152,7 @@ export default function FinancePage() {
                     </p>
                   </button>
 
-                  <button className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 transition-all duration-200 text-left group">
+                  <button className="min-h-[88px] bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 active:bg-white/15 transition-all duration-200 text-left group touch-manipulation">
                     <div className="text-green-400 mb-2">
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -166,7 +166,7 @@ export default function FinancePage() {
                     </p>
                   </button>
 
-                  <button className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 transition-all duration-200 text-left group">
+                  <button className="min-h-[88px] bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 active:bg-white/15 transition-all duration-200 text-left group touch-manipulation">
                     <div className="text-orange-400 mb-2">
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -180,7 +180,7 @@ export default function FinancePage() {
                     </p>
                   </button>
 
-                  <button className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 transition-all duration-200 text-left group">
+                  <button className="min-h-[88px] bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 active:bg-white/15 transition-all duration-200 text-left group touch-manipulation">
                     <div className="text-purple-400 mb-2">
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />

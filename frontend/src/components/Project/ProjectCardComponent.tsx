@@ -37,25 +37,26 @@ export default function ProjectCard({ project, isSelected, onClick }: ProjectCar
   return (
     <div
       onClick={onClick}
-      className={`group p-4 rounded-xl cursor-pointer transition-all duration-200 ${
+      className={`group min-h-[100px] p-3 sm:p-4 rounded-xl cursor-pointer transition-all duration-200 touch-manipulation ${
         isSelected
           ? 'bg-white/15 border border-white/20 shadow-lg'
-          : 'bg-white/5 hover:bg-white/10 border border-transparent'
+          : 'bg-white/5 hover:bg-white/10 active:bg-white/15 border border-transparent'
       }`}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-3">
+      <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+        <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
           <div
-            className="w-4 h-4 rounded-full"
+            className="w-4 h-4 rounded-full flex-shrink-0"
             style={{ backgroundColor: project.color }}
           />
-          <h3 className="font-semibold text-white truncate">{project.name}</h3>
+          <h3 className="font-semibold text-white text-sm sm:text-base truncate">{project.name}</h3>
         </div>
-        
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+
+        <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex space-x-1 flex-shrink-0">
           <button
             onClick={handleEdit}
-            className="p-1 hover:bg-white/10 rounded transition-colors"
+            className="min-w-[32px] min-h-[32px] p-1.5 sm:p-1 hover:bg-white/10 active:bg-white/20 rounded transition-colors touch-manipulation"
+            aria-label="Edit project"
           >
             <SVGComponent
               svgType={"editWrite"}
@@ -64,7 +65,8 @@ export default function ProjectCard({ project, isSelected, onClick }: ProjectCar
           </button>
           <button
             onClick={handleDelete}
-            className="p-1 hover:bg-red-500/20 rounded transition-colors"
+            className="min-w-[32px] min-h-[32px] p-1.5 sm:p-1 hover:bg-red-500/20 active:bg-red-500/30 rounded transition-colors touch-manipulation"
+            aria-label="Delete project"
           >
             <SVGComponent
               svgType={"delete"}
@@ -73,9 +75,9 @@ export default function ProjectCard({ project, isSelected, onClick }: ProjectCar
           </button>
         </div>
       </div>
-      
-      <p className="text-white/60 text-sm mb-3 line-clamp-2">{project.description}</p>
-      
+
+      <p className="text-white/60 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{project.description}</p>
+
       <div className="flex items-center justify-between text-xs text-white/50">
         <span>{project.taskCount || 0} tasks</span>
         <span>

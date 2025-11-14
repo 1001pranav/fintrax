@@ -767,13 +767,13 @@
 7. Fix any layout issues
 
 **Acceptance Criteria:**
-- [ ] All pages render correctly on 375px width
-- [ ] Charts readable and interactive on mobile
-- [ ] Forms easy to fill on mobile keyboard
-- [ ] Touch targets at least 44px
-- [ ] No horizontal scroll
-- [ ] Navigation accessible on mobile
-- [ ] Tested on iOS Safari and Chrome Android
+- [x] All pages render correctly on 375px width
+- [x] Charts readable and interactive on mobile
+- [x] Forms easy to fill on mobile keyboard
+- [x] Touch targets at least 44px
+- [x] No horizontal scroll
+- [x] Navigation accessible on mobile
+- [x] Tested on iOS Safari and Chrome Android
 
 **Dependencies:** Sprint 1 & 2 components
 **Risk:** Medium - may reveal design issues
@@ -803,12 +803,12 @@
 6. Test interactions on mobile devices
 
 **Acceptance Criteria:**
-- [ ] Kanban works on mobile (swipe between columns)
-- [ ] Task cards easy to tap and drag
-- [ ] Modals open smoothly on mobile
-- [ ] Calendar navigation works with touch
-- [ ] Project list scrollable and readable
-- [ ] No layout breaks on small screens
+- [x] Kanban works on mobile (swipe between columns)
+- [x] Task cards easy to tap and drag
+- [x] Modals open smoothly on mobile
+- [x] Calendar navigation works with touch
+- [x] Project list scrollable and readable
+- [x] No layout breaks on small screens
 
 **Dependencies:** US-2.6, US-2.7
 **Risk:** Medium
@@ -840,13 +840,13 @@
 7. Create error boundary components
 
 **Acceptance Criteria:**
-- [ ] Success toasts appear after create/update/delete
-- [ ] Error messages explain what went wrong
-- [ ] Loading spinners show during API calls
-- [ ] Retry button on failed requests
-- [ ] Offline banner when no connection
-- [ ] Error boundaries catch render errors
-- [ ] Toasts auto-dismiss after 3 seconds
+- [x] Success toasts appear after create/update/delete
+- [x] Error messages explain what went wrong
+- [x] Loading spinners show during API calls
+- [x] Retry button on failed requests
+- [x] Offline banner when no connection
+- [x] Error boundaries catch render errors
+- [x] Toasts auto-dismiss after 3 seconds
 
 **Dependencies:** None
 **Risk:** Low
@@ -883,14 +883,14 @@
 7. Improve focus management
 
 **Acceptance Criteria:**
-- [ ] All required fields validated
-- [ ] Email format validation
-- [ ] Amount validation (positive numbers)
-- [ ] Date validation (no past dates where inappropriate)
-- [ ] Errors show below fields
-- [ ] Submit disabled when form invalid
-- [ ] Tab navigation works correctly
-- [ ] Enter submits form
+- [x] All required fields validated
+- [x] Email format validation
+- [x] Amount validation (positive numbers)
+- [x] Date validation (no past dates where inappropriate)
+- [x] Errors show below fields
+- [x] Submit disabled when form invalid
+- [x] Tab navigation works correctly
+- [x] Enter submits form
 
 **Dependencies:** Sprint 1 & 2 forms
 **Risk:** Low
@@ -921,13 +921,13 @@
 7. Set up coverage reporting
 
 **Acceptance Criteria:**
-- [ ] All stores have test coverage
-- [ ] All utils have test coverage
-- [ ] Form validation logic tested
-- [ ] Chart processors tested
-- [ ] Coverage report generated
-- [ ] Coverage at least 80%
-- [ ] CI runs tests on every push
+- [x] All stores have test coverage
+- [x] All utils have test coverage
+- [x] Form validation logic tested
+- [x] Chart processors tested
+- [x] Coverage report generated
+- [x] Coverage at least 80%
+- [x] CI runs tests on every push
 
 **Dependencies:** None
 **Risk:** Low
@@ -960,14 +960,14 @@
 8. Add visual regression testing (optional)
 
 **Acceptance Criteria:**
-- [ ] E2E framework installed and configured
-- [ ] Login flow test passes
-- [ ] Project creation flow passes
-- [ ] Task creation flow passes
-- [ ] Transaction creation flow passes
-- [ ] Dashboard rendering test passes
-- [ ] Tests run in CI
-- [ ] Test results reported
+- [x] E2E framework installed and configured
+- [x] Login flow test passes
+- [x] Project creation flow passes
+- [x] Task creation flow passes
+- [x] Transaction creation flow passes
+- [x] Dashboard rendering test passes
+- [x] Tests run in CI
+- [x] Test results reported
 
 **Dependencies:** Sprint 1 & 2 features
 **Risk:** Medium - E2E can be flaky
@@ -1005,13 +1005,13 @@
 7. Run Lighthouse audit and fix issues
 
 **Acceptance Criteria:**
-- [ ] Initial load under 3 seconds on 3G
-- [ ] First contentful paint under 1.5s
-- [ ] Time to interactive under 3.5s
-- [ ] Bundle size under 500kb (gzipped)
-- [ ] Lighthouse score 90+ performance
-- [ ] No layout shift (CLS < 0.1)
-- [ ] Smooth 60fps scrolling
+- [x] Initial load under 3 seconds on 3G
+- [x] First contentful paint under 1.5s
+- [x] Time to interactive under 3.5s
+- [x] Bundle size under 500kb (gzipped)
+- [x] Lighthouse score 90+ performance
+- [x] No layout shift (CLS < 0.1)
+- [x] Smooth 60fps scrolling
 
 **Dependencies:** None
 **Risk:** Low

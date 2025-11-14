@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { Project } from '@/constants/interfaces';
 import { api, Project as ApiProject, CreateProjectData } from './api';
+import { toast } from './useToast';
 
 interface AppState {
     projects: Project[];
@@ -54,10 +55,9 @@ export const useAppStore = create<AppState>((set, get) => ({
             const projects = response.data.map(convertApiProject);
             set({ projects, isLoading: false });
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to fetch projects',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch projects';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
         }
     },
 
@@ -77,11 +77,11 @@ export const useAppStore = create<AppState>((set, get) => ({
                 projects: [...state.projects, newProject],
                 isLoading: false
             }));
+            toast.success(`Project "${projectData.name}" created successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to add project',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to add project';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -104,11 +104,11 @@ export const useAppStore = create<AppState>((set, get) => ({
                 ),
                 isLoading: false
             }));
+            toast.success(`Project "${updates.name || 'Project'}" updated successfully`);
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to update project',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update project';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
@@ -123,11 +123,11 @@ export const useAppStore = create<AppState>((set, get) => ({
                 selectedProject: state.selectedProject?.id === id ? null : state.selectedProject,
                 isLoading: false
             }));
+            toast.success('Project deleted successfully');
         } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to delete project',
-                isLoading: false
-            });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete project';
+            set({ error: errorMessage, isLoading: false });
+            toast.error(errorMessage);
             throw error;
         }
     },
