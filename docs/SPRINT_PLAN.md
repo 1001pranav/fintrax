@@ -874,14 +874,14 @@
 7. Improve focus management
 
 **Acceptance Criteria:**
-- [ ] All required fields validated
-- [ ] Email format validation
-- [ ] Amount validation (positive numbers)
-- [ ] Date validation (no past dates where inappropriate)
-- [ ] Errors show below fields
-- [ ] Submit disabled when form invalid
-- [ ] Tab navigation works correctly
-- [ ] Enter submits form
+- [x] All required fields validated
+- [x] Email format validation
+- [x] Amount validation (positive numbers)
+- [x] Date validation (no past dates where inappropriate)
+- [x] Errors show below fields
+- [x] Submit disabled when form invalid
+- [x] Tab navigation works correctly
+- [x] Enter submits form
 
 **Dependencies:** Sprint 1 & 2 forms
 **Risk:** Low

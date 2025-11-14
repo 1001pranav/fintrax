@@ -1,9 +1,10 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Tags, TaskFormData } from '@/constants/interfaces';
 import SVGComponent from '../svg';
 import { TASK_TAG_COLORS } from '@/constants/generalConstants';
+import { validateTextField, validateDateRange } from '@/utils/validation';
 
 const priorityOptions = [
   { value: 'low', label: 'Low', color: 'text-green-400' },
@@ -44,7 +45,33 @@ export default function TaskModal() {
   const [tagInput, setTagInput] = useState<Tags>({ id: '', name: '', color: '' });
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [mainTaskInfo, setMainTaskInfo] = useState<string | null>(selectedTask?.parentTaskId || null);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const isEditing = selectedTask?.id ? true : false;
+
+  // Validate form
+  const validateForm = useCallback(() => {
+    const newErrors: { [key: string]: string[] } = {};
+
+    // Validate title
+    const titleValidation = validateTextField(formData.title, 'Task title', { required: true, minLength: 1, maxLength: 200 });
+    if (!titleValidation.isValid) {
+      newErrors.title = titleValidation.errors;
+    }
+
+    // Validate date range if both dates are provided
+    if (formData.startDate && formData.endDate) {
+      const dateRangeValidation = validateDateRange(formData.startDate, formData.endDate, { required: false });
+      if (!dateRangeValidation.isValid) {
+        newErrors.dateRange = dateRangeValidation.errors;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [formData.title, formData.startDate, formData.endDate]);
+
+  const isFormValid = Object.keys(errors).length === 0 && formData.title.trim() !== '';
 
   const handleClose = useCallback(() => {
     setTaskModalOpen(false);
@@ -63,7 +90,8 @@ export default function TaskModal() {
     setMainTaskInfo(null);
     setTagInput({ id: '', name: '', color: '' });
     setShowColorPicker(false);
-  }, [setTaskModalOpen, setSelectedTask, setFormData, setTagInput]);
+    setErrors({});
+  }, [setTaskModalOpen, setSelectedTask]);
   
   useEffect(() => {
     if (isTaskModalOpen && selectedTask) {
@@ -81,6 +109,16 @@ export default function TaskModal() {
     }
   }, [isTaskModalOpen, selectedTask]);
 
+  // Focus management and keyboard shortcuts
+  useEffect(() => {
+    if (isTaskModalOpen) {
+      // Focus the title input when modal opens
+      setTimeout(() => {
+        titleInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isTaskModalOpen]);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -95,7 +133,12 @@ export default function TaskModal() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Validate form before submitting
+    if (!validateForm()) {
+      return;
+    }
+
     if (!selectedProject) return;
 
     const taskData = {
@@ -205,13 +248,32 @@ export default function TaskModal() {
               Task Title *
             </label>
             <input
+              ref={titleInputRef}
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full min-h-[44px] px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 touch-manipulation text-base"
+              onBlur={validateForm}
+              className={`w-full min-h-[44px] px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 transition-all touch-manipulation text-base ${
+                errors.title
+                  ? 'border-red-400/50 focus:ring-red-500/50 focus:border-red-400/50'
+                  : 'border-white/20 focus:ring-blue-500/50 focus:border-blue-400/50'
+              }`}
               placeholder="Enter task title"
-              required
+              aria-invalid={errors.title ? 'true' : 'false'}
+              aria-describedby={errors.title ? 'title-error' : undefined}
             />
+            {errors.title && (
+              <div id="title-error" className="mt-1 space-y-1" role="alert" aria-live="polite">
+                {errors.title.map((err, index) => (
+                  <p key={index} className="text-xs text-red-400 flex items-center gap-1">
+                    <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {err}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Description */}
@@ -275,7 +337,12 @@ export default function TaskModal() {
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+                onBlur={validateForm}
+                className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white focus:outline-none focus:ring-2 transition-all ${
+                  errors.dateRange
+                    ? 'border-red-400/50 focus:ring-red-500/50 focus:border-red-400/50'
+                    : 'border-white/20 focus:ring-blue-500/50 focus:border-blue-400/50'
+                }`}
               />
             </div>
 
@@ -287,10 +354,28 @@ export default function TaskModal() {
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+                onBlur={validateForm}
+                className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white focus:outline-none focus:ring-2 transition-all ${
+                  errors.dateRange
+                    ? 'border-red-400/50 focus:ring-red-500/50 focus:border-red-400/50'
+                    : 'border-white/20 focus:ring-blue-500/50 focus:border-blue-400/50'
+                }`}
               />
             </div>
           </div>
+          {/* Date range error */}
+          {errors.dateRange && (
+            <div className="mt-1 space-y-1" role="alert" aria-live="polite">
+              {errors.dateRange.map((err, index) => (
+                <p key={index} className="text-xs text-red-400 flex items-center gap-1">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {err}
+                </p>
+              ))}
+            </div>
+          )}
 
           {/* Task Dropdown Selection */}
           <div>
@@ -424,7 +509,12 @@ export default function TaskModal() {
             </button>
             <button
               type="submit"
-              className="flex-1 min-h-[48px] py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white font-semibold hover:from-blue-600 hover:to-purple-700 active:from-blue-700 active:to-purple-800 transition-all duration-200 touch-manipulation"
+              disabled={!isFormValid}
+              className={`flex-1 min-h-[48px] py-3 px-4 rounded-xl font-semibold transition-all duration-200 touch-manipulation ${
+                isFormValid
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 active:from-blue-700 active:to-purple-800'
+                  : 'bg-white/10 text-white/40 cursor-not-allowed'
+              }`}
             >
               {isEditing ? 'Update' : 'Create'} Task
             </button>

@@ -303,3 +303,164 @@ export const validateOTP = (otp: string): ValidationResult => {
 
   return { isValid: errors.length === 0, errors };
 };
+
+/**
+ * Amount/currency validation (positive numbers)
+ */
+export const validateAmount = (
+  value: number | string,
+  fieldName: string = 'Amount',
+  options: {
+    required?: boolean;
+    allowZero?: boolean;
+    min?: number;
+    max?: number;
+  } = {}
+): ValidationResult => {
+  const errors: string[] = [];
+  const { required = true, allowZero = false, min, max } = options;
+
+  if (required && (value === undefined || value === null || value === '')) {
+    errors.push(`${fieldName} is required`);
+    return { isValid: false, errors };
+  }
+
+  if (!required && (value === undefined || value === null || value === '')) {
+    return { isValid: true, errors: [] };
+  }
+
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+
+  if (isNaN(numValue)) {
+    errors.push(`${fieldName} must be a valid number`);
+    return { isValid: false, errors };
+  }
+
+  if (!allowZero && numValue <= 0) {
+    errors.push(`${fieldName} must be greater than zero`);
+  } else if (allowZero && numValue < 0) {
+    errors.push(`${fieldName} cannot be negative`);
+  }
+
+  if (min !== undefined && numValue < min) {
+    errors.push(`${fieldName} must be at least ${min}`);
+  }
+
+  if (max !== undefined && numValue > max) {
+    errors.push(`${fieldName} must not exceed ${max}`);
+  }
+
+  return { isValid: errors.length === 0, errors };
+};
+
+/**
+ * Date validation
+ */
+export const validateDate = (
+  value: string | Date,
+  fieldName: string = 'Date',
+  options: {
+    required?: boolean;
+    allowPast?: boolean;
+    allowFuture?: boolean;
+    minDate?: Date;
+    maxDate?: Date;
+  } = {}
+): ValidationResult => {
+  const errors: string[] = [];
+  const { required = true, allowPast = true, allowFuture = true, minDate, maxDate } = options;
+
+  if (required && !value) {
+    errors.push(`${fieldName} is required`);
+    return { isValid: false, errors };
+  }
+
+  if (!required && !value) {
+    return { isValid: true, errors: [] };
+  }
+
+  const date = typeof value === 'string' ? new Date(value) : value;
+
+  if (isNaN(date.getTime())) {
+    errors.push(`${fieldName} must be a valid date`);
+    return { isValid: false, errors };
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dateToCheck = new Date(date);
+  dateToCheck.setHours(0, 0, 0, 0);
+
+  if (!allowPast && dateToCheck < today) {
+    errors.push(`${fieldName} cannot be in the past`);
+  }
+
+  if (!allowFuture && dateToCheck > today) {
+    errors.push(`${fieldName} cannot be in the future`);
+  }
+
+  if (minDate) {
+    const minDateNormalized = new Date(minDate);
+    minDateNormalized.setHours(0, 0, 0, 0);
+    if (dateToCheck < minDateNormalized) {
+      errors.push(`${fieldName} must be on or after ${minDate.toLocaleDateString()}`);
+    }
+  }
+
+  if (maxDate) {
+    const maxDateNormalized = new Date(maxDate);
+    maxDateNormalized.setHours(0, 0, 0, 0);
+    if (dateToCheck > maxDateNormalized) {
+      errors.push(`${fieldName} must be on or before ${maxDate.toLocaleDateString()}`);
+    }
+  }
+
+  return { isValid: errors.length === 0, errors };
+};
+
+/**
+ * Date range validation (start date must be before end date)
+ */
+export const validateDateRange = (
+  startDate: string | Date,
+  endDate: string | Date,
+  options: {
+    required?: boolean;
+    startFieldName?: string;
+    endFieldName?: string;
+  } = {}
+): ValidationResult => {
+  const errors: string[] = [];
+  const { required = true, startFieldName = 'Start date', endFieldName = 'End date' } = options;
+
+  if (required && (!startDate || !endDate)) {
+    if (!startDate) errors.push(`${startFieldName} is required`);
+    if (!endDate) errors.push(`${endFieldName} is required`);
+    return { isValid: false, errors };
+  }
+
+  if (!startDate || !endDate) {
+    return { isValid: true, errors: [] };
+  }
+
+  const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
+  const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
+
+  if (isNaN(start.getTime())) {
+    errors.push(`${startFieldName} must be a valid date`);
+  }
+
+  if (isNaN(end.getTime())) {
+    errors.push(`${endFieldName} must be a valid date`);
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
+  if (start > end) {
+    errors.push(`${startFieldName} must be before ${endFieldName}`);
+  }
+
+  return { isValid: errors.length === 0, errors };
+};
