@@ -98,50 +98,46 @@ export default function CalendarViewComponent() {
   };
 
   return (
-    <div className="h-full p-6">
+    <div className="h-full p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="flex items-center space-x-3 sm:space-x-4">
             <div
-              className="w-4 h-4 rounded-full"
+              className="w-4 h-4 rounded-full flex-shrink-0"
               style={{ backgroundColor: selectedProject.color }}
             />
-            <div>
-              <h1 className="text-2xl font-bold text-white">{selectedProject.name}</h1>
-              <p className="text-white/60">Calendar View</p>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{selectedProject.name}</h1>
+              <p className="text-white/60 text-sm sm:text-base">Calendar View</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Calendar Controls */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           <button
             onClick={() => navigateMonth('prev')}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="min-w-[40px] min-h-[40px] p-2 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors touch-manipulation"
+            aria-label="Previous month"
           >
-            {/* <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="" />
-            </svg> */}
             <SVGComponent
               svgType={"leftArrowHead"}
               className="w-5 h-5 text-white"
             />
           </button>
-          
-          <h2 className="text-xl font-semibold text-white">
+
+          <h2 className="text-base sm:text-xl font-semibold text-white whitespace-nowrap">
             {monthNames[month]} {year}
           </h2>
-          
+
           <button
             onClick={() => navigateMonth('next')}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="min-w-[40px] min-h-[40px] p-2 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors touch-manipulation"
+            aria-label="Next month"
           >
-            {/* <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg> */}
             <SVGComponent
               svgType={"rightArrowHead"}
               className="w-5 h-5 text-white"
@@ -151,28 +147,29 @@ export default function CalendarViewComponent() {
 
         <button
           onClick={goToToday}
-          className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 hover:bg-blue-500/30 transition-colors"
+          className="min-h-[40px] px-3 sm:px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 text-sm hover:bg-blue-500/30 active:bg-blue-500/40 transition-colors touch-manipulation"
         >
           Today
         </button>
       </div>
 
       {/* Calendar Grid */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-2 sm:p-4">
         {/* Week Headers */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-2">
           {weekDays.map((day, index) => (
-            <div key={index} className="p-3 text-center text-white/60 font-medium text-sm">
-              {day}
+            <div key={index} className="p-1 sm:p-3 text-center text-white/60 font-medium text-xs sm:text-sm">
+              <span className="hidden sm:inline">{day}</span>
+              <span className="sm:hidden">{day.slice(0, 1)}</span>
             </div>
           ))}
         </div>
 
         {/* Calendar Days */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
           {calendarDays.map((day, index) => {
             if (day === null) {
-              return <div key={index} className="h-24" />;
+              return <div key={index} className="h-16 sm:h-24" />;
             }
 
             const dayTasks = getTasksForDate(day);
@@ -181,30 +178,30 @@ export default function CalendarViewComponent() {
             return (
               <div
                 key={index}
-                className={`h-24 p-2 border border-white/5 rounded-lg hover:bg-white/5 transition-colors ${
+                className={`h-16 sm:h-24 p-1 sm:p-2 border border-white/5 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors touch-manipulation ${
                   isToday ? 'bg-blue-500/10 border-blue-500/30' : ''
                 }`}
               >
-                <div className={`text-sm font-medium mb-1 ${
+                <div className={`text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 ${
                   isToday ? 'text-blue-300' : 'text-white/80'
                 }`}>
                   {day}
                 </div>
-                
-                <div className="space-y-1">
-                  {dayTasks.slice(0, 2).map((task) => (
+
+                <div className="space-y-0.5 sm:space-y-1">
+                  {dayTasks.slice(0, window.innerWidth < 640 ? 1 : 2).map((task) => (
                     <div
                       key={task.id}
                       onClick={() => handleTaskClick(task)}
-                      className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs cursor-pointer hover:bg-blue-500/30 transition-colors truncate"
+                      className="px-1 sm:px-2 py-0.5 sm:py-1 bg-blue-500/20 text-blue-300 rounded text-[10px] sm:text-xs cursor-pointer hover:bg-blue-500/30 active:bg-blue-500/40 transition-colors truncate touch-manipulation"
                     >
                       {task.title}
                     </div>
                   ))}
-                  
-                  {dayTasks.length > 2 && (
-                    <div className="px-2 py-1 bg-white/10 text-white/60 rounded text-xs">
-                      +{dayTasks.length - 2} more
+
+                  {dayTasks.length > (window.innerWidth < 640 ? 1 : 2) && (
+                    <div className="px-1 sm:px-2 py-0.5 sm:py-1 bg-white/10 text-white/60 rounded text-[10px] sm:text-xs">
+                      +{dayTasks.length - (window.innerWidth < 640 ? 1 : 2)}
                     </div>
                   )}
                 </div>

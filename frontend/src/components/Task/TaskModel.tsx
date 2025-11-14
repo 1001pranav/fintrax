@@ -172,31 +172,33 @@ export default function TaskModal() {
   
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-bold text-white">
             {isEditing ? 'Edit Task' : 'Create New Task'}
           </h2>
           <div className="flex items-center space-x-2">
             {isEditing && (
               <button
                 onClick={handleDelete}
-                className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                className="min-w-[40px] min-h-[40px] p-2 hover:bg-red-500/20 active:bg-red-500/30 rounded-lg transition-colors touch-manipulation"
+                aria-label="Delete task"
               >
                 <SVGComponent svgType="delete" className="w-5 h-5 text-red-400" />
               </button>
             )}
             <button
               onClick={handleClose}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="min-w-[40px] min-h-[40px] p-2 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors touch-manipulation"
+              aria-label="Close modal"
             >
               <SVGComponent svgType="x" className="w-5 h-5 text-white/60" />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-white/90 mb-2">
@@ -206,7 +208,7 @@ export default function TaskModal() {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+              className="w-full min-h-[44px] px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 touch-manipulation text-base"
               placeholder="Enter task title"
               required
             />
@@ -227,7 +229,7 @@ export default function TaskModal() {
           </div>
 
           {/* Priority and Status */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-white/90 mb-2">
                 Priority
@@ -235,7 +237,7 @@ export default function TaskModal() {
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+                className="w-full min-h-[44px] px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 touch-manipulation text-base"
               >
                 {priorityOptions.map((option) => (
                   <option key={option.value} value={option.value} className="bg-gray-800">
@@ -252,7 +254,7 @@ export default function TaskModal() {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as 'todo' | 'in-progress' | 'done' })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+                className="w-full min-h-[44px] px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 touch-manipulation text-base"
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value} className="bg-gray-800">
@@ -264,7 +266,7 @@ export default function TaskModal() {
           </div>
 
           {/* Dates */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-white/90 mb-2">
                 Start Date
@@ -412,17 +414,17 @@ export default function TaskModal() {
           </div>
 
           {/* Actions */}
-          <div className="flex space-x-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 py-3 px-4 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors"
+              className="flex-1 min-h-[48px] py-3 px-4 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 active:bg-white/15 transition-colors touch-manipulation"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+              className="flex-1 min-h-[48px] py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white font-semibold hover:from-blue-600 hover:to-purple-700 active:from-blue-700 active:to-purple-800 transition-all duration-200 touch-manipulation"
             >
               {isEditing ? 'Update' : 'Create'} Task
             </button>

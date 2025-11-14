@@ -794,12 +794,12 @@
 6. Test interactions on mobile devices
 
 **Acceptance Criteria:**
-- [ ] Kanban works on mobile (swipe between columns)
-- [ ] Task cards easy to tap and drag
-- [ ] Modals open smoothly on mobile
-- [ ] Calendar navigation works with touch
-- [ ] Project list scrollable and readable
-- [ ] No layout breaks on small screens
+- [x] Kanban works on mobile (swipe between columns)
+- [x] Task cards easy to tap and drag
+- [x] Modals open smoothly on mobile
+- [x] Calendar navigation works with touch
+- [x] Project list scrollable and readable
+- [x] No layout breaks on small screens
 
 **Dependencies:** US-2.6, US-2.7
 **Risk:** Medium
