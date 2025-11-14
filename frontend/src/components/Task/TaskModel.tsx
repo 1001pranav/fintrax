@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useTodoStore } from '@/lib/todoStore';
 import { Tags, TaskFormData } from '@/constants/interfaces';
 import SVGComponent from '../svg';
 import { TASK_TAG_COLORS } from '@/constants/generalConstants';
@@ -18,16 +19,20 @@ const statusOptions = [
 ];
 
 export default function TaskModal() {
-  const { 
-    isTaskModalOpen, 
-    setTaskModalOpen, 
-    selectedTask, 
-    setSelectedTask,
-    addTask, 
-    updateTask, 
-    deleteTask,
-    selectedProject 
+  const {
+    isTaskModalOpen,
+    setTaskModalOpen,
+    selectedProject
   } = useAppStore();
+
+  const {
+    selectedTask,
+    setSelectedTask,
+    createTask,
+    updateTask,
+    deleteTask,
+    todos
+  } = useTodoStore();
 
   const [formData, setFormData] = useState<TaskFormData>({
     title: '',
@@ -93,9 +98,9 @@ export default function TaskModal() {
     }
   }, [handleClose])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedProject) return;
 
     const taskData = {
@@ -105,18 +110,25 @@ export default function TaskModal() {
       projectId: selectedProject.id
     };
 
-    if (isEditing && selectedTask?.id) {
-      updateTask(selectedTask.id, taskData);
-    } else {
-      addTask(taskData);
-    }
+    // Handle parent task assignment
     if (mainTaskInfo && !selectedTask?.parentTaskId) {
-      const mainTask = useAppStore.getState().tasks.find(task => task.id === mainTaskInfo);
+      const mainTask = todos.find(task => task.id === mainTaskInfo);
       if (mainTask) {
         taskData.parentTaskId = mainTaskInfo;
       }
     }
-    handleClose();
+
+    try {
+      if (isEditing && selectedTask?.id) {
+        await updateTask(selectedTask.id, taskData);
+      } else {
+        await createTask(taskData);
+      }
+      handleClose();
+    } catch (error) {
+      console.error('Failed to save task:', error);
+      // Error is handled by the store, just log it
+    }
   };
 
   const handleMainTaskChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -125,10 +137,15 @@ export default function TaskModal() {
     setMainTaskInfo(selectedTaskId ? selectedTaskId : null);
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedTask?.id && confirm('Are you sure you want to delete this task?')) {
-      deleteTask(selectedTask.id);
-      handleClose();
+      try {
+        await deleteTask(selectedTask.id);
+        handleClose();
+      } catch (error) {
+        console.error('Failed to delete task:', error);
+        // Error is handled by the store, just log it
+      }
     }
   };
 
@@ -301,8 +318,8 @@ export default function TaskModal() {
               className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
             >
               <option value="">-- Select a task --</option>
-              {useAppStore.getState().tasks
-                .filter((task) => task.projectId === selectedProject?.id)
+              {todos
+                .filter((task) => task.projectId === selectedProject?.id && task.id !== selectedTask?.id)
                 .map((task) => (
                   <option key={task.id} value={task.id} className="bg-gray-800">
                     {task.title}

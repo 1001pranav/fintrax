@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useTodoStore } from '@/lib/todoStore';
 import TaskCard from '@/components/Task/TaskCard';
 import { Task } from '@/constants/interfaces';
 import SVGComponent from '../svg';
@@ -13,8 +14,24 @@ const columns = [
 ] as const;
 
 export default function KanbanBoard() {
-  const { selectedProject, getTasksByStatus, moveTask, setSelectedTask, setTaskModalOpen } = useAppStore();
+  const { selectedProject, setTaskModalOpen } = useAppStore();
+  const {
+    getTasksByStatus,
+    moveTask,
+    setSelectedTask,
+    fetchTodos,
+    isLoading,
+    error,
+    clearError,
+  } = useTodoStore();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+
+  // Fetch todos when project is selected
+  useEffect(() => {
+    if (selectedProject) {
+      fetchTodos(parseInt(selectedProject.id));
+    }
+  }, [selectedProject, fetchTodos]);
 
   if (!selectedProject) {
     return (
@@ -28,6 +45,18 @@ export default function KanbanBoard() {
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">Select a Project</h3>
           <p className="text-white/60">Choose a project from the sidebar to view tasks</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+          <p className="text-white/60">Loading tasks...</p>
         </div>
       </div>
     );
@@ -47,10 +76,15 @@ export default function KanbanBoard() {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e: React.DragEvent, status: Task['status']) => {
+  const handleDrop = async (e: React.DragEvent, status: Task['status']) => {
     e.preventDefault();
     if (draggedTask && draggedTask.status !== status) {
-      moveTask(draggedTask.id, status);
+      try {
+        await moveTask(draggedTask.id, status);
+      } catch (error) {
+        // Error is handled by the store, just log it
+        console.error('Failed to move task:', error);
+      }
     }
     setDraggedTask(null);
   };
@@ -86,6 +120,38 @@ export default function KanbanBoard() {
           </div>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-2xl p-4 backdrop-blur-xl">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-red-400">
+                Error loading tasks
+              </h3>
+              <p className="mt-1 text-sm text-red-300/80">
+                {error}
+              </p>
+              <button
+                onClick={() => {
+                  clearError();
+                  if (selectedProject) {
+                    fetchTodos(parseInt(selectedProject.id));
+                  }
+                }}
+                className="mt-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+              >
+                Try again
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Kanban Columns */}
       <div className="grid grid-cols-3 gap-6 h-[calc(100%-120px)]">

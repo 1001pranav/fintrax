@@ -568,14 +568,14 @@
 8. Add error handling and loading states
 
 **Acceptance Criteria:**
-- [ ] Tasks load from backend API
-- [ ] Creating task calls API and updates UI
-- [ ] Editing task persists to backend
-- [ ] Deleting task removes from backend
-- [ ] Drag-drop status change updates backend
-- [ ] Tasks filter by selected project
-- [ ] Loading indicators during API calls
-- [ ] Error messages on API failures
+- [x] Tasks load from backend API
+- [x] Creating task calls API and updates UI
+- [x] Editing task persists to backend
+- [x] Deleting task removes from backend
+- [x] Drag-drop status change updates backend
+- [x] Tasks filter by selected project
+- [x] Loading indicators during API calls
+- [x] Error messages on API failures
 
 **Dependencies:** None (backend API exists)
 **Risk:** Medium - requires significant store refactor
