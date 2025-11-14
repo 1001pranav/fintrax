@@ -38,6 +38,10 @@ export type {
   ChartMetricCardProps,
 } from './ChartContainer';
 
+// Specific chart components
+export { default as ExpensePieChart } from './ExpensePieChart';
+export type { ExpensePieChartProps } from './ExpensePieChart';
+
 // Theme and constants
 export {
   CHART_COLORS,
