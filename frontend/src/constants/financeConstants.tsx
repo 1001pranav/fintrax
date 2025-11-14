@@ -39,7 +39,7 @@ export const formatCurrency = (amount: number): string => {
 // Helper function to format date for display
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return new Intl.DateFormat('en-US', {
+  return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
