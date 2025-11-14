@@ -10,6 +10,7 @@ import LoanList from '@/components/Finance/LoanList';
 import TransactionModal from '@/components/finance/TransactionModal';
 import { TransactionFormData } from '@/components/finance/TransactionForm';
 import { CreateTransactionData } from '@/lib/api';
+import ExpensePieChart from '@/components/Charts/ExpensePieChart';
 
 export default function FinancePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,6 +101,11 @@ export default function FinancePage() {
 
               {/* Finance Overview Cards (US-1.1) */}
               <FinanceOverview />
+
+              {/* Expense Category Breakdown Chart (US-2.2) */}
+              <div className="mt-8">
+                <ExpensePieChart />
+              </div>
 
               {/* Transaction List Section (US-1.3) */}
               <div className="mt-8">

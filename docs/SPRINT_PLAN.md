@@ -407,13 +407,13 @@
 7. Add time filter (this month, last month, custom range)
 
 **Acceptance Criteria:**
-- [ ] Pie chart displays expense categories correctly
-- [ ] Percentages add up to 100%
-- [ ] Hover shows category name, amount, and percentage
-- [ ] Legend matches chart colors
-- [ ] Time filter updates chart data
-- [ ] Empty state when no expenses
-- [ ] Colors consistent with transaction list
+- [x] Pie chart displays expense categories correctly
+- [x] Percentages add up to 100%
+- [x] Hover shows category name, amount, and percentage
+- [x] Legend matches chart colors
+- [x] Time filter updates chart data
+- [x] Empty state when no expenses
+- [x] Colors consistent with transaction list
 
 **Dependencies:** US-2.1, US-1.3
 **Risk:** Low
