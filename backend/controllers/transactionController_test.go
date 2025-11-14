@@ -336,8 +336,9 @@ func TestDeleteTransaction(t *testing.T) {
 
 		// Verify transaction is soft deleted
 		var deletedTransaction models.Transactions
-		database.DB.First(&deletedTransaction, 1)
-		assert.Equal(t, constants.STATUS_DELETED, deletedTransaction.Status)
+		database.DB.Unscoped().First(&deletedTransaction, 1)
+		assert.Equal(t, uint(constants.STATUS_DELETED), deletedTransaction.Status)
+		assert.True(t, deletedTransaction.DeletedAt.Valid)
 	})
 
 	t.Run("fails with non-existent transaction", func(t *testing.T) {

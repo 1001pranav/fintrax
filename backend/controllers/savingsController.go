@@ -16,7 +16,7 @@ type savingsRequest struct {
 	Amount       float64 `json:"amount" binding:"required,gte=0"`
 	TargetAmount float64 `json:"target_amount" binding:"required,gte=0"`
 	Rate         float64 `json:"rate" binding:"gte=0"`
-	Status       uint    `json:"status" binding:"gte=1,lte=6"`
+	Status       uint    `json:"status" binding:"omitempty,gte=1,lte=6"`
 }
 
 type savingsResponse struct {

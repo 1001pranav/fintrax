@@ -15,11 +15,11 @@ type transactionRequest struct {
 	Source          string    `json:"source" binding:"required"`
 	Amount          float64   `json:"amount" binding:"required,gt=0"`
 	Type            uint      `json:"type" binding:"required,gte=1,lte=2"` // 1 = income, 2 = expense
-	TransactionType uint      `json:"transaction_type" binding:"gte=1,lte=5"`
+	TransactionType uint      `json:"transaction_type" binding:"omitempty,gte=1,lte=5"`
 	Category        string    `json:"category" binding:"required"`
 	NotesID         *uint     `json:"notes_id"`
 	Date            time.Time `json:"date"`
-	Status          uint      `json:"status" binding:"gte=1,lte=6"`
+	Status          uint      `json:"status" binding:"omitempty,gte=1,lte=6"`
 }
 
 type transactionResponse struct {

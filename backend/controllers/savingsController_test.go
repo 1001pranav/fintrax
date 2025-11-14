@@ -388,8 +388,8 @@ func TestDeleteSavings(t *testing.T) {
 
 		// Verify savings is soft deleted
 		var deletedSavings models.Savings
-		database.DB.First(&deletedSavings, 1)
-		assert.Equal(t, constants.STATUS_DELETED, deletedSavings.Status)
+		database.DB.Unscoped().First(&deletedSavings, 1)
+		assert.Equal(t, uint(constants.STATUS_DELETED), deletedSavings.Status)
 		assert.True(t, deletedSavings.DeletedAt.Valid)
 	})
 
