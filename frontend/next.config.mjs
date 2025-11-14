@@ -38,7 +38,6 @@ const nextConfig = {
 
   // Experimental features for performance
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['recharts', 'lucide-react', 'zustand'],
   },
 
