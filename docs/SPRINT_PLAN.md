@@ -951,14 +951,14 @@
 8. Add visual regression testing (optional)
 
 **Acceptance Criteria:**
-- [ ] E2E framework installed and configured
-- [ ] Login flow test passes
-- [ ] Project creation flow passes
-- [ ] Task creation flow passes
-- [ ] Transaction creation flow passes
-- [ ] Dashboard rendering test passes
-- [ ] Tests run in CI
-- [ ] Test results reported
+- [x] E2E framework installed and configured
+- [x] Login flow test passes
+- [x] Project creation flow passes
+- [x] Task creation flow passes
+- [x] Transaction creation flow passes
+- [x] Dashboard rendering test passes
+- [x] Tests run in CI
+- [x] Test results reported
 
 **Dependencies:** Sprint 1 & 2 features
 **Risk:** Medium - E2E can be flaky
