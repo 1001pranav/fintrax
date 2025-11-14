@@ -40,7 +40,7 @@ test.describe('Project Management', () => {
     await page.waitForTimeout(300);
 
     // Verify modal is visible
-    const modal = page.getByRole('dialog').or(page.locator('[role="dialog"]')).or(page.getByText(/create project|new project/i).locator('..').locator('..')));
+    const modal = page.getByRole('dialog').or(page.locator('[role="dialog"]')).or(page.getByText(/create project|new project/i).locator('..').locator('..'));
     await expect(modal.first()).toBeVisible();
 
     // Verify form fields are present
