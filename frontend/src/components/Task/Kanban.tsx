@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useTodoStore } from '@/lib/todoStore';
 import TaskCard from '@/components/Task/TaskCard';
+import TagManagement from '@/components/Task/TagManagement';
 import { Task } from '@/constants/interfaces';
 import SVGComponent from '../svg';
 
@@ -13,8 +15,29 @@ const columns = [
 ] as const;
 
 export default function KanbanBoard() {
-  const { selectedProject, getTasksByStatus, moveTask, setSelectedTask, setTaskModalOpen } = useAppStore();
+  const { selectedProject, setTaskModalOpen } = useAppStore();
+  const {
+    getTasksByStatus,
+    moveTask,
+    setSelectedTask,
+    fetchTodos,
+    isLoading,
+    error,
+    clearError,
+    tags,
+    fetchTags,
+  } = useTodoStore();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
+  const [isTagManagementOpen, setIsTagManagementOpen] = useState(false);
+
+  // Fetch todos and tags when project is selected
+  useEffect(() => {
+    if (selectedProject) {
+      fetchTodos(parseInt(selectedProject.id));
+      fetchTags();
+    }
+  }, [selectedProject, fetchTodos, fetchTags]);
 
   if (!selectedProject) {
     return (
@@ -28,6 +51,18 @@ export default function KanbanBoard() {
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">Select a Project</h3>
           <p className="text-white/60">Choose a project from the sidebar to view tasks</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+          <p className="text-white/60">Loading tasks...</p>
         </div>
       </div>
     );
@@ -47,10 +82,15 @@ export default function KanbanBoard() {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e: React.DragEvent, status: Task['status']) => {
+  const handleDrop = async (e: React.DragEvent, status: Task['status']) => {
     e.preventDefault();
     if (draggedTask && draggedTask.status !== status) {
-      moveTask(draggedTask.id, status);
+      try {
+        await moveTask(draggedTask.id, status);
+      } catch (error) {
+        // Error is handled by the store, just log it
+        console.error('Failed to move task:', error);
+      }
     }
     setDraggedTask(null);
   };
@@ -69,95 +109,174 @@ export default function KanbanBoard() {
     setTaskModalOpen(true);
   };
 
+  // Filter tasks by selected tag
+  const filterTasksByTag = (tasks: Task[]) => {
+    if (!selectedTagFilter) return tasks;
+    return tasks.filter(task => task.tags.some(tag => tag.id === selectedTagFilter));
+  };
+
   return (
-    <div className="h-full p-4 sm:p-6">
+    <div className="h-full p-6">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-          <div className="flex items-center space-x-3 sm:space-x-4">
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4">
             <div
-              className="w-4 h-4 rounded-full flex-shrink-0"
+              className="w-4 h-4 rounded-full"
               style={{ backgroundColor: selectedProject.color }}
             />
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{selectedProject.name}</h1>
-              <p className="text-white/60 text-sm sm:text-base truncate">{selectedProject.description}</p>
+            <div>
+              <h1 className="text-2xl font-bold text-white">{selectedProject.name}</h1>
+              <p className="text-white/60">{selectedProject.description}</p>
+            </div>
+          </div>
+
+          {/* Manage Tags Button */}
+          <button
+            onClick={() => setIsTagManagementOpen(true)}
+            className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-xl text-purple-300 hover:bg-purple-500/30 transition-colors flex items-center space-x-2"
+          >
+            <SVGComponent svgType="settings" className="w-4 h-4" />
+            <span>Manage Tags</span>
+          </button>
+        </div>
+
+        {/* Tag Filter */}
+        {tags.length > 0 && (
+          <div className="flex items-center space-x-2 overflow-x-auto pb-2">
+            <span className="text-sm text-white/60 whitespace-nowrap">Filter by tag:</span>
+            <button
+              onClick={() => setSelectedTagFilter(null)}
+              className={`px-3 py-1 rounded-lg text-sm transition-colors whitespace-nowrap ${
+                selectedTagFilter === null
+                  ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50'
+                  : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10'
+              }`}
+            >
+              All Tasks
+            </button>
+            {tags.map((tag) => (
+              <button
+                key={tag.id}
+                onClick={() => setSelectedTagFilter(tag.id)}
+                className={`px-3 py-1 rounded-lg text-sm transition-colors whitespace-nowrap ${
+                  selectedTagFilter === tag.id
+                    ? 'border-2'
+                    : 'border border-white/20 hover:border-white/40'
+                }`}
+                style={{
+                  backgroundColor: selectedTagFilter === tag.id ? tag.color : 'rgba(255, 255, 255, 0.05)',
+                  color: selectedTagFilter === tag.id ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                  borderColor: selectedTagFilter === tag.id ? tag.color : undefined,
+                }}
+              >
+                {tag.name}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-2xl p-4 backdrop-blur-xl">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-red-400">
+                Error loading tasks
+              </h3>
+              <p className="mt-1 text-sm text-red-300/80">
+                {error}
+              </p>
+              <button
+                onClick={() => {
+                  clearError();
+                  if (selectedProject) {
+                    fetchTodos(parseInt(selectedProject.id));
+                  }
+                }}
+                className="mt-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+              >
+                Try again
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Kanban Columns - Horizontal scroll on mobile, grid on desktop */}
-      <div className="h-[calc(100%-100px)] sm:h-[calc(100%-120px)]">
-        <div className="flex sm:grid sm:grid-cols-3 gap-4 sm:gap-6 h-full overflow-x-auto sm:overflow-x-visible pb-4 sm:pb-0 snap-x snap-mandatory sm:snap-none">
-          {columns.map((column) => {
-            const tasks = getTasksByStatus(selectedProject.id, column.id as Task['status']);
-
-            return (
-              <div
-                key={column.id}
-                className={`flex-shrink-0 w-[85vw] sm:w-auto bg-white/5 border-2 ${column.color} rounded-2xl p-3 sm:p-4 flex flex-col snap-center sm:snap-align-none touch-pan-x`}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, column.id as Task['status'])}
-              >
-                {/* Column Header */}
-                <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <div className="flex items-center space-x-2">
-                    <h2 className="font-semibold text-white text-sm sm:text-base">{column.title}</h2>
-                    <span className="px-2 py-1 bg-white/10 text-white/60 rounded-lg text-xs">
-                      {tasks.length}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleAddTask(column.id as Task['status'])}
-                    className="min-w-[32px] min-h-[32px] sm:min-w-0 sm:min-h-0 p-1.5 sm:p-1 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors touch-manipulation"
-                    aria-label={`Add task to ${column.title}`}
-                  >
-                    <SVGComponent svgType="plus" className="w-4 h-4 text-white/60" />
-                  </button>
+      {/* Kanban Columns */}
+      <div className="grid grid-cols-3 gap-6 h-[calc(100%-120px)]">
+        {columns.map((column) => {
+          const allTasks = getTasksByStatus(selectedProject.id, column.id as Task['status']);
+          const tasks = filterTasksByTag(allTasks);
+          
+          return (
+            <div
+              key={column.id}
+              className={`bg-white/5 border-2 ${column.color} rounded-2xl p-4 flex flex-col`}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, column.id as Task['status'])}
+            >
+              {/* Column Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <h2 className="font-semibold text-white">{column.title}</h2>
+                  <span className="px-2 py-1 bg-white/10 text-white/60 rounded-lg text-xs">
+                    {tasks.length}
+                  </span>
                 </div>
-
-                {/* Tasks */}
-                <div className="flex-1 space-y-2 sm:space-y-3 overflow-y-auto">
-                  {tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, task)}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <TaskCard
-                        task={task}
-                        isDragging={draggedTask?.id === task.id}
-                      />
-                    </div>
-                  ))}
-
-                  {tasks.length === 0 && (
-                    <div className="text-center py-6 sm:py-8 text-white/40">
-                      <SVGComponent svgType="task_logo" className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3" />
-                      <p className="text-xs sm:text-sm">No tasks yet</p>
-                      <button
-                        onClick={() => handleAddTask(column.id as Task['status'])}
-                        className="mt-2 text-xs text-blue-400 hover:text-blue-300 active:text-blue-200 transition-colors touch-manipulation"
-                      >
-                        Add your first task
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={() => handleAddTask(column.id as Task['status'])}
+                  className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <SVGComponent svgType="plus" className="w-4 h-4 text-white/60" />
+                </button>
               </div>
-            );
-          })}
-        </div>
 
-        {/* Mobile scroll hint */}
-        <div className="sm:hidden flex justify-center mt-2 space-x-1">
-          {columns.map((_, index) => (
-            <div key={index} className="w-1.5 h-1.5 rounded-full bg-white/20" />
-          ))}
-        </div>
+              {/* Tasks */}
+              <div className="flex-1 space-y-3 overflow-y-auto">
+                {tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, task)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <TaskCard 
+                      task={task} 
+                      isDragging={draggedTask?.id === task.id}
+                    />
+                  </div>
+                ))}
+                
+                {tasks.length === 0 && (
+                  <div className="text-center py-8 text-white/40">
+                    <SVGComponent svgType="task_logo" className="w-12 h-12 mx-auto mb-3" />
+                    <p className="text-sm">No tasks yet</p>
+                    <button
+                      onClick={() => handleAddTask(column.id as Task['status'])}
+                      className="mt-2 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Add your first task
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
+
+      {/* Tag Management Modal */}
+      <TagManagement
+        isOpen={isTagManagementOpen}
+        onClose={() => setIsTagManagementOpen(false)}
+      />
     </div>
   );
 }

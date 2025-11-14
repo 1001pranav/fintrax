@@ -1,14 +1,12 @@
 "use client";
 import { create } from 'zustand';
-import { Project, Task } from '@/constants/interfaces';
+import { Project } from '@/constants/interfaces';
 import { api, Project as ApiProject, CreateProjectData } from './api';
 import { toast } from './useToast';
 
 interface AppState {
     projects: Project[];
-    tasks: Task[];
     selectedProject: Project | null;
-    selectedTask: Task | null;
     isTaskModalOpen: boolean;
     isProjectModalOpen: boolean;
     currentView: 'kanban' | 'calendar';
@@ -22,21 +20,10 @@ interface AppState {
     deleteProject: (id: string) => Promise<void>;
     setSelectedProject: (project: Project | null) => void;
 
-    // Task actions
-    addTask: (task: Omit<Task, 'id' | 'createdDate'>) => void;
-    updateTask: (id: string, updates: Partial<Task>) => void;
-    deleteTask: (id: string) => void;
-    moveTask: (taskId: string, newStatus: Task['status']) => void;
-    setSelectedTask: (task: Task | null) => void;
-
     // UI actions
     setTaskModalOpen: (open: boolean) => void;
     setProjectModalOpen: (open: boolean) => void;
     setCurrentView: (view: 'kanban' | 'calendar') => void;
-
-    // Utility functions
-    getTasksByProject: (projectId: string) => Task[];
-    getTasksByStatus: (projectId: string, status: Task['status']) => Task[];
 }
 
 // Helper function to convert API project to frontend project format
@@ -53,68 +40,7 @@ const convertApiProject = (apiProject: ApiProject): Project => ({
 
 export const useAppStore = create<AppState>((set, get) => ({
     projects: [],
-    tasks: [
-        // Keep mock tasks for now - these will be managed through the todo API separately
-        {
-            id: '1',
-            title: 'Design Homepage Layout',
-            description: 'Create wireframes and mockups for the new homepage',
-            startDate: new Date(),
-            endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            tags:[{
-                id: '1',
-                name: 'design',
-                color: '#F59E0B'
-            }, {
-                id: '2',
-                name: 'frontend',
-                color: '#3B82F6'
-            }
-            ],
-            priority: 'high',
-            status: 'in-progress',
-            projectId: '1',
-            createdDate: new Date(),
-        },
-        {
-            id: '2',
-            title: 'Implement Authentication',
-            description: 'Set up user login and registration system',
-            tags: [{
-                id: '1',
-                name: 'backend',
-                color: '#F59E0B'
-            }, {
-                id: '2',
-                name: 'security',
-                color: '#EF4444'
-            }],
-            priority: 'high',
-            status: 'todo',
-            projectId: '1',
-            createdDate: new Date()
-        },
-        {
-            id: '3',
-            title: 'Create Social Media Content',
-            description: 'Develop content calendar for social platforms',
-            tags: [{
-                id: '3',
-                name: 'marketing',
-                color: '#8B5CF6'
-            }, {
-                id: '4',
-                name: 'content',
-                color: '#06B6D4'
-            }],
-            priority: 'medium',
-            status: 'done',
-            projectId: '2',
-            createdDate: new Date()
-        }
-    ],
     selectedProject: null,
-    selectedTask: null,
     isTaskModalOpen: false,
     isProjectModalOpen: false,
     currentView: 'kanban',
@@ -194,7 +120,6 @@ export const useAppStore = create<AppState>((set, get) => ({
             await api.projects.delete(parseInt(id));
             set((state) => ({
                 projects: state.projects.filter(project => project.id !== id),
-                tasks: state.tasks.filter(task => task.projectId !== id),
                 selectedProject: state.selectedProject?.id === id ? null : state.selectedProject,
                 isLoading: false
             }));
@@ -209,52 +134,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     setSelectedProject: (project) => set({ selectedProject: project }),
 
-    // Task actions (keeping mock implementation for now - will be connected to todo API separately)
-    addTask: (taskData) => {
-        const newTask: Task = {
-            ...taskData,
-            id: Date.now().toString(),
-            createdDate: new Date()
-        };
-        set((state) => ({ tasks: [...state.tasks, newTask] }));
-        toast.success(`Task "${taskData.title}" created successfully`);
-    },
-
-    updateTask: (id, updates) => {
-        set((state) => ({
-            tasks: state.tasks.map(task =>
-                task.id === id ? { ...task, ...updates } : task
-            )
-        }));
-        toast.success(`Task "${updates.title || 'Task'}" updated successfully`);
-    },
-
-    deleteTask: (id) => {
-        set((state) => ({
-            tasks: state.tasks.filter(task => task.id !== id && task.parentTaskId !== id),
-            selectedTask: state.selectedTask?.id === id ? null : state.selectedTask
-        }));
-        toast.success('Task deleted successfully');
-    },
-
-    moveTask: (taskId, newStatus) => set((state) => ({
-        tasks: state.tasks.map(task =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-        )
-    })),
-
-    setSelectedTask: (task) => set({ selectedTask: task }),
+    // UI actions
     setTaskModalOpen: (open) => set({ isTaskModalOpen: open }),
     setProjectModalOpen: (open) => set({ isProjectModalOpen: open }),
-    setCurrentView: (view) => set({ currentView: view }),
-
-    getTasksByProject: (projectId) => {
-        const state = get();
-        return state.tasks.filter(task => task.projectId === projectId);
-    },
-
-    getTasksByStatus: (projectId, status) => {
-        const state = get();
-        return state.tasks.filter(task => task.projectId === projectId && task.status === status);
-    }
+    setCurrentView: (view) => set({ currentView: view })
 }));

@@ -11,6 +11,8 @@ import TransactionModal from '@/components/finance/TransactionModal';
 import { TransactionFormData } from '@/components/finance/TransactionForm';
 import { CreateTransactionData } from '@/lib/api';
 import ExpensePieChart from '@/components/Charts/ExpensePieChart';
+import IncomeTrendChart from '@/components/Charts/IncomeTrendChart';
+import NetWorthChart from '@/components/Charts/NetWorthChart';
 
 export default function FinancePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -102,8 +104,15 @@ export default function FinancePage() {
               {/* Finance Overview Cards (US-1.1) */}
               <FinanceOverview />
 
-              {/* Expense Category Breakdown Chart (US-2.2) */}
-              <div className="mt-8">
+              {/* Charts Section */}
+              <div className="mt-8 grid grid-cols-1 gap-8">
+                {/* Net Worth Over Time Chart (US-2.4) */}
+                <NetWorthChart />
+
+                {/* Income vs Expense Trend Chart (US-2.3) */}
+                <IncomeTrendChart chartType="line" />
+
+                {/* Expense Category Breakdown Chart (US-2.2) */}
                 <ExpensePieChart />
               </div>
 

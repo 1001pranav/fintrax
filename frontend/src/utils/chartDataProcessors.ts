@@ -224,3 +224,308 @@ export const getTimePeriodLabel = (period: TimePeriod): string => {
       return 'This Month';
   }
 };
+
+/**
+ * Income/Expense trend data point
+ */
+export interface IncomeTrendData {
+  period: string; // formatted date label (e.g., "Jan 2024", "2024-01")
+  income: number;
+  expense: number;
+  netSavings: number;
+  date: Date; // for sorting
+}
+
+/**
+ * Aggregate transactions by month for trend charts
+ */
+export const aggregateTransactionsByMonth = (
+  transactions: Transaction[]
+): IncomeTrendData[] => {
+  if (transactions.length === 0) {
+    return [];
+  }
+
+  // Group transactions by year-month
+  const monthMap = new Map<string, { income: number; expense: number }>();
+
+  transactions.forEach((transaction) => {
+    const date = new Date(transaction.date);
+    const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+    const existing = monthMap.get(yearMonth) || { income: 0, expense: 0 };
+
+    if (transaction.type === 1) {
+      // Income
+      existing.income += transaction.amount;
+    } else if (transaction.type === 2) {
+      // Expense
+      existing.expense += transaction.amount;
+    }
+
+    monthMap.set(yearMonth, existing);
+  });
+
+  // Convert to array and format
+  const result: IncomeTrendData[] = Array.from(monthMap.entries()).map(
+    ([yearMonth, data]) => {
+      const [year, month] = yearMonth.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+
+      return {
+        period: formatMonthLabel(date),
+        income: data.income,
+        expense: data.expense,
+        netSavings: data.income - data.expense,
+        date,
+      };
+    }
+  );
+
+  // Sort by date ascending
+  result.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  return result;
+};
+
+/**
+ * Format month label for display
+ */
+const formatMonthLabel = (date: Date): string => {
+  const monthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+};
+
+/**
+ * Process income/expense trend data for line chart with time filtering
+ */
+export const processIncomeTrendData = (
+  transactions: Transaction[],
+  timePeriod: TimePeriod = 'last-6-months',
+  customRange?: DateRange
+): IncomeTrendData[] => {
+  // Get date range for the period
+  const dateRange = getDateRangeForPeriod(timePeriod, customRange);
+
+  // Filter transactions by date range
+  const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
+
+  // Aggregate by month
+  const aggregated = aggregateTransactionsByMonth(filteredTransactions);
+
+  // Fill in missing months with zero values for continuity
+  if (aggregated.length > 0) {
+    return fillMissingMonths(aggregated, dateRange);
+  }
+
+  return aggregated;
+};
+
+/**
+ * Fill in missing months with zero values for chart continuity
+ */
+const fillMissingMonths = (
+  data: IncomeTrendData[],
+  dateRange: DateRange
+): IncomeTrendData[] => {
+  if (data.length === 0) {
+    return data;
+  }
+
+  const startDate = new Date(dateRange.startDate);
+  const endDate = new Date(dateRange.endDate);
+
+  const result: IncomeTrendData[] = [];
+  const dataMap = new Map(
+    data.map((item) => [
+      `${item.date.getFullYear()}-${String(item.date.getMonth() + 1).padStart(2, '0')}`,
+      item,
+    ])
+  );
+
+  // Iterate through each month in the range
+  let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const lastDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+
+  while (currentDate <= lastDate) {
+    const yearMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+
+    const existing = dataMap.get(yearMonth);
+    if (existing) {
+      result.push(existing);
+    } else {
+      // Add zero values for missing months
+      result.push({
+        period: formatMonthLabel(currentDate),
+        income: 0,
+        expense: 0,
+        netSavings: 0,
+        date: new Date(currentDate),
+      });
+    }
+
+    // Move to next month
+    currentDate.setMonth(currentDate.getMonth() + 1);
+  }
+
+  return result;
+};
+
+/**
+ * Format number for compact display (e.g., 1.2K, 1.5M)
+ */
+export const formatCompactNumber = (value: number): string => {
+  if (value >= 10000000) {
+    return `${(value / 10000000).toFixed(1)}Cr`;
+  }
+  if (value >= 100000) {
+    return `${(value / 100000).toFixed(1)}L`;
+  }
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(1)}K`;
+  }
+  return value.toFixed(0);
+};
+
+/**
+ * Net worth trend data point
+ */
+export interface NetWorthData {
+  period: string; // formatted date label
+  assets: number; // balance + savings
+  liabilities: number; // debts + loans
+  netWorth: number; // assets - liabilities
+  date: Date; // for sorting
+}
+
+/**
+ * Calculate net worth at a specific point in time
+ * Formula: Net Worth = Assets - Liabilities
+ * Assets = Balance + Savings
+ * Liabilities = Debts + Loans
+ */
+export const calculateNetWorthAtDate = (
+  currentBalance: number,
+  currentSavings: number,
+  currentLiabilities: number,
+  transactions: Transaction[],
+  targetDate: Date
+): { assets: number; liabilities: number; netWorth: number } => {
+  // Start with current values
+  let balance = currentBalance;
+  let savings = currentSavings;
+
+  // Go through transactions from now to target date and reverse their effect
+  const now = new Date();
+  const filteredTransactions = transactions.filter((t) => {
+    const transactionDate = new Date(t.date);
+    return transactionDate > targetDate && transactionDate <= now;
+  });
+
+  // Sort by date descending (most recent first)
+  filteredTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Reverse the effect of each transaction
+  filteredTransactions.forEach((transaction) => {
+    if (transaction.type === 1) {
+      // Income - reverse by subtracting
+      balance -= transaction.amount;
+    } else if (transaction.type === 2) {
+      // Expense - reverse by adding back
+      balance += transaction.amount;
+    }
+  });
+
+  // For MVP, we assume liabilities remain relatively constant
+  // In a full implementation, we'd track historical liability changes
+  const assets = Math.max(0, balance + savings);
+  const liabilities = currentLiabilities;
+  const netWorth = assets - liabilities;
+
+  return { assets, liabilities, netWorth };
+};
+
+/**
+ * Process net worth data over time for area chart
+ * Since we may not have historical snapshots, we calculate backwards from current state
+ */
+export const processNetWorthData = (
+  currentBalance: number,
+  currentSavings: number,
+  currentLiabilities: number,
+  transactions: Transaction[],
+  timePeriod: TimePeriod = 'last-6-months',
+  customRange?: DateRange
+): NetWorthData[] => {
+  // Get date range for the period
+  const dateRange = getDateRangeForPeriod(timePeriod, customRange);
+  const startDate = new Date(dateRange.startDate);
+  const endDate = new Date(dateRange.endDate);
+
+  const result: NetWorthData[] = [];
+
+  // Generate data points for each month in the range
+  let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const lastDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+
+  while (currentDate <= lastDate) {
+    const { assets, liabilities, netWorth } = calculateNetWorthAtDate(
+      currentBalance,
+      currentSavings,
+      currentLiabilities,
+      transactions,
+      currentDate
+    );
+
+    result.push({
+      period: formatMonthLabel(currentDate),
+      assets,
+      liabilities,
+      netWorth,
+      date: new Date(currentDate),
+    });
+
+    // Move to next month
+    currentDate.setMonth(currentDate.getMonth() + 1);
+  }
+
+  // Add current month with actual current values
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Only add if not already in the list
+  const lastEntry = result[result.length - 1];
+  if (!lastEntry || lastEntry.date.getTime() < currentMonthStart.getTime()) {
+    const currentAssets = currentBalance + currentSavings;
+    result.push({
+      period: formatMonthLabel(now),
+      assets: currentAssets,
+      liabilities: currentLiabilities,
+      netWorth: currentAssets - currentLiabilities,
+      date: now,
+    });
+  }
+
+  return result;
+};
+
+/**
+ * Calculate growth percentage between two values
+ */
+export const calculateGrowthPercentage = (oldValue: number, newValue: number): number => {
+  if (oldValue === 0) {
+    return newValue > 0 ? 100 : 0;
+  }
+  return ((newValue - oldValue) / Math.abs(oldValue)) * 100;
+};
+
+/**
+ * Format growth percentage with sign
+ */
+export const formatGrowthPercentage = (percentage: number): string => {
+  const sign = percentage >= 0 ? '+' : '';
+  return `${sign}${percentage.toFixed(1)}%`;
+};

@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useTodoStore } from '@/lib/todoStore';
 import { Tags, TaskFormData } from '@/constants/interfaces';
 import SVGComponent from '../svg';
 import { TASK_TAG_COLORS } from '@/constants/generalConstants';
-import { validateTextField, validateDateRange } from '@/utils/validation';
+import ResourceList from './Resources/ResourceList';
 
 const priorityOptions = [
   { value: 'low', label: 'Low', color: 'text-green-400' },
@@ -19,16 +20,24 @@ const statusOptions = [
 ];
 
 export default function TaskModal() {
-  const { 
-    isTaskModalOpen, 
-    setTaskModalOpen, 
-    selectedTask, 
-    setSelectedTask,
-    addTask, 
-    updateTask, 
-    deleteTask,
-    selectedProject 
+  const {
+    isTaskModalOpen,
+    setTaskModalOpen,
+    selectedProject
   } = useAppStore();
+
+  const {
+    selectedTask,
+    setSelectedTask,
+    createTask,
+    updateTask,
+    deleteTask,
+    todos,
+    tags,
+    fetchTags,
+    createTag,
+    isLoadingTags,
+  } = useTodoStore();
 
   const [formData, setFormData] = useState<TaskFormData>({
     title: '',
@@ -44,34 +53,16 @@ export default function TaskModal() {
 
   const [tagInput, setTagInput] = useState<Tags>({ id: '', name: '', color: '' });
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [mainTaskInfo, setMainTaskInfo] = useState<string | null>(selectedTask?.parentTaskId || null);
-  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
-  const titleInputRef = useRef<HTMLInputElement>(null);
   const isEditing = selectedTask?.id ? true : false;
 
-  // Validate form
-  const validateForm = useCallback(() => {
-    const newErrors: { [key: string]: string[] } = {};
-
-    // Validate title
-    const titleValidation = validateTextField(formData.title, 'Task title', { required: true, minLength: 1, maxLength: 200 });
-    if (!titleValidation.isValid) {
-      newErrors.title = titleValidation.errors;
+  // Fetch tags when modal opens
+  useEffect(() => {
+    if (isTaskModalOpen) {
+      fetchTags();
     }
-
-    // Validate date range if both dates are provided
-    if (formData.startDate && formData.endDate) {
-      const dateRangeValidation = validateDateRange(formData.startDate, formData.endDate, { required: false });
-      if (!dateRangeValidation.isValid) {
-        newErrors.dateRange = dateRangeValidation.errors;
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData.title, formData.startDate, formData.endDate]);
-
-  const isFormValid = Object.keys(errors).length === 0 && formData.title.trim() !== '';
+  }, [isTaskModalOpen, fetchTags]);
 
   const handleClose = useCallback(() => {
     setTaskModalOpen(false);
@@ -90,8 +81,7 @@ export default function TaskModal() {
     setMainTaskInfo(null);
     setTagInput({ id: '', name: '', color: '' });
     setShowColorPicker(false);
-    setErrors({});
-  }, [setTaskModalOpen, setSelectedTask]);
+  }, [setTaskModalOpen, setSelectedTask, setFormData, setTagInput]);
   
   useEffect(() => {
     if (isTaskModalOpen && selectedTask) {
@@ -109,16 +99,6 @@ export default function TaskModal() {
     }
   }, [isTaskModalOpen, selectedTask]);
 
-  // Focus management and keyboard shortcuts
-  useEffect(() => {
-    if (isTaskModalOpen) {
-      // Focus the title input when modal opens
-      setTimeout(() => {
-        titleInputRef.current?.focus();
-      }, 100);
-    }
-  }, [isTaskModalOpen]);
-
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -131,13 +111,8 @@ export default function TaskModal() {
     }
   }, [handleClose])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate form before submitting
-    if (!validateForm()) {
-      return;
-    }
 
     if (!selectedProject) return;
 
@@ -148,18 +123,25 @@ export default function TaskModal() {
       projectId: selectedProject.id
     };
 
-    if (isEditing && selectedTask?.id) {
-      updateTask(selectedTask.id, taskData);
-    } else {
-      addTask(taskData);
-    }
+    // Handle parent task assignment
     if (mainTaskInfo && !selectedTask?.parentTaskId) {
-      const mainTask = useAppStore.getState().tasks.find(task => task.id === mainTaskInfo);
+      const mainTask = todos.find(task => task.id === mainTaskInfo);
       if (mainTask) {
         taskData.parentTaskId = mainTaskInfo;
       }
     }
-    handleClose();
+
+    try {
+      if (isEditing && selectedTask?.id) {
+        await updateTask(selectedTask.id, taskData);
+      } else {
+        await createTask(taskData);
+      }
+      handleClose();
+    } catch (error) {
+      console.error('Failed to save task:', error);
+      // Error is handled by the store, just log it
+    }
   };
 
   const handleMainTaskChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -168,10 +150,15 @@ export default function TaskModal() {
     setMainTaskInfo(selectedTaskId ? selectedTaskId : null);
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedTask?.id && confirm('Are you sure you want to delete this task?')) {
-      deleteTask(selectedTask.id);
-      handleClose();
+      try {
+        await deleteTask(selectedTask.id);
+        handleClose();
+      } catch (error) {
+        console.error('Failed to delete task:', error);
+        // Error is handled by the store, just log it
+      }
     }
   };
 
@@ -180,20 +167,30 @@ export default function TaskModal() {
     setShowColorPicker(false);
   };
 
-  const addTag = () => {
-    if (tagInput.name.trim() && !formData.tags.some(tag => tag.name === tagInput.name.trim())) {
-      const newTag = {
-        ...tagInput,
-        name: tagInput.name.trim(),
-        color: tagInput.color || TASK_TAG_COLORS[0],
-        id: Date.now().toString()
-      };
+  const addTagFromDropdown = (tag: Tags) => {
+    if (!formData.tags.some(t => t.id === tag.id)) {
       setFormData({
         ...formData,
-        tags: [...formData.tags, newTag]
+        tags: [...formData.tags, tag]
       });
-      setTagInput({ id: '', name: '', color: '' });
-      setShowColorPicker(false);
+    }
+    setShowTagDropdown(false);
+  };
+
+  const createAndAddTag = async () => {
+    if (tagInput.name.trim()) {
+      try {
+        const color = tagInput.color || TASK_TAG_COLORS[0];
+        await createTag(tagInput.name.trim(), color);
+
+        // After creating, fetch tags again to get the new tag with ID
+        await fetchTags();
+
+        setTagInput({ id: '', name: '', color: '' });
+        setShowColorPicker(false);
+      } catch (error) {
+        console.error('Failed to create tag:', error);
+      }
     }
   };
 
@@ -207,73 +204,55 @@ export default function TaskModal() {
   const handleTagKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addTag();
+      createAndAddTag();
     }
   };
+
+  // Get available tags (exclude already selected tags)
+  const availableTags = tags.filter(tag => !formData.tags.some(t => t.id === tag.id));
 
   if (!isTaskModalOpen) return null;
   
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-bold text-white">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-white">
             {isEditing ? 'Edit Task' : 'Create New Task'}
           </h2>
           <div className="flex items-center space-x-2">
             {isEditing && (
               <button
                 onClick={handleDelete}
-                className="min-w-[40px] min-h-[40px] p-2 hover:bg-red-500/20 active:bg-red-500/30 rounded-lg transition-colors touch-manipulation"
-                aria-label="Delete task"
+                className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
               >
                 <SVGComponent svgType="delete" className="w-5 h-5 text-red-400" />
               </button>
             )}
             <button
               onClick={handleClose}
-              className="min-w-[40px] min-h-[40px] p-2 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors touch-manipulation"
-              aria-label="Close modal"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
               <SVGComponent svgType="x" className="w-5 h-5 text-white/60" />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-white/90 mb-2">
               Task Title *
             </label>
             <input
-              ref={titleInputRef}
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              onBlur={validateForm}
-              className={`w-full min-h-[44px] px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 transition-all touch-manipulation text-base ${
-                errors.title
-                  ? 'border-red-400/50 focus:ring-red-500/50 focus:border-red-400/50'
-                  : 'border-white/20 focus:ring-blue-500/50 focus:border-blue-400/50'
-              }`}
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
               placeholder="Enter task title"
-              aria-invalid={errors.title ? 'true' : 'false'}
-              aria-describedby={errors.title ? 'title-error' : undefined}
+              required
             />
-            {errors.title && (
-              <div id="title-error" className="mt-1 space-y-1" role="alert" aria-live="polite">
-                {errors.title.map((err, index) => (
-                  <p key={index} className="text-xs text-red-400 flex items-center gap-1">
-                    <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    {err}
-                  </p>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Description */}
@@ -291,7 +270,7 @@ export default function TaskModal() {
           </div>
 
           {/* Priority and Status */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-white/90 mb-2">
                 Priority
@@ -299,7 +278,7 @@ export default function TaskModal() {
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' })}
-                className="w-full min-h-[44px] px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 touch-manipulation text-base"
+                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
               >
                 {priorityOptions.map((option) => (
                   <option key={option.value} value={option.value} className="bg-gray-800">
@@ -316,7 +295,7 @@ export default function TaskModal() {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as 'todo' | 'in-progress' | 'done' })}
-                className="w-full min-h-[44px] px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 touch-manipulation text-base"
+                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value} className="bg-gray-800">
@@ -328,7 +307,7 @@ export default function TaskModal() {
           </div>
 
           {/* Dates */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-white/90 mb-2">
                 Start Date
@@ -337,12 +316,7 @@ export default function TaskModal() {
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                onBlur={validateForm}
-                className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white focus:outline-none focus:ring-2 transition-all ${
-                  errors.dateRange
-                    ? 'border-red-400/50 focus:ring-red-500/50 focus:border-red-400/50'
-                    : 'border-white/20 focus:ring-blue-500/50 focus:border-blue-400/50'
-                }`}
+                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
               />
             </div>
 
@@ -354,28 +328,10 @@ export default function TaskModal() {
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                onBlur={validateForm}
-                className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white focus:outline-none focus:ring-2 transition-all ${
-                  errors.dateRange
-                    ? 'border-red-400/50 focus:ring-red-500/50 focus:border-red-400/50'
-                    : 'border-white/20 focus:ring-blue-500/50 focus:border-blue-400/50'
-                }`}
+                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
               />
             </div>
           </div>
-          {/* Date range error */}
-          {errors.dateRange && (
-            <div className="mt-1 space-y-1" role="alert" aria-live="polite">
-              {errors.dateRange.map((err, index) => (
-                <p key={index} className="text-xs text-red-400 flex items-center gap-1">
-                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {err}
-                </p>
-              ))}
-            </div>
-          )}
 
           {/* Task Dropdown Selection */}
           <div>
@@ -388,8 +344,8 @@ export default function TaskModal() {
               className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
             >
               <option value="">-- Select a task --</option>
-              {useAppStore.getState().tasks
-                .filter((task) => task.projectId === selectedProject?.id)
+              {todos
+                .filter((task) => task.projectId === selectedProject?.id && task.id !== selectedTask?.id)
                 .map((task) => (
                   <option key={task.id} value={task.id} className="bg-gray-800">
                     {task.title}
@@ -404,7 +360,48 @@ export default function TaskModal() {
               Tags
             </label>
             <div className="space-y-3">
-              {/* Tag Input Row */}
+              {/* Tag Selector & Create Row */}
+              <div className="flex space-x-2">
+                {/* Tag Dropdown Selector */}
+                <div className="relative flex-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white text-left hover:bg-white/10 transition-colors flex items-center justify-between"
+                  >
+                    <span className="text-white/70">Select existing tag...</span>
+                    <SVGComponent svgType="chevron-down" className="w-4 h-4 text-white/60" />
+                  </button>
+
+                  {/* Tag Dropdown */}
+                  {showTagDropdown && (
+                    <div className="absolute top-12 left-0 right-0 z-10 max-h-48 overflow-y-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl">
+                      {isLoadingTags ? (
+                        <div className="p-4 text-white/60 text-center text-sm">Loading tags...</div>
+                      ) : availableTags.length > 0 ? (
+                        availableTags.map((tag) => (
+                          <button
+                            key={tag.id}
+                            type="button"
+                            onClick={() => addTagFromDropdown(tag)}
+                            className="w-full px-4 py-2 text-left hover:bg-white/10 transition-colors flex items-center space-x-2"
+                          >
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: tag.color }}
+                            />
+                            <span className="text-white text-sm">{tag.name}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="p-4 text-white/60 text-center text-sm">No tags available</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Create New Tag Row */}
               <div className="flex space-x-2">
                 <input
                   type="text"
@@ -412,9 +409,9 @@ export default function TaskModal() {
                   onChange={(e) => setTagInput({ ...tagInput, name: e.target.value })}
                   onKeyPress={handleTagKeyPress}
                   className="flex-1 px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
-                  placeholder="Add a tag"
+                  placeholder="Create new tag..."
                 />
-                
+
                 {/* Color Picker Button */}
                 <div className="relative">
                   <button
@@ -422,12 +419,12 @@ export default function TaskModal() {
                     onClick={() => setShowColorPicker(!showColorPicker)}
                     className="flex items-center justify-center w-12 h-10 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 transition-colors"
                   >
-                    <div 
+                    <div
                       className="w-6 h-6 rounded-full border-2 border-white/40"
                       style={{ backgroundColor: tagInput.color || TASK_TAG_COLORS[0] }}
                     />
                   </button>
-                  
+
                   {/* Color Picker Dropdown */}
                   {showColorPicker && (
                     <div className="absolute top-12 right-0 z-10 p-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl">
@@ -450,13 +447,14 @@ export default function TaskModal() {
                     </div>
                   )}
                 </div>
-                
+
                 <button
                   type="button"
-                  onClick={addTag}
-                  className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-xl text-blue-300 hover:bg-blue-500/30 transition-colors"
+                  onClick={createAndAddTag}
+                  disabled={isLoadingTags || !tagInput.name.trim()}
+                  className="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-xl text-green-300 hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add
+                  Create
                 </button>
               </div>
               
@@ -498,23 +496,30 @@ export default function TaskModal() {
             />
           </div>
 
+          {/* Resources - Only show for existing tasks */}
+          {isEditing && selectedTask?.task_id && (
+            <div className="border-t border-white/10 pt-4">
+              <ResourceList
+                todoId={selectedTask.task_id}
+                onResourcesChange={() => {
+                  // Optionally refresh task data if needed
+                }}
+              />
+            </div>
+          )}
+
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="flex space-x-3 pt-4">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 min-h-[48px] py-3 px-4 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 active:bg-white/15 transition-colors touch-manipulation"
+              className="flex-1 py-3 px-4 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={!isFormValid}
-              className={`flex-1 min-h-[48px] py-3 px-4 rounded-xl font-semibold transition-all duration-200 touch-manipulation ${
-                isFormValid
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 active:from-blue-700 active:to-purple-800'
-                  : 'bg-white/10 text-white/40 cursor-not-allowed'
-              }`}
+              className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
             >
               {isEditing ? 'Update' : 'Create'} Task
             </button>
