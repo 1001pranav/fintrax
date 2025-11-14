@@ -389,3 +389,143 @@ export const formatCompactNumber = (value: number): string => {
   }
   return value.toFixed(0);
 };
+
+/**
+ * Net worth trend data point
+ */
+export interface NetWorthData {
+  period: string; // formatted date label
+  assets: number; // balance + savings
+  liabilities: number; // debts + loans
+  netWorth: number; // assets - liabilities
+  date: Date; // for sorting
+}
+
+/**
+ * Calculate net worth at a specific point in time
+ * Formula: Net Worth = Assets - Liabilities
+ * Assets = Balance + Savings
+ * Liabilities = Debts + Loans
+ */
+export const calculateNetWorthAtDate = (
+  currentBalance: number,
+  currentSavings: number,
+  currentLiabilities: number,
+  transactions: Transaction[],
+  targetDate: Date
+): { assets: number; liabilities: number; netWorth: number } => {
+  // Start with current values
+  let balance = currentBalance;
+  let savings = currentSavings;
+
+  // Go through transactions from now to target date and reverse their effect
+  const now = new Date();
+  const filteredTransactions = transactions.filter((t) => {
+    const transactionDate = new Date(t.date);
+    return transactionDate > targetDate && transactionDate <= now;
+  });
+
+  // Sort by date descending (most recent first)
+  filteredTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Reverse the effect of each transaction
+  filteredTransactions.forEach((transaction) => {
+    if (transaction.type === 1) {
+      // Income - reverse by subtracting
+      balance -= transaction.amount;
+    } else if (transaction.type === 2) {
+      // Expense - reverse by adding back
+      balance += transaction.amount;
+    }
+  });
+
+  // For MVP, we assume liabilities remain relatively constant
+  // In a full implementation, we'd track historical liability changes
+  const assets = Math.max(0, balance + savings);
+  const liabilities = currentLiabilities;
+  const netWorth = assets - liabilities;
+
+  return { assets, liabilities, netWorth };
+};
+
+/**
+ * Process net worth data over time for area chart
+ * Since we may not have historical snapshots, we calculate backwards from current state
+ */
+export const processNetWorthData = (
+  currentBalance: number,
+  currentSavings: number,
+  currentLiabilities: number,
+  transactions: Transaction[],
+  timePeriod: TimePeriod = 'last-6-months',
+  customRange?: DateRange
+): NetWorthData[] => {
+  // Get date range for the period
+  const dateRange = getDateRangeForPeriod(timePeriod, customRange);
+  const startDate = new Date(dateRange.startDate);
+  const endDate = new Date(dateRange.endDate);
+
+  const result: NetWorthData[] = [];
+
+  // Generate data points for each month in the range
+  let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const lastDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+
+  while (currentDate <= lastDate) {
+    const { assets, liabilities, netWorth } = calculateNetWorthAtDate(
+      currentBalance,
+      currentSavings,
+      currentLiabilities,
+      transactions,
+      currentDate
+    );
+
+    result.push({
+      period: formatMonthLabel(currentDate),
+      assets,
+      liabilities,
+      netWorth,
+      date: new Date(currentDate),
+    });
+
+    // Move to next month
+    currentDate.setMonth(currentDate.getMonth() + 1);
+  }
+
+  // Add current month with actual current values
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Only add if not already in the list
+  const lastEntry = result[result.length - 1];
+  if (!lastEntry || lastEntry.date.getTime() < currentMonthStart.getTime()) {
+    const currentAssets = currentBalance + currentSavings;
+    result.push({
+      period: formatMonthLabel(now),
+      assets: currentAssets,
+      liabilities: currentLiabilities,
+      netWorth: currentAssets - currentLiabilities,
+      date: now,
+    });
+  }
+
+  return result;
+};
+
+/**
+ * Calculate growth percentage between two values
+ */
+export const calculateGrowthPercentage = (oldValue: number, newValue: number): number => {
+  if (oldValue === 0) {
+    return newValue > 0 ? 100 : 0;
+  }
+  return ((newValue - oldValue) / Math.abs(oldValue)) * 100;
+};
+
+/**
+ * Format growth percentage with sign
+ */
+export const formatGrowthPercentage = (percentage: number): string => {
+  const sign = percentage >= 0 ? '+' : '';
+  return `${sign}${percentage.toFixed(1)}%`;
+};

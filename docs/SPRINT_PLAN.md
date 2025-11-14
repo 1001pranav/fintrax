@@ -488,12 +488,12 @@
 6. Add milestone markers
 
 **Acceptance Criteria:**
-- [ ] Chart displays net worth trend
-- [ ] Shows assets (balance + savings)
-- [ ] Shows liabilities (debts + loans)
-- [ ] Growth percentage calculated correctly
-- [ ] Positive growth in green, negative in red
-- [ ] Milestone markers (if any) visible
+- [x] Chart displays net worth trend
+- [x] Shows assets (balance + savings)
+- [x] Shows liabilities (debts + loans)
+- [x] Growth percentage calculated correctly
+- [x] Positive growth in green, negative in red
+- [x] Milestone markers (if any) visible
 
 **Dependencies:** US-2.1, Sprint 1 finance data
 **Risk:** Medium - requires historical data or snapshots
