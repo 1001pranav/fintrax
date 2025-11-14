@@ -912,13 +912,13 @@
 7. Set up coverage reporting
 
 **Acceptance Criteria:**
-- [ ] All stores have test coverage
-- [ ] All utils have test coverage
-- [ ] Form validation logic tested
-- [ ] Chart processors tested
-- [ ] Coverage report generated
-- [ ] Coverage at least 80%
-- [ ] CI runs tests on every push
+- [x] All stores have test coverage
+- [x] All utils have test coverage
+- [x] Form validation logic tested
+- [x] Chart processors tested
+- [x] Coverage report generated
+- [x] Coverage at least 80%
+- [x] CI runs tests on every push
 
 **Dependencies:** None
 **Risk:** Low

@@ -172,6 +172,10 @@ export const validateNumber = (
     return { isValid: false, errors };
   }
 
+  if (!required && (value === undefined || value === null || value === '')) {
+    return { isValid: true, errors: [] };
+  }
+
   const numValue = typeof value === 'string' ? parseFloat(value) : value;
 
   if (isNaN(numValue)) {
