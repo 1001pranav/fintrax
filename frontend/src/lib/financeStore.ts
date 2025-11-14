@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api, FinanceSummary, Transaction, Savings, Loan, CreateTransactionData, CreateSavingsData } from './api';
+import { api, FinanceSummary, Transaction, Savings, Loan, CreateTransactionData, CreateSavingsData, CreateLoanData } from './api';
 
 interface FinancialItem {
     name: string;
@@ -47,6 +47,7 @@ interface FinanceStore {
     balance: number;
     netWorth: number;
     transactions: Transaction[];
+    loans: Loan[];
 
     // Loading & Error States
     isLoading: boolean;
@@ -72,6 +73,11 @@ interface FinanceStore {
     updateSavings: (id: number, data: Partial<CreateSavingsData>) => Promise<void>;
     deleteSavings: (id: number) => Promise<void>;
 
+    // Loan Actions
+    createLoan: (data: CreateLoanData) => Promise<void>;
+    updateLoan: (id: number, data: Partial<CreateLoanData>) => Promise<void>;
+    deleteLoan: (id: number) => Promise<void>;
+
     // Computed
     getNetWorth: () => number;
 }
@@ -84,6 +90,7 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
     balance: 0,
     netWorth: 0,
     transactions: [],
+    loans: [],
     isLoading: false,
     error: null,
 
@@ -251,6 +258,7 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
             }));
 
             set((state) => ({
+                loans: loansList,
                 financialData: {
                     ...state.financialData,
                     debts: {
@@ -385,6 +393,66 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         } catch (error) {
             set({
                 error: error instanceof Error ? error.message : 'Failed to delete savings goal',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Create a new loan
+    createLoan: async (data: CreateLoanData) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.loans.create(data);
+            // Refresh all financial data after creating loan
+            await Promise.all([
+                get().fetchLoans(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to create loan',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Update a loan
+    updateLoan: async (id: number, data: Partial<CreateLoanData>) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.loans.update(id, data);
+            // Refresh all financial data after updating loan
+            await Promise.all([
+                get().fetchLoans(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to update loan',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    // Delete a loan
+    deleteLoan: async (id: number) => {
+        set({ isLoading: true, error: null });
+        try {
+            await api.loans.delete(id);
+            // Refresh all financial data after deleting loan
+            await Promise.all([
+                get().fetchLoans(),
+                get().fetchFinanceSummary()
+            ]);
+            set({ isLoading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to delete loan',
                 isLoading: false
             });
             throw error;

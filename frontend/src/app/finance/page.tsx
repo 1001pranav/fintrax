@@ -6,6 +6,7 @@ import Sidebar from '@/components/Layout/Sidebar';
 import FinanceOverview from '@/components/Finance/FinanceOverview';
 import TransactionList from '@/components/Finance/TransactionList';
 import SavingsList from '@/components/Finance/SavingsList';
+import LoanList from '@/components/Finance/LoanList';
 import TransactionModal from '@/components/finance/TransactionModal';
 import { TransactionFormData } from '@/components/finance/TransactionForm';
 import { CreateTransactionData } from '@/lib/api';
@@ -108,6 +109,11 @@ export default function FinancePage() {
               {/* Savings Goals Section (US-1.4) */}
               <div className="mt-8">
                 <SavingsList />
+              </div>
+
+              {/* Loans & Debts Section (US-1.5) */}
+              <div className="mt-8">
+                <LoanList />
               </div>
 
               {/* Quick Actions */}
