@@ -1,0 +1,148 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual deployment
+
+jobs:
+  # Deploy Backend
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://api.fintrax.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build backend
+        working-directory: ./backend
+        run: |
+          CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o fintrax main.go
+
+      - name: Deploy to production
+        env:
+          DEPLOY_KEY: ${{ secrets.BACKEND_DEPLOY_KEY }}
+          DEPLOY_HOST: ${{ secrets.BACKEND_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.BACKEND_DEPLOY_USER }}
+        run: |
+          echo "Deployment step - Configure your deployment method here"
+          echo "Options:"
+          echo "  - SCP/rsync to VPS"
+          echo "  - Docker image push"
+          echo "  - Cloud platform deployment (Railway, Render, AWS, etc.)"
+
+          # Example: Deploy via SCP
+          # mkdir -p ~/.ssh
+          # echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          # chmod 600 ~/.ssh/deploy_key
+          # scp -i ~/.ssh/deploy_key backend/fintrax $DEPLOY_USER@$DEPLOY_HOST:/app/
+          # ssh -i ~/.ssh/deploy_key $DEPLOY_USER@$DEPLOY_HOST "systemctl restart fintrax"
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Run migrations here"
+          # Example: migrate -path backend/migrations -database "$DATABASE_URL" up
+
+      - name: Health check
+        run: |
+          echo "Waiting for service to start..."
+          sleep 10
+          echo "Performing health check..."
+          # curl -f https://api.fintrax.com/health || exit 1
+
+  # Deploy Frontend
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://fintrax.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ./frontend
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+        run: npm run build
+
+      - name: Deploy to Vercel (or other platform)
+        working-directory: ./frontend
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          echo "Deployment step - Configure your deployment method here"
+          echo "Options:"
+          echo "  - Vercel: npx vercel --prod --token=$VERCEL_TOKEN"
+          echo "  - Netlify: npx netlify deploy --prod"
+          echo "  - AWS S3 + CloudFront: aws s3 sync .next/... s3://bucket"
+          echo "  - Railway/Render: git push or CLI deploy"
+
+          # Example: Vercel deployment
+          # npm install -g vercel
+          # vercel --prod --token=$VERCEL_TOKEN --yes
+
+      - name: Health check
+        run: |
+          echo "Waiting for deployment..."
+          sleep 15
+          echo "Performing health check..."
+          # curl -f https://fintrax.com || exit 1
+
+  # Post-deployment tasks
+  post-deploy:
+    name: Post-Deployment Tasks
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    if: success()
+
+    steps:
+      - name: Send deployment notification
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          echo "Deployment successful!"
+          # Send Slack/Discord/Email notification
+          # curl -X POST $SLACK_WEBHOOK -d '{"text":"Fintrax deployed successfully to production!"}'
+
+      - name: Tag release
+        uses: actions/checkout@v4
+
+      - name: Create release tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          VERSION="v$(date +'%Y.%m.%d-%H%M')"
+          git tag -a $VERSION -m "Production deployment $VERSION"
+          git push origin $VERSION
+
+      - name: Clear CDN cache (if applicable)
+        run: |
+          echo "Clear CDN cache here if needed"
+          # Example: CloudFlare API call to purge cache

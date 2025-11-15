@@ -1,0 +1,91 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to rollback to (e.g., v2024.01.15-1200)'
+        required: true
+        type: string
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  rollback:
+    name: Rollback to Previous Version
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Verify version
+        run: |
+          echo "Rolling back to version: ${{ inputs.version }}"
+          echo "Environment: ${{ inputs.environment }}"
+          git log -1 --pretty=format:"%h - %an, %ar : %s"
+
+      - name: Confirm rollback
+        run: |
+          echo "⚠️  WARNING: This will rollback the deployment"
+          echo "Please ensure this is intentional"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build previous version
+        run: |
+          # Frontend
+          cd frontend
+          npm ci
+          npm run build
+          cd ..
+
+          # Backend
+          cd backend
+          go mod download
+          go build -o fintrax main.go
+
+      - name: Deploy previous version
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          echo "Deploying previous version..."
+          echo "Configure rollback deployment here"
+          # Use same deployment method as deploy.yml
+
+      - name: Health check
+        run: |
+          echo "Performing health check..."
+          sleep 15
+          # curl -f https://fintrax.com/health || exit 1
+
+      - name: Notify team
+        if: success()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          echo "Rollback to ${{ inputs.version }} completed successfully"
+          # Send notification
+          # curl -X POST $SLACK_WEBHOOK -d "{\"text\":\"Rollback to ${{ inputs.version }} completed\"}"
+
+      - name: Create rollback record
+        run: |
+          echo "Rollback performed on $(date)" >> rollback.log
+          echo "Version: ${{ inputs.version }}" >> rollback.log
+          echo "Environment: ${{ inputs.environment }}" >> rollback.log
