@@ -133,14 +133,14 @@ const getTasksByTag = (tasks: Task[], tagId: string): Task[] => {
  * Get tag usage count
  */
 const getTagUsageCount = (tasks: Task[], tagId: string): number => {
-  return tasks.filter((task) => task.tags.some((tag) => tag.id === tagId)).length;
+  return tasks.filter((task) => task.tags?.some((tag) => tag.id === tagId)).length;
 };
 
 /**
  * Check if task has tag
  */
 const taskHasTag = (task: Task, tagId: string): boolean => {
-  return task.tags.some((tag) => tag.id === tagId);
+  return task.tags?.some((tag) => tag.id === tagId) ?? false;
 };
 
 /**
@@ -150,7 +150,7 @@ const getAllTagsFromTasks = (tasks: Task[]): Tags[] => {
   const tagMap = new Map<string, Tags>();
 
   tasks.forEach((task) => {
-    task.tags.forEach((tag) => {
+    task.tags?.forEach((tag) => {
       if (!tagMap.has(tag.id)) {
         tagMap.set(tag.id, tag);
       }

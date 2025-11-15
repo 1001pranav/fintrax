@@ -1,0 +1,310 @@
+
+> frontend@0.1.0 test
+> jest --passWithNoTests
+
+ ⚠ Found lockfile missing swc dependencies, patching...
+ ⨯ Failed to patch lockfile, please try uninstalling and reinstalling next in this workspace
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo EAI_AGAIN registry.npmjs.org] {
+    errno: -3001,
+    code: 'EAI_AGAIN',
+    syscall: 'getaddrinfo',
+    hostname: 'registry.npmjs.org'
+  }
+}
+PASS src/lib/__tests__/financeStore.test.ts
+PASS src/lib/__tests__/store.test.ts
+PASS src/lib/__tests__/todoStore.mapping.test.ts
+PASS src/__tests__/sprint5/US-5.1-beta-launch.test.ts
+PASS src/components/Task/__tests__/tag.logic.test.ts
+FAIL src/utils/__tests__/financeAnalytics.test.ts
+  ● Finance Analytics › calculateMonthlyTrends › should calculate monthly trends correctly
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 5000
+    Received: 0
+
+      37 |
+      38 |       expect(trends).toHaveLength(2);
+    > 39 |       expect(trends[1].income).toBe(5000);
+         |                                ^
+      40 |       expect(trends[1].expense).toBe(200);
+      41 |       expect(trends[1].net).toBe(4800);
+      42 |     });
+
+      at Object.toBe (src/utils/__tests__/financeAnalytics.test.ts:39:32)
+
+PASS src/utils/__tests__/chartDataProcessors.test.ts
+FAIL src/lib/__tests__/todoStore.tagAssignment.test.ts
+  ● TodoStore Tag Assignment Integration Tests › assignTagToTask › should assign tag to task successfully
+
+    TypeError: Cannot read properties of undefined (reading 'assignToTodo')
+
+      427 |   assignTagToTask: async (taskId, tagId) => {
+      428 |     try {
+    > 429 |       await api.tags.assignToTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      430 |
+      431 |       // Find the tag in the store
+      432 |       const tag = get().tags.find((t) => t.id === tagId);
+
+      at Object.assignToTodo [as assignTagToTask] (src/lib/todoStore.ts:429:22)
+      at assignTagToTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:70:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:69:16)
+
+  ● TodoStore Tag Assignment Integration Tests › assignTagToTask › should handle assign tag error
+
+    TypeError: Cannot read properties of undefined (reading 'assignToTodo')
+
+      427 |   assignTagToTask: async (taskId, tagId) => {
+      428 |     try {
+    > 429 |       await api.tags.assignToTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      430 |
+      431 |       // Find the tag in the store
+      432 |       const tag = get().tags.find((t) => t.id === tagId);
+
+      at Object.assignToTodo [as assignTagToTask] (src/lib/todoStore.ts:429:22)
+      at assignTagToTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:100:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:99:16)
+
+  ● TodoStore Tag Assignment Integration Tests › assignTagToTask › should not duplicate tags when assigning same tag twice
+
+    TypeError: Cannot read properties of undefined (reading 'assignToTodo')
+
+      427 |   assignTagToTask: async (taskId, tagId) => {
+      428 |     try {
+    > 429 |       await api.tags.assignToTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      430 |
+      431 |       // Find the tag in the store
+      432 |       const tag = get().tags.find((t) => t.id === tagId);
+
+      at Object.assignToTodo [as assignTagToTask] (src/lib/todoStore.ts:429:22)
+      at assignTagToTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:141:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:140:16)
+
+  ● TodoStore Tag Assignment Integration Tests › assignTagToTask › should handle assigning multiple tags to same task
+
+    TypeError: Cannot read properties of undefined (reading 'assignToTodo')
+
+      427 |   assignTagToTask: async (taskId, tagId) => {
+      428 |     try {
+    > 429 |       await api.tags.assignToTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      430 |
+      431 |       // Find the tag in the store
+      432 |       const tag = get().tags.find((t) => t.id === tagId);
+
+      at Object.assignToTodo [as assignTagToTask] (src/lib/todoStore.ts:429:22)
+      at assignTagToTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:184:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:183:16)
+
+  ● TodoStore Tag Assignment Integration Tests › removeTagFromTask › should remove tag from task successfully
+
+    TypeError: Cannot read properties of undefined (reading 'removeFromTodo')
+
+      459 |   removeTagFromTask: async (taskId, tagId) => {
+      460 |     try {
+    > 461 |       await api.tags.removeFromTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      462 |
+      463 |       // Update task by removing tag
+      464 |       set((state) => ({
+
+      at Object.removeFromTodo [as removeTagFromTask] (src/lib/todoStore.ts:461:22)
+      at removeTagFromTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:243:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:242:16)
+
+  ● TodoStore Tag Assignment Integration Tests › removeTagFromTask › should handle remove tag error
+
+    TypeError: Cannot read properties of undefined (reading 'removeFromTodo')
+
+      459 |   removeTagFromTask: async (taskId, tagId) => {
+      460 |     try {
+    > 461 |       await api.tags.removeFromTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      462 |
+      463 |       // Update task by removing tag
+      464 |       set((state) => ({
+
+      at Object.removeFromTodo [as removeTagFromTask] (src/lib/todoStore.ts:461:22)
+      at removeTagFromTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:273:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:272:16)
+
+  ● TodoStore Tag Assignment Integration Tests › removeTagFromTask › should handle removing last tag from task
+
+    TypeError: Cannot read properties of undefined (reading 'removeFromTodo')
+
+      459 |   removeTagFromTask: async (taskId, tagId) => {
+      460 |     try {
+    > 461 |       await api.tags.removeFromTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      462 |
+      463 |       // Update task by removing tag
+      464 |       set((state) => ({
+
+      at Object.removeFromTodo [as removeTagFromTask] (src/lib/todoStore.ts:461:22)
+      at removeTagFromTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:309:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:308:16)
+
+  ● TodoStore Tag Assignment Integration Tests › removeTagFromTask › should handle removing non-existent tag gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'removeFromTodo')
+
+      459 |   removeTagFromTask: async (taskId, tagId) => {
+      460 |     try {
+    > 461 |       await api.tags.removeFromTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      462 |
+      463 |       // Update task by removing tag
+      464 |       set((state) => ({
+
+      at Object.removeFromTodo [as removeTagFromTask] (src/lib/todoStore.ts:461:22)
+      at removeTagFromTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:345:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:344:16)
+
+  ● TodoStore Tag Assignment Integration Tests › fetchTaskTags › should fetch tags for specific task
+
+    TypeError: Cannot read properties of undefined (reading 'getTodoTags')
+
+      485 |   fetchTaskTags: async (taskId) => {
+      486 |     try {
+    > 487 |       const response = await api.tags.getTodoTags(parseInt(taskId));
+          |                                       ^
+      488 |       const tags = response.data.map(convertBackendTag);
+      489 |
+      490 |       // Update the task with fetched tags
+
+      at Object.getTodoTags [as fetchTaskTags] (src/lib/todoStore.ts:487:39)
+      at fetchTaskTags (src/lib/__tests__/todoStore.tagAssignment.test.ts:383:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:382:16)
+
+  ● TodoStore Tag Assignment Integration Tests › fetchTaskTags › should handle fetch task tags error
+
+    TypeError: Cannot read properties of undefined (reading 'getTodoTags')
+
+      485 |   fetchTaskTags: async (taskId) => {
+      486 |     try {
+    > 487 |       const response = await api.tags.getTodoTags(parseInt(taskId));
+          |                                       ^
+      488 |       const tags = response.data.map(convertBackendTag);
+      489 |
+      490 |       // Update the task with fetched tags
+
+      at Object.getTodoTags [as fetchTaskTags] (src/lib/todoStore.ts:487:39)
+      at fetchTaskTags (src/lib/__tests__/todoStore.tagAssignment.test.ts:416:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:415:16)
+
+  ● TodoStore Tag Assignment Integration Tests › fetchTaskTags › should handle task not found when fetching tags
+
+    TypeError: Cannot read properties of undefined (reading 'getTodoTags')
+
+      485 |   fetchTaskTags: async (taskId) => {
+      486 |     try {
+    > 487 |       const response = await api.tags.getTodoTags(parseInt(taskId));
+          |                                       ^
+      488 |       const tags = response.data.map(convertBackendTag);
+      489 |
+      490 |       // Update the task with fetched tags
+
+      at Object.getTodoTags [as fetchTaskTags] (src/lib/todoStore.ts:487:39)
+      at fetchTaskTags (src/lib/__tests__/todoStore.tagAssignment.test.ts:446:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:445:16)
+
+  ● TodoStore Tag Assignment Integration Tests › Complex Tag Assignment Scenarios › should maintain tag consistency across multiple operations
+
+    TypeError: Cannot read properties of undefined (reading 'assignToTodo')
+
+      427 |   assignTagToTask: async (taskId, tagId) => {
+      428 |     try {
+    > 429 |       await api.tags.assignToTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      430 |
+      431 |       // Find the tag in the store
+      432 |       const tag = get().tags.find((t) => t.id === tagId);
+
+      at Object.assignToTodo [as assignTagToTask] (src/lib/todoStore.ts:429:22)
+      at assignTagToTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:498:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:497:16)
+
+  ● TodoStore Tag Assignment Integration Tests › Complex Tag Assignment Scenarios › should handle rapid tag assignment/removal
+
+    TypeError: Cannot read properties of undefined (reading 'assignToTodo')
+
+      427 |   assignTagToTask: async (taskId, tagId) => {
+      428 |     try {
+    > 429 |       await api.tags.assignToTodo(parseInt(taskId), parseInt(tagId));
+          |                      ^
+      430 |
+      431 |       // Find the tag in the store
+      432 |       const tag = get().tags.find((t) => t.id === tagId);
+
+      at Object.assignToTodo [as assignTagToTask] (src/lib/todoStore.ts:429:22)
+      at assignTagToTask (src/lib/__tests__/todoStore.tagAssignment.test.ts:551:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:550:16)
+
+  ● TodoStore Tag Assignment Integration Tests › Complex Tag Assignment Scenarios › should update tags when deleting a tag that is assigned to tasks
+
+    TypeError: Cannot read properties of undefined (reading 'delete')
+
+      398 |     set({ isLoadingTags: true, tagError: null });
+      399 |     try {
+    > 400 |       await api.tags.delete(parseInt(id));
+          |                      ^
+      401 |       set((state) => ({
+      402 |         tags: state.tags.filter((tag) => tag.id !== id),
+      403 |         isLoadingTags: false,
+
+      at Object.delete [as deleteTag] (src/lib/todoStore.ts:400:22)
+      at deleteTag (src/lib/__tests__/todoStore.tagAssignment.test.ts:594:30)
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:789:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.<anonymous> (src/lib/__tests__/todoStore.tagAssignment.test.ts:593:16)
+
+Test Suites: 2 failed, 6 passed, 8 total
+Tests:       15 failed, 179 passed, 194 total
+Snapshots:   0 total
+Time:        7.18 s
+Ran all test suites.

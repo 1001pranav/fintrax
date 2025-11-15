@@ -6,10 +6,10 @@ import SVGComponent  from '../svg';
 export default function ProjectStats() {
     const { projects, tasks } = useAppStore();
 
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(task => task.status === 'done').length;
-    const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
-    const todoTasks = tasks.filter(task => task.status === 'todo').length;
+    const totalTasks = tasks?.length ?? 0;
+    const completedTasks = tasks?.filter(task => task.status === 'done').length ?? 0;
+    const inProgressTasks = tasks?.filter(task => task.status === 'in-progress').length ?? 0;
+    const todoTasks = tasks?.filter(task => task.status === 'todo').length ?? 0;
 
     const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 

@@ -1,11 +1,12 @@
 "use client";
 import { create } from 'zustand';
-import { Project } from '@/constants/interfaces';
+import { Project, Task } from '@/constants/interfaces';
 import { api, Project as ApiProject, CreateProjectData } from './api';
 import { toast } from './useToast';
 
 interface AppState {
     projects: Project[];
+    tasks: Task[];
     selectedProject: Project | null;
     isTaskModalOpen: boolean;
     isProjectModalOpen: boolean;
@@ -40,6 +41,7 @@ const convertApiProject = (apiProject: ApiProject): Project => ({
 
 export const useAppStore = create<AppState>((set, get) => ({
     projects: [],
+    tasks: [],
     selectedProject: null,
     isTaskModalOpen: false,
     isProjectModalOpen: false,
