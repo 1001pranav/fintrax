@@ -6,8 +6,8 @@ import { useAppStore } from '@/lib/store';
 export default function WelcomeHero() {
   const { projects, tasks, setProjectModalOpen } = useAppStore();
 
-  const completedTasks = tasks.filter(task => task.status === 'done').length;
-  const totalTasks = tasks.length;
+  const completedTasks = tasks?.filter(task => task.status === 'done').length ?? 0;
+  const totalTasks = tasks?.length ?? 0;
 
   return (
     <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-2xl p-8 mb-8 relative overflow-hidden backdrop-blur-xl">

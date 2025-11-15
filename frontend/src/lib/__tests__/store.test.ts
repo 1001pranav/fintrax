@@ -7,6 +7,8 @@ describe('useAppStore - Basic Tests', () => {
     expect(state).toBeDefined();
     expect(state.projects).toBeDefined();
     expect(Array.isArray(state.projects)).toBe(true);
+    expect(state.tasks).toBeDefined();
+    expect(Array.isArray(state.tasks)).toBe(true);
   });
 
   it('should have UI state properties', () => {
