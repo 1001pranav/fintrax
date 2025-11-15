@@ -14,6 +14,16 @@ jest.mock('../api', () => ({
     post: jest.fn(),
     put: jest.fn(),
     delete: jest.fn(),
+    tags: {
+      getAll: jest.fn(),
+      getById: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      assignToTodo: jest.fn(),
+      removeFromTodo: jest.fn(),
+      getTodoTags: jest.fn(),
+    },
   },
 }));
 
@@ -55,15 +65,13 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
       });
 
       // Mock successful tag assignment
-      (api.api.post as jest.Mock).mockResolvedValue({
+      (api.api.tags.assignToTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
       // Mock fetchTaskTags to return the assigned tag
-      (api.api.get as jest.Mock).mockResolvedValue({
-        data: {
-          data: [{ tag_id: 5, name: 'Frontend', color: '#FF5733' }],
-        },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValue({
+        data: [{ tag_id: 5, name: 'Frontend', color: '#FF5733' }],
       });
 
       await act(async () => {
@@ -71,7 +79,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
       });
 
       await waitFor(() => {
-        expect(api.api.post).toHaveBeenCalledWith('/task/1/tags/5');
+        expect(api.api.tags.assignToTodo).toHaveBeenCalledWith(1, 5);
         expect(result.current.tasks[0].tags).toHaveLength(1);
         expect(result.current.tasks[0].tags[0].name).toBe('Frontend');
       });
@@ -94,14 +102,18 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.post as jest.Mock).mockRejectedValue(new Error('Assignment failed'));
+      (api.api.tags.assignToTodo as jest.Mock).mockRejectedValue(new Error('Assignment failed'));
 
       await act(async () => {
-        await result.current.assignTagToTask('1', '5');
+        try {
+          await result.current.assignTagToTask('1', '5');
+        } catch (error) {
+          // Error is expected and re-thrown by the store
+        }
       });
 
       await waitFor(() => {
-        expect(result.current.tagError).toContain('Failed to assign tag');
+        expect(result.current.tagError).toContain('Assignment failed');
         expect(result.current.tasks[0].tags).toHaveLength(0);
       });
     });
@@ -127,14 +139,12 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.post as jest.Mock).mockResolvedValue({
+      (api.api.tags.assignToTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
-      (api.api.get as jest.Mock).mockResolvedValue({
-        data: {
-          data: [{ tag_id: 5, name: 'Frontend', color: '#FF5733' }],
-        },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValue({
+        data: [{ tag_id: 5, name: 'Frontend', color: '#FF5733' }],
       });
 
       await act(async () => {
@@ -169,12 +179,12 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.post as jest.Mock).mockResolvedValue({
+      (api.api.tags.assignToTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
       // First tag assignment
-      (api.api.get as jest.Mock).mockResolvedValueOnce({
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValueOnce({
         data: {
           data: [{ tag_id: 1, name: 'Frontend', color: '#FF5733' }],
         },
@@ -185,7 +195,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
       });
 
       // Second tag assignment
-      (api.api.get as jest.Mock).mockResolvedValueOnce({
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValueOnce({
         data: {
           data: [
             { tag_id: 1, name: 'Frontend', color: '#FF5733' },
@@ -229,14 +239,12 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.delete as jest.Mock).mockResolvedValue({
+      (api.api.tags.removeFromTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
-      (api.api.get as jest.Mock).mockResolvedValue({
-        data: {
-          data: [{ tag_id: 6, name: 'Backend', color: '#3B82F6' }],
-        },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValue({
+        data: [{ tag_id: 6, name: 'Backend', color: '#3B82F6' }],
       });
 
       await act(async () => {
@@ -244,7 +252,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
       });
 
       await waitFor(() => {
-        expect(api.api.delete).toHaveBeenCalledWith('/task/1/tags/5');
+        expect(api.api.tags.removeFromTodo).toHaveBeenCalledWith(1, 5);
         expect(result.current.tasks[0].tags).toHaveLength(1);
         expect(result.current.tasks[0].tags[0].name).toBe('Backend');
       });
@@ -267,14 +275,18 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.delete as jest.Mock).mockRejectedValue(new Error('Remove failed'));
+      (api.api.tags.removeFromTodo as jest.Mock).mockRejectedValue(new Error('Remove failed'));
 
       await act(async () => {
-        await result.current.removeTagFromTask('1', '5');
+        try {
+          await result.current.removeTagFromTask('1', '5');
+        } catch (error) {
+          // Error is expected and re-thrown by the store
+        }
       });
 
       await waitFor(() => {
-        expect(result.current.tagError).toContain('Failed to remove tag');
+        expect(result.current.tagError).toContain('Remove failed');
         // Tag should still be present on error
         expect(result.current.tasks[0].tags).toHaveLength(1);
       });
@@ -297,12 +309,12 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.delete as jest.Mock).mockResolvedValue({
+      (api.api.tags.removeFromTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
-      (api.api.get as jest.Mock).mockResolvedValue({
-        data: { data: [] },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValue({
+        data: [] ,
       });
 
       await act(async () => {
@@ -331,14 +343,12 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.delete as jest.Mock).mockResolvedValue({
+      (api.api.tags.removeFromTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
-      (api.api.get as jest.Mock).mockResolvedValue({
-        data: {
-          data: [{ tag_id: 5, name: 'Frontend', color: '#FF5733' }],
-        },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValue({
+        data: [{ tag_id: 5, name: 'Frontend', color: '#FF5733' }],
       });
 
       await act(async () => {
@@ -347,7 +357,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
 
       await waitFor(() => {
         // Should still call API but task tags remain unchanged
-        expect(api.api.delete).toHaveBeenCalled();
+        expect(api.api.tags.removeFromTodo).toHaveBeenCalled();
       });
     });
   });
@@ -375,8 +385,8 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         { tag_id: 2, name: 'Bug', color: '#EF4444' },
       ];
 
-      (api.api.get as jest.Mock).mockResolvedValue({
-        data: { data: mockTaskTags },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValue({
+        data: mockTaskTags,
       });
 
       await act(async () => {
@@ -384,7 +394,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
       });
 
       await waitFor(() => {
-        expect(api.api.get).toHaveBeenCalledWith('/task/1/tags');
+        expect(api.api.tags.getTodoTags).toHaveBeenCalledWith(1);
         expect(result.current.tasks[0].tags).toHaveLength(2);
         expect(result.current.tasks[0].tags.map((t) => t.name)).toEqual([
           'Frontend',
@@ -410,7 +420,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.get as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
+      (api.api.tags.getTodoTags as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
 
       await act(async () => {
         await result.current.fetchTaskTags('1');
@@ -438,8 +448,8 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.get as jest.Mock).mockResolvedValue({
-        data: { data: [] },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValue({
+        data: [] ,
       });
 
       await act(async () => {
@@ -483,12 +493,12 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.post as jest.Mock).mockResolvedValue({
+      (api.api.tags.assignToTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
       // Assign Frontend tag to Task 1
-      (api.api.get as jest.Mock).mockResolvedValueOnce({
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValueOnce({
         data: {
           data: [{ tag_id: 1, name: 'Frontend', color: '#FF5733' }],
         },
@@ -499,7 +509,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
       });
 
       // Assign Backend tag to Task 2
-      (api.api.get as jest.Mock).mockResolvedValueOnce({
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValueOnce({
         data: {
           data: [{ tag_id: 2, name: 'Backend', color: '#3B82F6' }],
         },
@@ -530,18 +540,22 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
             createdDate: new Date(),
           },
         ];
+
+        result.current.tags = [
+          { id: '1', name: 'Frontend', color: '#FF5733' },
+        ];
       });
 
-      (api.api.post as jest.Mock).mockResolvedValue({
+      (api.api.tags.assignToTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
-      (api.api.delete as jest.Mock).mockResolvedValue({
+      (api.api.tags.removeFromTodo as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
       // Assign tag
-      (api.api.get as jest.Mock).mockResolvedValueOnce({
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValueOnce({
         data: {
           data: [{ tag_id: 1, name: 'Frontend', color: '#FF5733' }],
         },
@@ -552,8 +566,8 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
       });
 
       // Remove tag
-      (api.api.get as jest.Mock).mockResolvedValueOnce({
-        data: { data: [] },
+      (api.api.tags.getTodoTags as jest.Mock).mockResolvedValueOnce({
+        data: [] ,
       });
 
       await act(async () => {
@@ -586,7 +600,7 @@ describe('TodoStore Tag Assignment Integration Tests', () => {
         ];
       });
 
-      (api.api.delete as jest.Mock).mockResolvedValue({
+      (api.api.tags.delete as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
