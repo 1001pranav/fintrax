@@ -443,7 +443,8 @@ describe('chartDataProcessors', () => {
 
     it('should handle negative old value', () => {
       const result = calculateGrowthPercentage(-100, -50);
-      expect(result).toBe(-50);
+      // From -100 to -50 is a 50% increase (getting less negative)
+      expect(result).toBe(50);
     });
   });
 
