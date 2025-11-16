@@ -54,8 +54,19 @@ export default function LoginComponent() {
                 password: formData.password, // Don't sanitize password
             };
 
-            const data = await api.login(sanitizedData)
-            console.log('Login successful:', data)
+            const response: any = await api.login(sanitizedData)
+            console.log('Login successful:', response)
+
+            // Store user data in localStorage
+            if (response.data) {
+                localStorage.setItem('token', response.data.token)
+                localStorage.setItem('email', response.data.email)
+                localStorage.setItem('username', response.data.username)
+                localStorage.setItem('user_id', response.data.user_id.toString())
+            }
+
+            // Redirect to projects page
+            window.location.href = '/projects'
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Login failed. Please check your credentials and try again.'
             setErrors([message])
