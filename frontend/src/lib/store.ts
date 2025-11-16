@@ -8,6 +8,7 @@ interface AppState {
     projects: Project[];
     tasks: Task[];
     selectedProject: Project | null;
+    selectedTask: Task | null;
     isTaskModalOpen: boolean;
     isProjectModalOpen: boolean;
     currentView: 'kanban' | 'calendar';
@@ -20,6 +21,9 @@ interface AppState {
     updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
     deleteProject: (id: string) => Promise<void>;
     setSelectedProject: (project: Project | null) => void;
+
+    // Task actions
+    setSelectedTask: (task: Task | null) => void;
 
     // UI actions
     setTaskModalOpen: (open: boolean) => void;
@@ -43,6 +47,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     projects: [],
     tasks: [],
     selectedProject: null,
+    selectedTask: null,
     isTaskModalOpen: false,
     isProjectModalOpen: false,
     currentView: 'kanban',
@@ -135,6 +140,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     setSelectedProject: (project) => set({ selectedProject: project }),
+
+    // Task actions
+    setSelectedTask: (task) => set({ selectedTask: task }),
 
     // UI actions
     setTaskModalOpen: (open) => set({ isTaskModalOpen: open }),

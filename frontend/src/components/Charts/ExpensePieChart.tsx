@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useFinanceStore } from '@/lib/financeStore';
 import { ChartContainer } from './ChartContainer';
@@ -118,6 +118,20 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
   const [timePeriod, setTimePeriod] = useState<TimePeriod>(initialPeriod);
   const [customRange, setCustomRange] = useState<DateRange | undefined>();
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  const [windowWidth, setWindowWidth] = useState<number>(768); // Default to medium screen
+
+  // Handle window resize
+  useEffect(() => {
+    // Set initial width on client side
+    setWindowWidth(window.innerWidth);
+
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Process expense data
   const expenseData = useMemo(() => {
@@ -207,8 +221,8 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
               cy="50%"
               labelLine={false}
               label={renderLabel}
-              outerRadius={window.innerWidth < 640 ? 80 : 120}
-              innerRadius={window.innerWidth < 640 ? 40 : 60}
+              outerRadius={windowWidth < 640 ? 80 : 120}
+              innerRadius={windowWidth < 640 ? 40 : 60}
               fill="#8884d8"
               dataKey="amount"
               nameKey="category"
@@ -226,7 +240,7 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
               iconType="circle"
               wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
               formatter={(value: string) => (
-                <span style={{ color: CHART_COLORS.text.primary, fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
+                <span style={{ color: CHART_COLORS.text.primary, fontSize: windowWidth < 640 ? '10px' : '12px' }}>
                   {value}
                 </span>
               )}

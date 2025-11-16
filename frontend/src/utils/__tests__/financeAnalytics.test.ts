@@ -36,9 +36,9 @@ describe('Finance Analytics', () => {
       const trends = calculateMonthlyTrends(transactions, 2);
 
       expect(trends).toHaveLength(2);
-      expect(trends[1].income).toBe(5000);
-      expect(trends[1].expense).toBe(200);
-      expect(trends[1].net).toBe(4800);
+      expect(trends[0].income).toBe(5000); // Transactions from 1 month ago are at index 0
+      expect(trends[0].expense).toBe(200);
+      expect(trends[0].net).toBe(4800);
     });
 
     it('should return empty values for months with no transactions', () => {

@@ -26,6 +26,16 @@ export interface ExpenseCategoryData {
 }
 
 /**
+ * Format date to YYYY-MM-DD without timezone conversion
+ */
+const formatDateLocal = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+/**
  * Get start and end dates for a time period
  */
 export const getDateRangeForPeriod = (period: TimePeriod, customRange?: DateRange): DateRange => {
@@ -38,8 +48,8 @@ export const getDateRangeForPeriod = (period: TimePeriod, customRange?: DateRang
       const startDate = new Date(year, month, 1);
       const endDate = new Date(year, month + 1, 0);
       return {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatDateLocal(startDate),
+        endDate: formatDateLocal(endDate),
       };
     }
 
@@ -47,8 +57,8 @@ export const getDateRangeForPeriod = (period: TimePeriod, customRange?: DateRang
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 0);
       return {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatDateLocal(startDate),
+        endDate: formatDateLocal(endDate),
       };
     }
 
@@ -56,8 +66,8 @@ export const getDateRangeForPeriod = (period: TimePeriod, customRange?: DateRang
       const startDate = new Date(year, month - 3, 1);
       const endDate = new Date(year, month + 1, 0);
       return {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatDateLocal(startDate),
+        endDate: formatDateLocal(endDate),
       };
     }
 
@@ -65,8 +75,8 @@ export const getDateRangeForPeriod = (period: TimePeriod, customRange?: DateRang
       const startDate = new Date(year, month - 6, 1);
       const endDate = new Date(year, month + 1, 0);
       return {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatDateLocal(startDate),
+        endDate: formatDateLocal(endDate),
       };
     }
 
@@ -74,15 +84,15 @@ export const getDateRangeForPeriod = (period: TimePeriod, customRange?: DateRang
       const startDate = new Date(year, 0, 1);
       const endDate = new Date(year, 11, 31);
       return {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatDateLocal(startDate),
+        endDate: formatDateLocal(endDate),
       };
     }
 
     case 'custom':
       return customRange || {
-        startDate: new Date(year, 0, 1).toISOString().split('T')[0],
-        endDate: now.toISOString().split('T')[0],
+        startDate: formatDateLocal(new Date(year, 0, 1)),
+        endDate: formatDateLocal(now),
       };
 
     default:
