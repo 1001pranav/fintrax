@@ -1,15 +1,31 @@
 'use client';
 
 import { useAppStore } from '@/lib/store';
-import ProjectCard from '@/components/Project/ProjectCardComponent';3
+import ProjectCard from '@/components/Project/ProjectCardComponent';
 import SVGComponent from '../svg';
 import { APP_NAME } from '@/constants/generalConstants';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function Sidebar() {
   const { projects, selectedProject, setSelectedProject, setProjectModalOpen } = useAppStore();
+  const router = useRouter();
+  const [username, setUsername] = useState<string>('User');
+
+  useEffect(() => {
+    // Get username from localStorage
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
+
+  const handleProfileClick = () => {
+    router.push('/profile');
+  };
 
   return (
-    <div className="w-80 h-screen bg-white/5 border-r border-white/10 backdrop-blur-xl p-6 overflow-y-auto">
+    <div className="w-80 h-screen bg-white/5 border-r border-white/10 backdrop-blur-xl p-6 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-6">
@@ -35,13 +51,13 @@ export default function Sidebar() {
       </div>
 
       {/* Projects List */}
-      <div className="space-y-3">
+      <div className="flex-1 overflow-y-auto space-y-3">
         <h2 className="text-white/80 font-semibold text-sm uppercase tracking-wider mb-4">
           Projects ({projects.length})
         </h2>
-        
+
         {projects.map((project, index) => (
-          
+
             (
 
               <ProjectCard
@@ -51,8 +67,25 @@ export default function Sidebar() {
                 onClick={() => setSelectedProject(project)}
               />
             )
-          
+
         ))}
+      </div>
+
+      {/* User Profile Section */}
+      <div className="mt-auto pt-4 border-t border-white/10">
+        <button
+          onClick={handleProfileClick}
+          className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all duration-200 flex items-center space-x-3"
+        >
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <SVGComponent svgType="user" className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 text-left overflow-hidden">
+            <p className="text-white font-medium truncate">{username}</p>
+            <p className="text-white/60 text-xs">View Profile</p>
+          </div>
+          <SVGComponent svgType="rightArrowHead" className="w-4 h-4 text-white/60" />
+        </button>
       </div>
     </div>
   );
