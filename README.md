@@ -54,6 +54,12 @@ Fintrax is a comprehensive productivity and finance management platform that hel
 - **Password Hashing:** bcrypt
 - **Testing:** Testify v1.10.0
 
+### Mobile
+- **Framework:** Expo ~54.0.23
+- **Language:** TypeScript 5
+- **Runtime:** React Native 0.81.5 with React 19.1.0
+- **Platform Support:** iOS, Android, Web
+
 ## 📁 Project Structure
 
 ```
@@ -65,6 +71,12 @@ fintrax/
 │   │   ├── lib/          # State management & API utilities
 │   │   ├── constants/    # Type definitions & constants
 │   │   └── utils/        # Utility functions
+│   └── package.json
+│
+├── mobile/               # React Native Expo application
+│   ├── App.tsx          # Main app component
+│   ├── assets/          # Images, fonts, and static assets
+│   ├── app.json         # Expo configuration
 │   └── package.json
 │
 └── backend/              # Go REST API server
@@ -177,6 +189,44 @@ yarn dev
 ```
 
 The frontend will be available at `http://localhost:3000`
+
+### Mobile Setup
+
+1. Navigate to the mobile directory:
+```bash
+cd mobile
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create a `.env` file:
+```bash
+cp .env.example .env
+```
+
+Update the API URL in `.env`:
+```bash
+# For emulator/simulator
+EXPO_PUBLIC_API_URL=http://localhost:80/api
+
+# For physical devices, use your computer's local IP
+# EXPO_PUBLIC_API_URL=http://192.168.1.100:80/api
+```
+
+4. Start the Expo development server:
+```bash
+npm start
+```
+
+5. Run on your device:
+   - **iOS Simulator**: Press `i` in the terminal or run `npm run ios`
+   - **Android Emulator**: Press `a` in the terminal or run `npm run android`
+   - **Physical Device**: Install **Expo Go** app and scan the QR code
+
+For more details, see [`mobile/README.md`](./mobile/README.md)
 
 ## 📚 API Documentation
 
