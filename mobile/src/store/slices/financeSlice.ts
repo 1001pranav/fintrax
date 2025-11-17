@@ -1,11 +1,13 @@
 /**
- * Finance Slice
- * Redux slice for financial data state management
+ * Finance Slice (US-4.4)
+ * Redux slice for financial data state management with offline support
+ * Uses Repository Pattern for data access abstraction
  */
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { financeApi } from '../../api';
-import { sqliteService, offlineManager } from '../../services';
+import { offlineManager } from '../../services';
+import { transactionRepository } from '../../database/helpers';
 import {
   Transaction,
   Savings,
@@ -13,9 +15,7 @@ import {
   FinanceSummary,
   SyncOperationType,
   SyncEntity,
-  SyncStatus,
 } from '../../constants/types';
-import { v4 as uuidv4 } from 'uuid';
 
 interface FinanceState {
   transactions: Transaction[];
@@ -52,27 +52,42 @@ export const fetchTransactions = createAsyncThunk(
   'finance/fetchTransactions',
   async (_, { rejectWithValue }) => {
     try {
+      // Always load from local database first (offline-first) (US-4.4)
+      const localTransactions = await transactionRepository.getAll();
+
+      // If online, fetch from server and update local database
       if (offlineManager.isConnected()) {
-        const transactions = await financeApi.getTransactions();
-        for (const transaction of transactions) {
-          const existing = await sqliteService.getById<Transaction>(
-            'transactions',
-            transaction.id
-          );
-          if (existing) {
-            await sqliteService.update('transactions', transaction.id, transaction);
-          } else {
-            await sqliteService.insert('transactions', transaction);
+        try {
+          const serverTransactions = await financeApi.getTransactions();
+
+          // Update local database with server data
+          for (const serverTransaction of serverTransactions) {
+            const existing = await transactionRepository.getById(
+              serverTransaction.id
+            );
+            if (existing) {
+              await transactionRepository.update(serverTransaction.id, {
+                ...serverTransaction,
+                syncStatus: 'synced',
+              });
+            } else {
+              await transactionRepository.create({
+                ...serverTransaction,
+                syncStatus: 'synced',
+              });
+            }
           }
+
+          return await transactionRepository.getAll();
+        } catch (serverError) {
+          console.warn('Server fetch failed, using local data:', serverError);
+          return localTransactions;
         }
-        return transactions;
-      } else {
-        const transactions = await sqliteService.getAll<Transaction>('transactions');
-        return transactions;
       }
+
+      return localTransactions;
     } catch (error: any) {
-      const transactions = await sqliteService.getAll<Transaction>('transactions');
-      return transactions;
+      return rejectWithValue(error.message || 'Failed to fetch transactions');
     }
   }
 );
@@ -81,26 +96,21 @@ export const createTransaction = createAsyncThunk(
   'finance/createTransaction',
   async (transactionData: Partial<Transaction>, { rejectWithValue }) => {
     try {
-      const localId = uuidv4();
-      const transaction: Transaction = {
-        id: localId,
+      // Create transaction using repository (US-4.4)
+      const transaction = await transactionRepository.create({
         amount: transactionData.amount!,
         category: transactionData.category!,
         description: transactionData.description || '',
         type: transactionData.type!,
         date: transactionData.date!,
         userId: transactionData.userId!,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        localId,
-        syncStatus: SyncStatus.PENDING,
-      };
+        syncStatus: 'pending',
+      });
 
-      await sqliteService.insert('transactions', transaction);
       await offlineManager.queueOperation(
         SyncOperationType.CREATE,
         SyncEntity.TRANSACTION,
-        localId,
+        transaction.id,
         transactionData
       );
 
@@ -118,10 +128,10 @@ export const updateTransaction = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      await sqliteService.update('transactions', id, {
+      // Update using repository (US-4.4)
+      const transaction = await transactionRepository.update(id, {
         ...updates,
-        updatedAt: new Date().toISOString(),
-        syncStatus: SyncStatus.PENDING,
+        syncStatus: 'pending',
       });
 
       await offlineManager.queueOperation(
@@ -131,11 +141,7 @@ export const updateTransaction = createAsyncThunk(
         updates
       );
 
-      const transaction = await sqliteService.getById<Transaction>(
-        'transactions',
-        id
-      );
-      return transaction!;
+      return transaction;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to update transaction');
     }
@@ -146,7 +152,8 @@ export const deleteTransaction = createAsyncThunk(
   'finance/deleteTransaction',
   async (id: string, { rejectWithValue }) => {
     try {
-      await sqliteService.delete('transactions', id);
+      // Soft delete using repository (US-4.4)
+      await transactionRepository.delete(id);
       await offlineManager.queueOperation(
         SyncOperationType.DELETE,
         SyncEntity.TRANSACTION,

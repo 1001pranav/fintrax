@@ -164,13 +164,25 @@ export class OfflineManager {
   }
 
   /**
-   * Sync a single operation
+   * Sync a single operation with exponential backoff (US-4.2)
    */
   private async syncOperation(operation: SyncOperation): Promise<boolean> {
     const strategy = this.syncStrategies.get(operation.type);
     if (!strategy) {
       console.error(`No strategy found for operation type: ${operation.type}`);
       return false;
+    }
+
+    // Check if we should retry based on exponential backoff
+    if (operation.lastAttempt && operation.retryCount > 0) {
+      const backoffMs = this.calculateBackoff(operation.retryCount);
+      const timeSinceLastAttempt =
+        Date.now() - new Date(operation.lastAttempt).getTime();
+
+      if (timeSinceLastAttempt < backoffMs) {
+        // Too soon to retry, skip this operation
+        return false;
+      }
     }
 
     try {
@@ -184,6 +196,13 @@ export class OfflineManager {
 
       // Remove from queue (hard delete)
       await sqliteService.hardDelete('sync_queue', operation.id);
+
+      // Update local entity sync status
+      await this.updateLocalEntitySyncStatus(
+        operation.entity,
+        operation.entityId,
+        'synced'
+      );
 
       return true;
     } catch (error: any) {
@@ -203,7 +222,47 @@ export class OfflineManager {
         error: error.message,
       });
 
+      // Update local entity sync status
+      if (newStatus === SyncStatus.FAILED) {
+        await this.updateLocalEntitySyncStatus(
+          operation.entity,
+          operation.entityId,
+          'failed'
+        );
+      }
+
       return false;
+    }
+  }
+
+  /**
+   * Calculate exponential backoff delay (US-4.2)
+   * Returns delay in milliseconds
+   */
+  private calculateBackoff(retryCount: number): number {
+    // Exponential backoff: 2^retryCount * base delay
+    const baseDelayMs = 2000; // 2 seconds
+    const maxDelayMs = 60000; // 60 seconds max
+    const delayMs = Math.min(
+      baseDelayMs * Math.pow(2, retryCount - 1),
+      maxDelayMs
+    );
+    return delayMs;
+  }
+
+  /**
+   * Update local entity sync status (US-4.2)
+   */
+  private async updateLocalEntitySyncStatus(
+    entity: string,
+    entityId: string,
+    status: string
+  ): Promise<void> {
+    try {
+      const table = entity.toLowerCase() + 's'; // e.g., 'task' -> 'tasks'
+      await sqliteService.update(table, entityId, { syncStatus: status });
+    } catch (error) {
+      console.error('Error updating local entity sync status:', error);
     }
   }
 
