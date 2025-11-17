@@ -13,6 +13,7 @@ import authReducer from './slices/authSlice';
 import tasksReducer from './slices/tasksSlice';
 import projectsReducer from './slices/projectsSlice';
 import financeReducer from './slices/financeSlice';
+import dashboardReducer from './slices/dashboardSlice';
 
 // Import middleware
 import { syncMiddleware } from './middleware/syncMiddleware';
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   tasks: tasksReducer,
   projects: projectsReducer,
   finance: financeReducer,
+  dashboard: dashboardReducer,
 });
 
 // Persist configuration
@@ -30,7 +32,7 @@ const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
   whitelist: ['auth'], // Only persist auth state
-  blacklist: ['tasks', 'projects', 'finance'], // Don't persist these (use SQLite instead)
+  blacklist: ['tasks', 'projects', 'finance', 'dashboard'], // Don't persist these (use SQLite instead)
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
