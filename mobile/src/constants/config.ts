@@ -64,9 +64,7 @@ export const APP_INFO = {
   NAME: 'Fintrax',
   VERSION: Constants.expoConfig?.version || '1.0.0',
   BUILD_NUMBER:
-    Constants.expoConfig?.ios?.buildNumber ||
-    Constants.expoConfig?.android?.versionCode ||
-    '1',
+    Constants.expoConfig?.ios?.buildNumber || Constants.expoConfig?.android?.versionCode || '1',
 } as const;
 
 // ============================================================================

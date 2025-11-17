@@ -3,7 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "target": "ES2021",
-    "lib": ["ES2021"],
+    "lib": [
+      "ES2021"
+    ],
     "jsx": "react-native",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
@@ -12,25 +14,64 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@components": ["src/components"],
-      "@screens/*": ["src/screens/*"],
-      "@screens": ["src/screens"],
-      "@navigation/*": ["src/navigation/*"],
-      "@store/*": ["src/store/*"],
-      "@store": ["src/store"],
-      "@api/*": ["src/api/*"],
-      "@api": ["src/api"],
-      "@utils/*": ["src/utils/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@hooks": ["src/hooks"],
-      "@constants/*": ["src/constants/*"],
-      "@app-types/*": ["src/types/*"],
-      "@theme/*": ["src/theme/*"],
-      "@theme": ["src/theme"]
+      "@/*": [
+        "src/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@components": [
+        "src/components"
+      ],
+      "@screens/*": [
+        "src/screens/*"
+      ],
+      "@screens": [
+        "src/screens"
+      ],
+      "@navigation/*": [
+        "src/navigation/*"
+      ],
+      "@store/*": [
+        "src/store/*"
+      ],
+      "@store": [
+        "src/store"
+      ],
+      "@api/*": [
+        "src/api/*"
+      ],
+      "@api": [
+        "src/api"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@hooks/*": [
+        "src/hooks/*"
+      ],
+      "@hooks": [
+        "src/hooks"
+      ],
+      "@constants/*": [
+        "src/constants/*"
+      ],
+      "@app-types/*": [
+        "src/types/*"
+      ],
+      "@theme/*": [
+        "src/theme/*"
+      ],
+      "@theme": [
+        "src/theme"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -3,7 +3,7 @@
  * Main application entry point with layered architecture integration
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { Provider } from 'react-redux';

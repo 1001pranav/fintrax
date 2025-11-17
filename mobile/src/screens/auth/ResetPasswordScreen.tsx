@@ -240,12 +240,7 @@ export const ResetPasswordScreen: React.FC = () => {
           title="Reset Password"
           onPress={handleResetPassword}
           loading={isLoading}
-          disabled={
-            isLoading ||
-            otp.some((digit) => !digit) ||
-            !newPassword ||
-            !confirmPassword
-          }
+          disabled={isLoading || otp.some((digit) => !digit) || !newPassword || !confirmPassword}
           fullWidth
           testID="reset-password-button"
         />

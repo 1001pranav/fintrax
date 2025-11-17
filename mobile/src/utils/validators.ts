@@ -140,10 +140,7 @@ export const getOTPError = (otp: string): string | null => {
 /**
  * Validate passwords match
  */
-export const validatePasswordMatch = (
-  password: string,
-  confirmPassword: string
-): string | null => {
+export const validatePasswordMatch = (password: string, confirmPassword: string): string | null => {
   if (password !== confirmPassword) {
     return ERROR_MESSAGES.VALIDATION.PASSWORDS_DONT_MATCH;
   }

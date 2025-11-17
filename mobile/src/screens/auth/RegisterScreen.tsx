@@ -196,9 +196,8 @@ export const RegisterScreen: React.FC = () => {
 
           {/* Terms and Conditions */}
           <Text style={styles.termsText}>
-            By signing up, you agree to our{' '}
-            <Text style={styles.termsLink}>Terms of Service</Text> and{' '}
-            <Text style={styles.termsLink}>Privacy Policy</Text>
+            By signing up, you agree to our <Text style={styles.termsLink}>Terms of Service</Text>{' '}
+            and <Text style={styles.termsLink}>Privacy Policy</Text>
           </Text>
 
           {/* Register Button */}

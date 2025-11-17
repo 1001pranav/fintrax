@@ -160,11 +160,9 @@ export const VerifyEmailScreen: React.FC = () => {
       await authApi.generateOTP({ email });
 
       // Show success message
-      Alert.alert(
-        'OTP Sent',
-        'A new verification code has been sent to your email.',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('OTP Sent', 'A new verification code has been sent to your email.', [
+        { text: 'OK' },
+      ]);
 
       // Clear OTP inputs
       setOtp(['', '', '', '', '', '']);
