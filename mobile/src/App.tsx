@@ -1,12 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '@store/index';
 import { loadUserFromStorage } from '@store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '@hooks';
-import { LoginScreen } from '@screens/auth/LoginScreen';
+import { LoginScreen, RegisterScreen, VerifyEmailScreen } from '@screens/auth';
 import { colors } from '@theme';
+
+type AuthScreen = 'login' | 'register' | 'verify';
 
 /**
  * App Content Component
@@ -15,6 +17,8 @@ import { colors } from '@theme';
 function AppContent() {
   const dispatch = useAppDispatch();
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  const [currentAuthScreen, setCurrentAuthScreen] = useState<AuthScreen>('login');
+  const [verificationEmail, setVerificationEmail] = useState<string>('');
 
   // Load user from storage on app start
   useEffect(() => {
@@ -31,9 +35,32 @@ function AppContent() {
     );
   }
 
-  // Show login screen if not authenticated
+  // Show auth screens if not authenticated
   if (!isAuthenticated) {
-    return <LoginScreen />;
+    if (currentAuthScreen === 'register') {
+      return (
+        <RegisterScreen
+          onNavigateToLogin={() => setCurrentAuthScreen('login')}
+          onNavigateToVerify={(email) => {
+            setVerificationEmail(email);
+            setCurrentAuthScreen('verify');
+          }}
+        />
+      );
+    }
+
+    if (currentAuthScreen === 'verify') {
+      return (
+        <VerifyEmailScreen
+          email={verificationEmail}
+          onNavigateToLogin={() => setCurrentAuthScreen('login')}
+          onVerificationSuccess={() => setCurrentAuthScreen('login')}
+        />
+      );
+    }
+
+    // Default to login screen
+    return <LoginScreen onNavigateToRegister={() => setCurrentAuthScreen('register')} />;
   }
 
   // Show dashboard (placeholder for now)

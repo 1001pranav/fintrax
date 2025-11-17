@@ -19,7 +19,15 @@ import { asyncStorage, STORAGE_KEYS } from '@utils/storage';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { login, clearError } from '@store/slices/authSlice';
 
-export const LoginScreen: React.FC = () => {
+interface LoginScreenProps {
+  onNavigateToRegister?: () => void;
+  onNavigateToForgotPassword?: () => void;
+}
+
+export const LoginScreen: React.FC<LoginScreenProps> = ({
+  onNavigateToRegister,
+  onNavigateToForgotPassword,
+}) => {
   const dispatch = useAppDispatch();
   const { isLoading, error: authError } = useAppSelector((state) => state.auth);
 
@@ -101,15 +109,23 @@ export const LoginScreen: React.FC = () => {
   };
 
   const handleForgotPassword = () => {
-    // TODO: Navigate to Forgot Password screen (US-1.6)
-    Alert.alert('Forgot Password', 'This feature will be available in the next update.', [
-      { text: 'OK' },
-    ]);
+    if (onNavigateToForgotPassword) {
+      onNavigateToForgotPassword();
+    } else {
+      Alert.alert('Forgot Password', 'This feature will be available in the next update.', [
+        { text: 'OK' },
+      ]);
+    }
   };
 
   const handleSignUp = () => {
-    // TODO: Navigate to Register screen (US-1.6)
-    Alert.alert('Sign Up', 'Registration will be available in the next update.', [{ text: 'OK' }]);
+    if (onNavigateToRegister) {
+      onNavigateToRegister();
+    } else {
+      Alert.alert('Sign Up', 'Registration will be available in the next update.', [
+        { text: 'OK' },
+      ]);
+    }
   };
 
   return (
