@@ -1,198 +1,219 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+/**
+ * API Client
+ * Axios instance factory with interceptors for authentication and error handling
+ * Implements Factory Pattern for creating configured HTTP client
+ */
+
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
+import { config } from '../constants/config';
+import { secureStorage } from '../services/storage';
 import NetInfo from '@react-native-community/netinfo';
-import { API_BASE_URL, REQUEST_TIMEOUT, RETRY_CONFIG, HTTP_STATUS } from '@constants/api';
-import { tokenStorage } from '@utils/storage';
-import { ApiResponse, NetworkError } from '@app-types/api.types';
 
 /**
- * Create Axios instance with base configuration
+ * API Client Factory
+ * Creates and configures an axios instance with interceptors
  */
-const apiClient: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: REQUEST_TIMEOUT.DEFAULT,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
+class ApiClient {
+  private static instance: AxiosInstance;
+  private static isRefreshing = false;
+  private static failedQueue: Array<{
+    resolve: (token: string) => void;
+    reject: (error: any) => void;
+  }> = [];
 
-/**
- * Request Interceptor
- * - Adds JWT token to headers
- * - Checks network connectivity
- * - Logs requests in development mode
- */
-apiClient.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    // Check network connectivity
-    const networkState = await NetInfo.fetch();
-    if (!networkState.isConnected) {
-      return Promise.reject({
-        message: 'No internet connection. Please check your network and try again.',
-        isNetworkError: true,
-      } as NetworkError);
-    }
+  /**
+   * Create axios instance with default configuration
+   */
+  private static createInstance(): AxiosInstance {
+    const instance = axios.create({
+      baseURL: config.API_URL,
+      timeout: config.API_TIMEOUT,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
 
-    // Add JWT token if available
+    // Configure retry logic for failed requests
+    axiosRetry(instance, {
+      retries: config.SYNC.MAX_RETRIES,
+      retryDelay: (retryCount) => {
+        return retryCount * 1000; // Exponential backoff
+      },
+      retryCondition: (error) => {
+        // Retry on network errors or 5xx server errors
+        return (
+          axiosRetry.isNetworkError(error) ||
+          (error.response?.status ?? 0) >= 500
+        );
+      },
+    });
+
+    return instance;
+  }
+
+  /**
+   * Process failed queue after token refresh
+   */
+  private static processQueue(error: any, token: string | null = null) {
+    this.failedQueue.forEach((promise) => {
+      if (error) {
+        promise.reject(error);
+      } else if (token) {
+        promise.resolve(token);
+      }
+    });
+    this.failedQueue = [];
+  }
+
+  /**
+   * Request interceptor - adds auth token to requests
+   */
+  private static async requestInterceptor(
+    config: InternalAxiosRequestConfig
+  ): Promise<InternalAxiosRequestConfig> {
     try {
-      const token = await tokenStorage.getToken();
+      // Check network connectivity
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        throw new Error('No internet connection');
+      }
+
+      // Add auth token if available
+      const token = await secureStorage.getSecure(config.STORAGE_KEYS.AUTH_TOKEN);
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+
+      return config;
     } catch (error) {
-      console.error('Error retrieving token:', error);
+      return Promise.reject(error);
     }
-
-    // Log request in development
-    if (__DEV__) {
-      console.log('📤 API Request:', {
-        method: config.method?.toUpperCase(),
-        url: config.url,
-        baseURL: config.baseURL,
-        headers: config.headers,
-        data: config.data,
-      });
-    }
-
-    return config;
-  },
-  (error: AxiosError) => {
-    if (__DEV__) {
-      console.error('❌ Request Error:', error);
-    }
-    return Promise.reject(error);
   }
-);
 
-/**
- * Response Interceptor
- * - Handles successful responses
- * - Handles error responses
- * - Triggers logout on 401
- * - Logs responses in development mode
- */
-apiClient.interceptors.response.use(
-  (response: AxiosResponse<ApiResponse>) => {
-    // Log response in development
-    if (__DEV__) {
-      console.log('📥 API Response:', {
-        status: response.status,
-        url: response.config.url,
-        data: response.data,
-      });
-    }
+  /**
+   * Response error interceptor - handles token refresh
+   */
+  private static async responseErrorInterceptor(error: AxiosError) {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
-    return response;
-  },
-  async (error: AxiosError<ApiResponse>) => {
-    // Log error in development
-    if (__DEV__) {
-      console.error('❌ API Error:', {
-        status: error.response?.status,
-        url: error.config?.url,
-        message: error.message,
-        data: error.response?.data,
-      });
-    }
-
-    // Handle 401 Unauthorized - Token expired or invalid
-    if (error.response?.status === HTTP_STATUS.UNAUTHORIZED) {
-      // Clear token
-      await tokenStorage.removeToken();
-
-      // Trigger logout (this will be handled by Redux middleware later)
-      // For now, we'll just reject the promise
-      if (__DEV__) {
-        console.log('🔐 Unauthorized - Token cleared');
+    // Handle 401 Unauthorized - token expired
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (this.isRefreshing) {
+        // Queue this request while token is being refreshed
+        return new Promise((resolve, reject) => {
+          this.failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            return this.instance(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
       }
 
-      return Promise.reject({
-        message: 'Your session has expired. Please login again.',
-        statusCode: HTTP_STATUS.UNAUTHORIZED,
-        isNetworkError: false,
-      } as NetworkError);
+      originalRequest._retry = true;
+      this.isRefreshing = true;
+
+      try {
+        // Try to refresh token
+        const refreshToken = await secureStorage.getSecure(
+          config.STORAGE_KEYS.REFRESH_TOKEN
+        );
+
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+
+        const response = await axios.post(
+          `${config.API_URL}/user/refresh`,
+          { refreshToken }
+        );
+
+        const { accessToken } = response.data.data;
+
+        // Store new token
+        await secureStorage.setSecure(
+          config.STORAGE_KEYS.AUTH_TOKEN,
+          accessToken
+        );
+
+        // Update Authorization header
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
+        // Process queued requests
+        this.processQueue(null, accessToken);
+
+        return this.instance(originalRequest);
+      } catch (refreshError) {
+        this.processQueue(refreshError, null);
+
+        // Clear auth data and redirect to login
+        await secureStorage.deleteSecure(config.STORAGE_KEYS.AUTH_TOKEN);
+        await secureStorage.deleteSecure(config.STORAGE_KEYS.REFRESH_TOKEN);
+        await secureStorage.deleteSecure(config.STORAGE_KEYS.USER_DATA);
+
+        // Emit logout event (will be handled by navigation)
+        // This is where you'd dispatch a Redux action or emit an event
+
+        return Promise.reject(refreshError);
+      } finally {
+        this.isRefreshing = false;
+      }
     }
 
-    // Handle network errors
-    if (error.message === 'Network Error' || !error.response) {
-      return Promise.reject({
-        message: 'Network error. Please check your internet connection.',
-        isNetworkError: true,
-      } as NetworkError);
-    }
-
-    // Handle other errors with custom message
+    // Extract error message from response
     const errorMessage =
       error.response?.data?.message ||
-      error.response?.data?.errors?.[0]?.message ||
+      error.response?.data?.errors?.[0] ||
       error.message ||
-      'An unexpected error occurred';
+      'An unknown error occurred';
 
     return Promise.reject({
+      ...error,
       message: errorMessage,
-      statusCode: error.response?.status,
-      isNetworkError: false,
-    } as NetworkError);
+    });
   }
-);
 
-/**
- * Configure axios-retry for automatic retries
- * - Retries on network errors and specific status codes
- * - Uses exponential backoff
- * - Max 3 retries
- */
-axiosRetry(apiClient, {
-  retries: RETRY_CONFIG.MAX_RETRIES,
-  retryDelay: (retryCount) => {
-    // Exponential backoff: 1s, 2s, 4s
-    const delay = RETRY_CONFIG.RETRY_DELAY * Math.pow(2, retryCount - 1);
-    if (__DEV__) {
-      console.log(`🔄 Retry attempt ${retryCount} after ${delay}ms`);
-    }
-    return delay;
-  },
-  retryCondition: (error: AxiosError) => {
-    // Retry on network errors
-    if (!error.response) {
-      return true;
+  /**
+   * Get configured axios instance (Singleton)
+   */
+  public static getInstance(): AxiosInstance {
+    if (!this.instance) {
+      this.instance = this.createInstance();
+
+      // Add request interceptor
+      this.instance.interceptors.request.use(
+        this.requestInterceptor.bind(this),
+        (error) => Promise.reject(error)
+      );
+
+      // Add response interceptor
+      this.instance.interceptors.response.use(
+        (response) => response,
+        this.responseErrorInterceptor.bind(this)
+      );
     }
 
-    // Retry on specific status codes (5xx, 429, 408)
-    const status = error.response.status;
-    return (RETRY_CONFIG.RETRY_STATUS_CODES as readonly number[]).includes(status);
-  },
-  shouldResetTimeout: true,
-  onRetry: (retryCount, error, requestConfig) => {
-    if (__DEV__) {
-      console.log(`🔄 Retrying request to ${requestConfig.url} (Attempt ${retryCount})`);
-    }
-  },
-});
+    return this.instance;
+  }
 
-/**
- * Helper function to check network connectivity
- */
-export const checkNetworkConnectivity = async (): Promise<boolean> => {
-  const networkState = await NetInfo.fetch();
-  return networkState.isConnected ?? false;
-};
+  /**
+   * Reset client instance (useful for testing or logout)
+   */
+  public static reset(): void {
+    this.instance = this.createInstance();
+  }
+}
 
-/**
- * Helper function to get network info
- */
-export const getNetworkInfo = async () => {
-  const networkState = await NetInfo.fetch();
-  return {
-    isConnected: networkState.isConnected ?? false,
-    isInternetReachable: networkState.isInternetReachable ?? false,
-    type: networkState.type,
-    details: networkState.details,
-  };
-};
-
-/**
- * Export the configured API client
- */
+// Export singleton instance
+export const apiClient = ApiClient.getInstance();
 export default apiClient;

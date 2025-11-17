@@ -542,9 +542,6 @@ Contributions are welcome! Please follow these steps:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👥 Authors
-
-- Your Name - Initial work
 
 ## 🙏 Acknowledgments
 
@@ -555,8 +552,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📞 Support
 
-For support, please open an issue on GitHub or contact the development team.
-
+For support, please open an issue on GitHub.
 ---
 
-**Built with ❤️ using Next.js and Go**
+**Built with ❤️ using Next.js, Go And Claude**

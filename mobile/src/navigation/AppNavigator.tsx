@@ -8,7 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from './types';
 import { useAppSelector, useAppDispatch } from '../hooks';
-import { loadUserFromStorage } from '../store/slices/authSlice';
+import { checkAuth } from '../store/slices/authSlice';
 import { AuthNavigator } from './AuthNavigator';
 import { MainNavigator } from './MainNavigator';
 
@@ -16,17 +16,17 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 export const AppNavigator = () => {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const { isAuthenticated } = useAppSelector((state: any) => state.auth);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check authentication status on app start
-    dispatch(loadUserFromStorage()).finally(() => {
-      setIsInitializing(false);
+    dispatch(checkAuth()).finally(() => {
+      setIsLoading(false);
     });
   }, [dispatch]);
 
-  if (isLoading || isInitializing) {
+  if (isLoading) {
     // Loading state is handled by PersistGate in App.tsx
     return null;
   }

@@ -1,88 +1,59 @@
-import { configureStore, combineReducers, Middleware } from '@reduxjs/toolkit';
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from 'redux-persist';
+/**
+ * Redux Store Configuration
+ * Configures Redux store with slices, middleware, and persistence
+ */
+
+import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { combineReducers } from 'redux';
+
+// Import reducers
 import authReducer from './slices/authSlice';
-import uiReducer from './slices/uiSlice';
+import tasksReducer from './slices/tasksSlice';
+import projectsReducer from './slices/projectsSlice';
+import financeReducer from './slices/financeSlice';
 
-/**
- * Redux Persist Configuration
- */
-const persistConfig = {
-  key: 'root',
-  version: 1,
-  storage: AsyncStorage,
-  whitelist: ['auth'], // Only persist auth slice
-  blacklist: ['ui'], // Don't persist UI slice (loading states, toasts, etc.)
-};
+// Import middleware
+import { syncMiddleware } from './middleware/syncMiddleware';
 
-/**
- * Root Reducer
- */
+// Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
-  ui: uiReducer,
+  tasks: tasksReducer,
+  projects: projectsReducer,
+  finance: financeReducer,
 });
 
-/**
- * Persisted Reducer
- */
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
-/**
- * Custom Logging Middleware (Development Only)
- */
-const loggingMiddleware: Middleware = (store) => (next) => (action: any) => {
-  if (__DEV__) {
-    console.group(`🔄 Redux Action: ${action.type}`);
-    console.log('Previous State:', store.getState());
-    console.log('Action:', action);
-    const result = next(action);
-    console.log('Next State:', store.getState());
-    console.groupEnd();
-    return result;
-  }
-  return next(action);
+// Persist configuration
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  whitelist: ['auth'], // Only persist auth state
+  blacklist: ['tasks', 'projects', 'finance'], // Don't persist these (use SQLite instead)
 };
 
-/**
- * Configure Store
- */
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+// Configure store
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore redux-persist actions
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        // Ignore these action types from redux-persist
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
-    }).concat(__DEV__ ? [loggingMiddleware] : []),
-  devTools: __DEV__, // Enable Redux DevTools in development
+    }).concat(syncMiddleware),
 });
 
-/**
- * Persistor
- */
 export const persistor = persistStore(store);
 
-/**
- * Type Exports
- */
+// Export types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
-/**
- * Export for testing/debugging
- */
-export const resetStore = () => {
-  persistor.purge();
-  store.dispatch({ type: 'RESET' } as any);
-};
+// Export hooks
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
