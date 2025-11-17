@@ -8,16 +8,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { MainTabParamList } from './types';
+import { DashboardScreen } from '../screens/dashboard/DashboardScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Placeholder screens (will be implemented in Sprint 2)
-const DashboardScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Dashboard Screen</Text>
-    <Text style={styles.placeholderSubtext}>Coming in Sprint 2</Text>
-  </View>
-);
 
 const TasksScreen = () => (
   <View style={styles.placeholder}>
