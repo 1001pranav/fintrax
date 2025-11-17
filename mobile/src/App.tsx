@@ -5,10 +5,16 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '@store/index';
 import { loadUserFromStorage } from '@store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '@hooks';
-import { LoginScreen, RegisterScreen, VerifyEmailScreen } from '@screens/auth';
+import {
+  LoginScreen,
+  RegisterScreen,
+  VerifyEmailScreen,
+  ForgotPasswordScreen,
+  ResetPasswordScreen,
+} from '@screens/auth';
 import { colors } from '@theme';
 
-type AuthScreen = 'login' | 'register' | 'verify';
+type AuthScreen = 'login' | 'register' | 'verify' | 'forgot-password' | 'reset-password';
 
 /**
  * App Content Component
@@ -19,6 +25,7 @@ function AppContent() {
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const [currentAuthScreen, setCurrentAuthScreen] = useState<AuthScreen>('login');
   const [verificationEmail, setVerificationEmail] = useState<string>('');
+  const [resetEmail, setResetEmail] = useState<string>('');
 
   // Load user from storage on app start
   useEffect(() => {
@@ -59,8 +66,35 @@ function AppContent() {
       );
     }
 
+    if (currentAuthScreen === 'forgot-password') {
+      return (
+        <ForgotPasswordScreen
+          onNavigateToLogin={() => setCurrentAuthScreen('login')}
+          onNavigateToReset={(email) => {
+            setResetEmail(email);
+            setCurrentAuthScreen('reset-password');
+          }}
+        />
+      );
+    }
+
+    if (currentAuthScreen === 'reset-password') {
+      return (
+        <ResetPasswordScreen
+          email={resetEmail}
+          onNavigateToLogin={() => setCurrentAuthScreen('login')}
+          onResetSuccess={() => setCurrentAuthScreen('login')}
+        />
+      );
+    }
+
     // Default to login screen
-    return <LoginScreen onNavigateToRegister={() => setCurrentAuthScreen('register')} />;
+    return (
+      <LoginScreen
+        onNavigateToRegister={() => setCurrentAuthScreen('register')}
+        onNavigateToForgotPassword={() => setCurrentAuthScreen('forgot-password')}
+      />
+    );
   }
 
   // Show dashboard (placeholder for now)
