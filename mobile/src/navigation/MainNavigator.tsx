@@ -9,17 +9,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { MainTabParamList } from './types';
 import { DashboardScreen } from '../screens/dashboard/DashboardScreen';
+import { TasksNavigator } from './TasksNavigator';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-// Placeholder screens (will be implemented in Sprint 2)
-
-const TasksScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Tasks Screen</Text>
-    <Text style={styles.placeholderSubtext}>Coming in Sprint 2</Text>
-  </View>
-);
+// Placeholder screens (will be implemented in Sprint 3 & 4)
 
 const FinanceScreen = () => (
   <View style={styles.placeholder}>
@@ -62,7 +56,7 @@ export const MainNavigator = () => {
       />
       <Tab.Screen
         name="Tasks"
-        component={TasksScreen}
+        component={TasksNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="checkmark-circle-outline" size={size} color={color} />
