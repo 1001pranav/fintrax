@@ -10,6 +10,8 @@ import {
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { InputField } from '@components/common/InputField';
 import { Button } from '@components/common/Button';
@@ -18,16 +20,12 @@ import { colors, spacing, typography } from '@theme';
 import { getUsernameError, getEmailError, getPasswordError } from '@utils/validators';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { register, clearError } from '@store/slices/authSlice';
+import type { AuthStackParamList } from '../../navigation/types';
 
-interface RegisterScreenProps {
-  onNavigateToLogin?: () => void;
-  onNavigateToVerify?: (email: string) => void;
-}
+type RegisterScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Register'>;
 
-export const RegisterScreen: React.FC<RegisterScreenProps> = ({
-  onNavigateToLogin,
-  onNavigateToVerify,
-}) => {
+export const RegisterScreen: React.FC = () => {
+  const navigation = useNavigation<RegisterScreenNavigationProp>();
   const dispatch = useAppDispatch();
   const { isLoading, error: authError } = useAppSelector((state) => state.auth);
 
@@ -98,15 +96,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       await dispatch(register({ username, email, password })).unwrap();
 
       // Registration successful - navigate to OTP verification
-      if (onNavigateToVerify) {
-        onNavigateToVerify(email);
-      } else {
-        Alert.alert(
-          'Registration Successful',
-          'Please check your email for the verification code.',
-          [{ text: 'OK' }]
-        );
-      }
+      navigation.navigate('VerifyEmail', { email });
     } catch (error: any) {
       // Error is handled by the useEffect above via authError
       console.error('Registration error:', error);
@@ -114,11 +104,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   };
 
   const handleLoginNavigation = () => {
-    if (onNavigateToLogin) {
-      onNavigateToLogin();
-    } else {
-      Alert.alert('Sign In', 'This will navigate to the login screen.', [{ text: 'OK' }]);
-    }
+    navigation.navigate('Login');
   };
 
   return (

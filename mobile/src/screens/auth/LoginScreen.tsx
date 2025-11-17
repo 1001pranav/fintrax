@@ -10,6 +10,8 @@ import {
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { InputField } from '@components/common/InputField';
 import { Button } from '@components/common/Button';
@@ -18,16 +20,12 @@ import { getEmailError, getPasswordError } from '@utils/validators';
 import { asyncStorage, STORAGE_KEYS } from '@utils/storage';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { login, clearError } from '@store/slices/authSlice';
+import type { AuthStackParamList } from '../../navigation/types';
 
-interface LoginScreenProps {
-  onNavigateToRegister?: () => void;
-  onNavigateToForgotPassword?: () => void;
-}
+type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({
-  onNavigateToRegister,
-  onNavigateToForgotPassword,
-}) => {
+export const LoginScreen: React.FC = () => {
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const dispatch = useAppDispatch();
   const { isLoading, error: authError } = useAppSelector((state) => state.auth);
 
@@ -109,23 +107,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   };
 
   const handleForgotPassword = () => {
-    if (onNavigateToForgotPassword) {
-      onNavigateToForgotPassword();
-    } else {
-      Alert.alert('Forgot Password', 'This feature will be available in the next update.', [
-        { text: 'OK' },
-      ]);
-    }
+    navigation.navigate('ForgotPassword');
   };
 
   const handleSignUp = () => {
-    if (onNavigateToRegister) {
-      onNavigateToRegister();
-    } else {
-      Alert.alert('Sign Up', 'Registration will be available in the next update.', [
-        { text: 'OK' },
-      ]);
-    }
+    navigation.navigate('Register');
   };
 
   return (

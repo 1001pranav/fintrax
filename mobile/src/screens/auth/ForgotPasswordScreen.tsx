@@ -10,22 +10,20 @@ import {
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@components/common/Button';
 import { InputField } from '@components/common/InputField';
 import { colors, spacing, typography } from '@theme';
 import { getEmailError } from '@utils/validators';
 import { authApi } from '@api/auth.api';
+import type { AuthStackParamList } from '../../navigation/types';
 
-interface ForgotPasswordScreenProps {
-  onNavigateToLogin?: () => void;
-  onNavigateToReset?: (email: string) => void;
-}
+type ForgotPasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
 
-export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
-  onNavigateToLogin,
-  onNavigateToReset,
-}) => {
+export const ForgotPasswordScreen: React.FC = () => {
+  const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,11 +57,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
           {
             text: 'OK',
             onPress: () => {
-              if (onNavigateToReset) {
-                onNavigateToReset(email);
-              } else {
-                Alert.alert('Next Step', 'Please check your email for the reset code.');
-              }
+              navigation.navigate('ResetPassword', { email });
             },
           },
         ]
@@ -79,11 +73,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   };
 
   const handleBackToLogin = () => {
-    if (onNavigateToLogin) {
-      onNavigateToLogin();
-    } else {
-      Alert.alert('Sign In', 'This will navigate to the login screen.', [{ text: 'OK' }]);
-    }
+    navigation.navigate('Login');
   };
 
   return (

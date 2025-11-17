@@ -11,6 +11,9 @@ import {
   TextInput,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@components/common/Button';
 import { colors, spacing, typography } from '@theme';
@@ -18,25 +21,21 @@ import { getOTPError } from '@utils/validators';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { clearError } from '@store/slices/authSlice';
 import { authApi } from '@api/auth.api';
+import type { AuthStackParamList } from '../../navigation/types';
 
-interface VerifyEmailScreenProps {
-  email?: string;
-  onNavigateToLogin?: () => void;
-  onVerificationSuccess?: () => void;
-}
+type VerifyEmailScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'VerifyEmail'>;
+type VerifyEmailScreenRouteProp = RouteProp<AuthStackParamList, 'VerifyEmail'>;
 
 const OTP_LENGTH = 6;
 const RESEND_COOLDOWN = 60; // seconds
 
-export const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
-  email: propEmail,
-  onNavigateToLogin,
-  onVerificationSuccess,
-}) => {
+export const VerifyEmailScreen: React.FC = () => {
+  const navigation = useNavigation<VerifyEmailScreenNavigationProp>();
+  const route = useRoute<VerifyEmailScreenRouteProp>();
   const dispatch = useAppDispatch();
   const { error: authError } = useAppSelector((state) => state.auth);
 
-  const [email, setEmail] = useState(propEmail || '');
+  const [email] = useState(route.params.email);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -135,11 +134,7 @@ export const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
           {
             text: 'OK',
             onPress: () => {
-              if (onVerificationSuccess) {
-                onVerificationSuccess();
-              } else if (onNavigateToLogin) {
-                onNavigateToLogin();
-              }
+              navigation.navigate('Login');
             },
           },
         ]
@@ -191,11 +186,7 @@ export const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
   };
 
   const handleLoginNavigation = () => {
-    if (onNavigateToLogin) {
-      onNavigateToLogin();
-    } else {
-      Alert.alert('Sign In', 'This will navigate to the login screen.', [{ text: 'OK' }]);
-    }
+    navigation.navigate('Login');
   };
 
   return (

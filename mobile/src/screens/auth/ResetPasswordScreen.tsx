@@ -11,6 +11,9 @@ import {
   TextInput,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@components/common/Button';
 import { InputField } from '@components/common/InputField';
@@ -18,21 +21,17 @@ import { PasswordStrengthIndicator } from '@components/common/PasswordStrengthIn
 import { colors, spacing, typography } from '@theme';
 import { getOTPError, getPasswordError } from '@utils/validators';
 import { authApi } from '@api/auth.api';
+import type { AuthStackParamList } from '../../navigation/types';
 
-interface ResetPasswordScreenProps {
-  email?: string;
-  onNavigateToLogin?: () => void;
-  onResetSuccess?: () => void;
-}
+type ResetPasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'ResetPassword'>;
+type ResetPasswordScreenRouteProp = RouteProp<AuthStackParamList, 'ResetPassword'>;
 
 const OTP_LENGTH = 6;
 
-export const ResetPasswordScreen: React.FC<ResetPasswordScreenProps> = ({
-  email: propEmail,
-  onNavigateToLogin,
-  onResetSuccess,
-}) => {
-  const [email, setEmail] = useState(propEmail || '');
+export const ResetPasswordScreen: React.FC = () => {
+  const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
+  const route = useRoute<ResetPasswordScreenRouteProp>();
+  const [email] = useState(route.params.email);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -117,11 +116,7 @@ export const ResetPasswordScreen: React.FC<ResetPasswordScreenProps> = ({
           {
             text: 'OK',
             onPress: () => {
-              if (onResetSuccess) {
-                onResetSuccess();
-              } else if (onNavigateToLogin) {
-                onNavigateToLogin();
-              }
+              navigation.navigate('Login');
             },
           },
         ]
@@ -137,11 +132,7 @@ export const ResetPasswordScreen: React.FC<ResetPasswordScreenProps> = ({
   };
 
   const handleBackToLogin = () => {
-    if (onNavigateToLogin) {
-      onNavigateToLogin();
-    } else {
-      Alert.alert('Sign In', 'This will navigate to the login screen.', [{ text: 'OK' }]);
-    }
+    navigation.navigate('Login');
   };
 
   return (
