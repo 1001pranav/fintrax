@@ -15,6 +15,7 @@ const RegisterComponent: React.FC = () => {
         username: '',
         email: '',
         password: '',
+        confirmPassword: '',
     });
     const [errors, setErrors] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -38,6 +39,11 @@ const RegisterComponent: React.FC = () => {
         const passwordValidation = validatePassword(formData.password, false);
         if (!passwordValidation.isValid) {
             newErrors.push(...passwordValidation.errors);
+        }
+
+        // Validate password match
+        if (formData.password !== formData.confirmPassword) {
+            newErrors.push('Passwords do not match');
         }
 
         return newErrors;
@@ -110,6 +116,15 @@ const RegisterComponent: React.FC = () => {
                                 label="Password"
                                 value={formData.password}
                                 onChange={(value: string) => handleInputChange('password', value)}
+                                required
+                            />
+
+                            <InputField
+                                type="password"
+                                placeholder="Confirm your password"
+                                label="Confirm Password"
+                                value={formData.confirmPassword}
+                                onChange={(value: string) => handleInputChange('confirmPassword', value)}
                                 required
                             />
                         </div>

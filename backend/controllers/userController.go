@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -89,21 +92,38 @@ func Register(c *gin.Context) {
 	}
 	var tx = database.DB.Begin()
 
-	tx.Create(&newUser)
+	if err := tx.Create(&newUser).Error; err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to create user", nil, err.Error())
+		tx.Rollback()
+		return
+	}
+
 	var finance = models.Finance{
 		UserID:    newUser.ID,
 		Balance:   0,
 		TotalDebt: 0,
 	}
-	tx.Create(&finance)
-
-	// Send OTP verification email
-	emailBody := "Welcome to Fintrax!\n\nYour OTP for email verification is: " + strconv.Itoa(otp) + "\n\nThis OTP is valid for " + strconv.Itoa(constants.MAX_OTP_TIME) + " minutes.\n\nPlease verify your email to start using Fintrax."
-	err = helper.SendEmail(newUser.Email, "Fintrax - Verify Your Email", emailBody)
-	if err != nil {
-		helper.Response(c, http.StatusInternalServerError, "User created but failed to send verification email", nil, err.Error())
+	if err := tx.Create(&finance).Error; err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to create finance record", nil, err.Error())
 		tx.Rollback()
 		return
+	}
+
+	// Send OTP verification email
+	// emailBody := "Welcome to Fintrax!\n\nYour OTP for email verification is: " + strconv.Itoa(otp) + "\n\nThis OTP is valid for " + strconv.Itoa(constants.MAX_OTP_TIME) + " minutes.\n\nPlease verify your email to start using Fintrax."
+
+	// Check if email credentials are configured
+	if os.Getenv("EMAIL") != "" && os.Getenv("EMAIL_PASSWORD") != "" {
+		// err = helper.SendEmail(newUser.Email, "Fintrax - Verify Your Email", emailBody)
+		// if err != nil {
+		// 	log.Printf("Failed to send email: %v", err)
+		// 	log.Printf("OTP for %s: %d", newUser.Email, otp)
+		// 	// Continue anyway in development
+		// }
+		fmt.Println("Email sent to ", newUser.Email, " with OTP:", otp)
+	} else {
+		// Development mode - log OTP to console
+		log.Printf("⚠️  EMAIL CREDENTIALS NOT CONFIGURED - OTP for %s: %d", newUser.Email, otp)
 	}
 
 	token, err := helper.CreateToken(newUser.ID)
