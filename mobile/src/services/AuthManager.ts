@@ -1,20 +1,25 @@
 /**
  * Authentication Manager
  * Centralized authentication logic and token management (Singleton Pattern)
+ * Integrated with BiometricService using Strategy Pattern
  */
 
 import * as LocalAuthentication from 'expo-local-authentication';
 import { secureStorage, asyncStorage } from './storage';
 import { config } from '../constants/config';
 import { User, AuthTokens } from '../constants/types';
+import { BiometricService } from '../patterns/authentication/BiometricService';
 
 export class AuthManager {
   private static instance: AuthManager;
+  private biometricService: BiometricService;
 
   /**
    * Private constructor for Singleton Pattern
    */
-  private constructor() {}
+  private constructor() {
+    this.biometricService = BiometricService.getInstance();
+  }
 
   /**
    * Get singleton instance
@@ -121,15 +126,11 @@ export class AuthManager {
   }
 
   /**
-   * Check if biometric authentication is available
+   * Check if biometric authentication is available (using Strategy Pattern)
    */
   async isBiometricAvailable(): Promise<boolean> {
     try {
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      if (!compatible) return false;
-
-      const enrolled = await LocalAuthentication.isEnrolledAsync();
-      return enrolled;
+      return await this.biometricService.isBiometricSupported();
     } catch (error) {
       console.error('Error checking biometric availability:', error);
       return false;
@@ -143,7 +144,7 @@ export class AuthManager {
     LocalAuthentication.AuthenticationType[]
   > {
     try {
-      return await LocalAuthentication.supportedAuthenticationTypesAsync();
+      return await this.biometricService.getSupportedTypes();
     } catch (error) {
       console.error('Error getting supported biometrics:', error);
       return [];
@@ -151,16 +152,23 @@ export class AuthManager {
   }
 
   /**
-   * Authenticate with biometrics
+   * Get biometric type name for display
+   */
+  async getBiometricTypeName(): Promise<string> {
+    try {
+      return await this.biometricService.getBiometricTypeName();
+    } catch (error) {
+      console.error('Error getting biometric type name:', error);
+      return 'Biometric Authentication';
+    }
+  }
+
+  /**
+   * Authenticate with biometrics (using Strategy Pattern)
    */
   async authenticateWithBiometrics(): Promise<boolean> {
     try {
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: config.BIOMETRICS.PROMPT_MESSAGE,
-        fallbackLabel: 'Use Password',
-        cancelLabel: 'Cancel',
-      });
-
+      const result = await this.biometricService.authenticate();
       return result.success;
     } catch (error) {
       console.error('Error authenticating with biometrics:', error);
@@ -169,7 +177,22 @@ export class AuthManager {
   }
 
   /**
-   * Enable biometric authentication
+   * Authenticate with password (fallback method)
+   */
+  async authenticateWithPassword(password: string): Promise<boolean> {
+    try {
+      const result = await this.biometricService.authenticateWithPassword(
+        password
+      );
+      return result.success;
+    } catch (error) {
+      console.error('Error authenticating with password:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Enable biometric authentication (using Strategy Pattern)
    */
   async enableBiometrics(): Promise<boolean> {
     const available = await this.isBiometricAvailable();
@@ -177,7 +200,7 @@ export class AuthManager {
 
     const authenticated = await this.authenticateWithBiometrics();
     if (authenticated) {
-      await asyncStorage.set('biometrics_enabled', true);
+      await this.biometricService.enableBiometric();
       return true;
     }
 
@@ -185,18 +208,56 @@ export class AuthManager {
   }
 
   /**
-   * Disable biometric authentication
+   * Disable biometric authentication (using Strategy Pattern)
    */
   async disableBiometrics(): Promise<void> {
-    await asyncStorage.set('biometrics_enabled', false);
+    await this.biometricService.disableBiometric();
   }
 
   /**
-   * Check if biometrics are enabled for this app
+   * Check if biometrics are enabled for this app (using Strategy Pattern)
    */
   async isBiometricsEnabled(): Promise<boolean> {
-    const enabled = await asyncStorage.get<boolean>('biometrics_enabled');
-    return enabled || false;
+    try {
+      return await this.biometricService.isBiometricEnabled();
+    } catch (error) {
+      console.error('Error checking if biometrics enabled:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get available authentication methods (from Strategy Pattern)
+   */
+  async getAvailableAuthMethods(): Promise<string[]> {
+    try {
+      const methods = await this.biometricService.getAvailableAuthMethods();
+      return methods.map((method) => method.getDisplayName());
+    } catch (error) {
+      console.error('Error getting available auth methods:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get retry attempts for biometric authentication
+   */
+  getRetryAttempts(): number {
+    return this.biometricService.getRetryAttempts();
+  }
+
+  /**
+   * Get remaining retry attempts for biometric authentication
+   */
+  getRemainingAttempts(): number {
+    return this.biometricService.getRemainingAttempts();
+  }
+
+  /**
+   * Reset retry attempts
+   */
+  resetRetryAttempts(): void {
+    this.biometricService.resetRetryAttempts();
   }
 }
 
