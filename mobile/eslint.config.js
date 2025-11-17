@@ -63,6 +63,7 @@ module.exports = [
       'react-native/no-color-literals': 'warn',
       'prettier/prettier': 'error',
       'no-undef': 'off', // TypeScript handles this
+      'import/no-unresolved': ['error', { ignore: ['^@env$'] }], // Ignore @env imports (handled by babel)
     },
   },
 ];
