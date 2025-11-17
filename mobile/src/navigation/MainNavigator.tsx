@@ -10,17 +10,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { MainTabParamList } from './types';
 import { DashboardScreen } from '../screens/dashboard/DashboardScreen';
 import { TasksNavigator } from './TasksNavigator';
+import { FinanceNavigator } from './FinanceNavigator';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-// Placeholder screens (will be implemented in Sprint 3 & 4)
-
-const FinanceScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Finance Screen</Text>
-    <Text style={styles.placeholderSubtext}>Coming in Sprint 3</Text>
-  </View>
-);
+// Placeholder screens (will be implemented in Sprint 4 & 5)
 
 const ProjectsScreen = () => (
   <View style={styles.placeholder}>
@@ -65,7 +59,7 @@ export const MainNavigator = () => {
       />
       <Tab.Screen
         name="Finance"
-        component={FinanceScreen}
+        component={FinanceNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="wallet-outline" size={size} color={color} />
