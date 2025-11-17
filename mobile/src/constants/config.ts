@@ -19,6 +19,7 @@ export const config = {
     AUTH_TOKEN: '@fintrax:auth_token',
     REFRESH_TOKEN: '@fintrax:refresh_token',
     USER_DATA: '@fintrax:user_data',
+    REMEMBER_ME: '@fintrax:remember_me',
     APP_SETTINGS: '@fintrax:app_settings',
     SYNC_QUEUE: '@fintrax:sync_queue',
     LAST_SYNC: '@fintrax:last_sync',
@@ -62,8 +63,8 @@ export const config = {
 export const APP_INFO = {
   NAME: 'Fintrax',
   VERSION: Constants.expoConfig?.version || '1.0.0',
-  BUILD_NUMBER: Constants.expoConfig?.ios?.buildNumber ||
-                 Constants.expoConfig?.android?.versionCode || '1',
+  BUILD_NUMBER:
+    Constants.expoConfig?.ios?.buildNumber || Constants.expoConfig?.android?.versionCode || '1',
 } as const;
 
 // ============================================================================
@@ -85,8 +86,12 @@ export const ERROR_MESSAGES = {
   VALIDATION: {
     REQUIRED_FIELD: 'This field is required.',
     INVALID_EMAIL: 'Please enter a valid email address.',
-    PASSWORD_TOO_SHORT: 'Password must be at least 8 characters.',
+    PASSWORD_TOO_SHORT: 'Password must be at least 6 characters.',
     PASSWORDS_DONT_MATCH: 'Passwords do not match.',
+    INVALID_OTP: 'OTP must be 4-6 digits.',
+    INVALID_USERNAME: 'Username can only contain letters, numbers, and underscores.',
+    USERNAME_TOO_SHORT: 'Username must be at least 3 characters.',
+    USERNAME_TOO_LONG: 'Username must be less than 20 characters.',
   },
   SYNC: {
     FAILED: 'Sync failed. Changes will retry automatically.',
@@ -101,9 +106,11 @@ export const ERROR_MESSAGES = {
 export const SUCCESS_MESSAGES = {
   AUTH: {
     LOGIN_SUCCESS: 'Welcome back!',
-    REGISTER_SUCCESS: 'Account created successfully!',
+    REGISTER_SUCCESS: 'Account created successfully! Please verify your email.',
     LOGOUT_SUCCESS: 'Logged out successfully.',
     PASSWORD_RESET: 'Password reset successfully.',
+    EMAIL_VERIFIED: 'Email verified successfully!',
+    OTP_SENT: 'Verification code sent to your email.',
   },
   TASK: {
     CREATED: 'Task created successfully.',

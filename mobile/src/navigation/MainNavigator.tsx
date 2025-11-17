@@ -1,77 +1,125 @@
 /**
  * Main Navigator
- * Bottom tab navigation for main app screens
+ * Bottom tab navigation for authenticated users
  */
 
 import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MainTabParamList } from '../constants/types';
-
-// Import screens (placeholders for now)
-const DashboardScreen = () => null; // TODO: Implement DashboardScreen
-const TasksScreen = () => null; // TODO: Implement TasksScreen
-const FinanceScreen = () => null; // TODO: Implement FinanceScreen
-const ProjectsScreen = () => null; // TODO: Implement ProjectsScreen
-const SettingsScreen = () => null; // TODO: Implement SettingsScreen
+import { Ionicons } from '@expo/vector-icons';
+import { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
+
+// Placeholder screens (will be implemented in Sprint 2)
+const DashboardScreen = () => (
+  <View style={styles.placeholder}>
+    <Text style={styles.placeholderText}>Dashboard Screen</Text>
+    <Text style={styles.placeholderSubtext}>Coming in Sprint 2</Text>
+  </View>
+);
+
+const TasksScreen = () => (
+  <View style={styles.placeholder}>
+    <Text style={styles.placeholderText}>Tasks Screen</Text>
+    <Text style={styles.placeholderSubtext}>Coming in Sprint 2</Text>
+  </View>
+);
+
+const FinanceScreen = () => (
+  <View style={styles.placeholder}>
+    <Text style={styles.placeholderText}>Finance Screen</Text>
+    <Text style={styles.placeholderSubtext}>Coming in Sprint 3</Text>
+  </View>
+);
+
+const ProjectsScreen = () => (
+  <View style={styles.placeholder}>
+    <Text style={styles.placeholderText}>Projects Screen</Text>
+    <Text style={styles.placeholderSubtext}>Coming in Sprint 4</Text>
+  </View>
+);
+
+const MoreScreen = () => (
+  <View style={styles.placeholder}>
+    <Text style={styles.placeholderText}>More Screen</Text>
+    <Text style={styles.placeholderSubtext}>Settings & Profile</Text>
+  </View>
+);
 
 export const MainNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
         tabBarActiveTintColor: '#3B82F6',
         tabBarInactiveTintColor: '#9CA3AF',
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: '#E5E7EB',
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
-        },
       }}
     >
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
         options={{
-          tabBarLabel: 'Dashboard',
-          // tabBarIcon: // TODO: Add icon
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Tasks"
         component={TasksScreen}
         options={{
-          tabBarLabel: 'Tasks',
-          // tabBarIcon: // TODO: Add icon
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="checkmark-circle-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Finance"
         component={FinanceScreen}
         options={{
-          tabBarLabel: 'Finance',
-          // tabBarIcon: // TODO: Add icon
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="wallet-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Projects"
         component={ProjectsScreen}
         options={{
-          tabBarLabel: 'Projects',
-          // tabBarIcon: // TODO: Add icon
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="folder-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
+        name="More"
+        component={MoreScreen}
         options={{
-          tabBarLabel: 'Settings',
-          // tabBarIcon: // TODO: Add icon
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="ellipsis-horizontal" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  placeholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  placeholderText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  placeholderSubtext: {
+    fontSize: 16,
+    color: '#6B7280',
+  },
+});

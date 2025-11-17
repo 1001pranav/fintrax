@@ -1,95 +1,168 @@
-/**
- * Authentication API
- * API endpoints for user authentication
- */
-
 import apiClient from './client';
+import { API_ENDPOINTS } from '@constants/api';
 import {
-  LoginCredentials,
-  RegisterData,
-  OTPVerification,
-  ResetPasswordData,
-  AuthTokens,
-  User,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  VerifyEmailRequest,
+  OTPResponse,
+  GenerateOTPRequest,
+  ForgotPasswordRequest,
   ApiResponse,
-} from '../constants/types';
+} from '@app-types/api.types';
 
+/**
+ * Authentication API Module
+ * Handles all authentication-related API calls
+ */
 export const authApi = {
   /**
-   * Login user
+   * User Login
+   * @param credentials - Email and password
+   * @returns JWT token and user information
    */
-  login: async (
-    credentials: LoginCredentials
-  ): Promise<{ user: User; tokens: AuthTokens }> => {
-    const response = await apiClient.post<ApiResponse<{ user: User; token: string }>>(
-      '/user/login',
+  login: async (credentials: LoginRequest): Promise<LoginResponse> => {
+    const response = await apiClient.post<ApiResponse<LoginResponse>>(
+      API_ENDPOINTS.AUTH.LOGIN,
       credentials
     );
-    return {
-      user: response.data.data!.user,
-      tokens: { accessToken: response.data.data!.token },
-    };
+    return response.data.data!;
   },
 
   /**
-   * Register new user
+   * User Registration
+   * @param userData - Username, email, and password
+   * @returns User information and token
    */
-  register: async (data: RegisterData): Promise<{ message: string }> => {
-    const response = await apiClient.post<ApiResponse>('/user/register', data);
-    return { message: response.data.message };
+  register: async (userData: RegisterRequest): Promise<RegisterResponse> => {
+    const response = await apiClient.post<ApiResponse<RegisterResponse>>(
+      API_ENDPOINTS.AUTH.REGISTER,
+      userData
+    );
+    return response.data.data!;
   },
 
   /**
-   * Verify email with OTP
+   * Verify Email with OTP
+   * @param data - Email and OTP code
+   * @returns Verification status
    */
-  verifyEmail: async (data: OTPVerification): Promise<{ message: string }> => {
-    const response = await apiClient.post<ApiResponse>(
-      '/user/verify-email',
+  verifyEmail: async (data: VerifyEmailRequest): Promise<OTPResponse> => {
+    const response = await apiClient.post<ApiResponse<OTPResponse>>(
+      API_ENDPOINTS.AUTH.VERIFY_EMAIL,
       data
     );
-    return { message: response.data.message };
+    return response.data.data!;
   },
 
   /**
    * Generate OTP for email verification or password reset
+   * @param data - Email address
+   * @returns Success message
    */
-  generateOTP: async (email: string): Promise<{ message: string }> => {
-    const response = await apiClient.post<ApiResponse>('/user/generate-otp', {
-      email,
-    });
-    return { message: response.data.message };
-  },
-
-  /**
-   * Request password reset
-   */
-  forgotPassword: async (email: string): Promise<{ message: string }> => {
-    const response = await apiClient.post<ApiResponse>('/user/forgot-password', {
-      email,
-    });
-    return { message: response.data.message };
-  },
-
-  /**
-   * Reset password with OTP
-   */
-  resetPassword: async (data: ResetPasswordData): Promise<{ message: string }> => {
-    const response = await apiClient.post<ApiResponse>(
-      '/user/reset-password',
-      {
-        email: data.email,
-        otp: data.otp,
-        new_password: data.newPassword,
-      }
+  generateOTP: async (data: GenerateOTPRequest): Promise<{ message: string }> => {
+    const response = await apiClient.post<ApiResponse<{ message: string }>>(
+      API_ENDPOINTS.AUTH.GENERATE_OTP,
+      data
     );
-    return { message: response.data.message };
+    return response.data.data!;
   },
 
   /**
-   * Logout user (optional - just clear local data)
+   * Forgot Password - Reset with OTP
+   * @param data - Email, OTP, and new password
+   * @returns Success message
    */
-  logout: async (): Promise<void> => {
-    // No server-side logout needed for JWT
-    // Just clear local storage
+  forgotPassword: async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
+    const response = await apiClient.post<ApiResponse<{ message: string }>>(
+      API_ENDPOINTS.AUTH.FORGOT_PASSWORD,
+      data
+    );
+    return response.data.data!;
+  },
+
+  /**
+   * Change Password (authenticated user)
+   * @param data - Current password and new password
+   * @returns Success message
+   */
+  changePassword: async (data: {
+    current_password: string;
+    new_password: string;
+  }): Promise<{ message: string }> => {
+    const response = await apiClient.post<ApiResponse<{ message: string }>>(
+      API_ENDPOINTS.AUTH.CHANGE_PASSWORD,
+      data
+    );
+    return response.data.data!;
+  },
+
+  /**
+   * Logout User
+   * @returns Success message
+   */
+  logout: async (): Promise<{ message: string }> => {
+    const response = await apiClient.post<ApiResponse<{ message: string }>>(
+      API_ENDPOINTS.AUTH.LOGOUT
+    );
+    return response.data.data!;
+  },
+
+  /**
+   * Get User Profile
+   * @returns User profile information
+   */
+  getProfile: async (): Promise<{
+    id: number;
+    username: string;
+    email: string;
+    created_at: string;
+  }> => {
+    const response = await apiClient.get<
+      ApiResponse<{
+        id: number;
+        username: string;
+        email: string;
+        created_at: string;
+      }>
+    >(API_ENDPOINTS.USER.PROFILE);
+    return response.data.data!;
+  },
+
+  /**
+   * Update User Profile
+   * @param data - Updated user information
+   * @returns Updated user information
+   */
+  updateProfile: async (data: {
+    username?: string;
+    email?: string;
+  }): Promise<{
+    id: number;
+    username: string;
+    email: string;
+  }> => {
+    const response = await apiClient.patch<
+      ApiResponse<{
+        id: number;
+        username: string;
+        email: string;
+      }>
+    >(API_ENDPOINTS.USER.UPDATE_PROFILE, data);
+    return response.data.data!;
+  },
+
+  /**
+   * Delete User Account
+   * @returns Success message
+   */
+  deleteAccount: async (): Promise<{ message: string }> => {
+    const response = await apiClient.delete<ApiResponse<{ message: string }>>(
+      API_ENDPOINTS.USER.DELETE_ACCOUNT
+    );
+    return response.data.data!;
   },
 };
+
+export default authApi;

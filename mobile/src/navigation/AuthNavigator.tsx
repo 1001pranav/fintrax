@@ -5,16 +5,28 @@
 
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AuthStackParamList } from '../constants/types';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { RouteProp } from '@react-navigation/native';
+import { AuthStackParamList } from './types';
 
-// Import screens (placeholders for now)
-const LoginScreen = () => null; // TODO: Implement LoginScreen
-const RegisterScreen = () => null; // TODO: Implement RegisterScreen
-const ForgotPasswordScreen = () => null; // TODO: Implement ForgotPasswordScreen
-const ResetPasswordScreen = () => null; // TODO: Implement ResetPasswordScreen
-const VerifyEmailScreen = () => null; // TODO: Implement VerifyEmailScreen
+// Import auth screens
+import {
+  LoginScreen,
+  RegisterScreen,
+  ForgotPasswordScreen,
+  ResetPasswordScreen,
+  VerifyEmailScreen,
+} from '../screens/auth';
 
 const Stack = createStackNavigator<AuthStackParamList>();
+
+// Navigation prop types for auth screens
+export type AuthNavigation = StackNavigationProp<AuthStackParamList>;
+export type LoginScreenRouteProp = RouteProp<AuthStackParamList, 'Login'>;
+export type RegisterScreenRouteProp = RouteProp<AuthStackParamList, 'Register'>;
+export type ForgotPasswordScreenRouteProp = RouteProp<AuthStackParamList, 'ForgotPassword'>;
+export type ResetPasswordScreenRouteProp = RouteProp<AuthStackParamList, 'ResetPassword'>;
+export type VerifyEmailScreenRouteProp = RouteProp<AuthStackParamList, 'VerifyEmail'>;
 
 export const AuthNavigator = () => {
   return (

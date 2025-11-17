@@ -6,8 +6,8 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootStackParamList } from '../constants/types';
-import { useAppSelector, useAppDispatch } from '../store';
+import { RootStackParamList } from './types';
+import { useAppSelector, useAppDispatch } from '../hooks';
 import { checkAuth } from '../store/slices/authSlice';
 import { AuthNavigator } from './AuthNavigator';
 import { MainNavigator } from './MainNavigator';
@@ -16,7 +16,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 export const AppNavigator = () => {
   const dispatch = useAppDispatch();
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAppSelector((state: any) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export const AppNavigator = () => {
   }, [dispatch]);
 
   if (isLoading) {
-    // TODO: Add a proper loading screen
+    // Loading state is handled by PersistGate in App.tsx
     return null;
   }
 
