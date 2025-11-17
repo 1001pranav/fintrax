@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,19 +16,42 @@ import { Button } from '@components/common/Button';
 import { colors, spacing, typography } from '@theme';
 import { getEmailError, getPasswordError } from '@utils/validators';
 import { asyncStorage, STORAGE_KEYS } from '@utils/storage';
+import { useAppDispatch, useAppSelector } from '@hooks';
+import { login, clearError } from '@store/slices/authSlice';
 
 export const LoginScreen: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { isLoading, error: authError } = useAppSelector((state) => state.auth);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   // Load saved email if "Remember Me" was checked
   useEffect(() => {
     loadSavedEmail();
   }, []);
+
+  // Clear auth error when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
+  // Show auth error as alert
+  useEffect(() => {
+    if (authError) {
+      Alert.alert('Login Failed', authError, [
+        {
+          text: 'OK',
+          onPress: () => dispatch(clearError()),
+        },
+      ]);
+    }
+  }, [authError, dispatch]);
 
   const loadSavedEmail = async () => {
     const savedEmail = await asyncStorage.getItem(STORAGE_KEYS.REMEMBER_ME);
@@ -51,13 +75,12 @@ export const LoginScreen: React.FC = () => {
     // Clear previous errors
     setEmailError(null);
     setPasswordError(null);
+    dispatch(clearError());
 
     // Validate form
     if (!validateForm()) {
       return;
     }
-
-    setLoading(true);
 
     try {
       // Save email if "Remember Me" is checked
@@ -67,28 +90,26 @@ export const LoginScreen: React.FC = () => {
         await asyncStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
       }
 
-      // TODO: Dispatch login action (will be implemented in US-1.5)
-      // dispatch(login({ email, password }));
+      // Dispatch login action
+      await dispatch(login({ email, password })).unwrap();
 
-      // For now, just show loading for demo
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      console.log('Login:', { email, password, rememberMe });
-    } catch (error) {
+      // Login successful - Redux will handle navigation via App.tsx
+    } catch (error: any) {
+      // Error is handled by the useEffect above via authError
       console.error('Login error:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleForgotPassword = () => {
-    // TODO: Navigate to Forgot Password screen
-    console.log('Navigate to Forgot Password');
+    // TODO: Navigate to Forgot Password screen (US-1.6)
+    Alert.alert('Forgot Password', 'This feature will be available in the next update.', [
+      { text: 'OK' },
+    ]);
   };
 
   const handleSignUp = () => {
-    // TODO: Navigate to Register screen
-    console.log('Navigate to Register');
+    // TODO: Navigate to Register screen (US-1.6)
+    Alert.alert('Sign Up', 'Registration will be available in the next update.', [{ text: 'OK' }]);
   };
 
   return (
@@ -126,6 +147,7 @@ export const LoginScreen: React.FC = () => {
             leftIcon="mail-outline"
             error={emailError}
             autoFocus
+            editable={!isLoading}
             testID="email-input"
           />
 
@@ -140,6 +162,7 @@ export const LoginScreen: React.FC = () => {
             type="password"
             leftIcon="lock-closed-outline"
             error={passwordError}
+            editable={!isLoading}
             testID="password-input"
           />
 
@@ -148,6 +171,7 @@ export const LoginScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.rememberMeContainer}
               onPress={() => setRememberMe(!rememberMe)}
+              disabled={isLoading}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
@@ -156,7 +180,11 @@ export const LoginScreen: React.FC = () => {
               <Text style={styles.rememberMeText}>Remember Me</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleForgotPassword} hitSlop={{ top: 10, bottom: 10 }}>
+            <TouchableOpacity
+              onPress={handleForgotPassword}
+              disabled={isLoading}
+              hitSlop={{ top: 10, bottom: 10 }}
+            >
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
           </View>
@@ -165,7 +193,8 @@ export const LoginScreen: React.FC = () => {
           <Button
             title="Sign In"
             onPress={handleLogin}
-            loading={loading}
+            loading={isLoading}
+            disabled={isLoading}
             fullWidth
             testID="login-button"
           />
@@ -190,7 +219,7 @@ export const LoginScreen: React.FC = () => {
           {/* Sign Up Link */}
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={handleSignUp}>
+            <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
               <Text style={styles.signUpLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
