@@ -17,9 +17,12 @@
       "@screens/*": ["src/screens/*"],
       "@navigation/*": ["src/navigation/*"],
       "@store/*": ["src/store/*"],
+      "@store": ["src/store"],
       "@api/*": ["src/api/*"],
+      "@api": ["src/api"],
       "@utils/*": ["src/utils/*"],
       "@hooks/*": ["src/hooks/*"],
+      "@hooks": ["src/hooks"],
       "@constants/*": ["src/constants/*"],
       "@app-types/*": ["src/types/*"],
       "@theme/*": ["src/theme/*"]
