@@ -5,15 +5,32 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "scheme": "fintrax",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.fintrax.mobile",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Fintrax needs access to your camera to scan receipts and capture transaction images.",
+        "NSPhotoLibraryUsageDescription": "Fintrax needs access to your photo library to attach receipts to transactions.",
+        "NSFaceIDUsageDescription": "Fintrax uses Face ID for secure and quick authentication.",
+        "NSLocationWhenInUseUsageDescription": "Fintrax uses your location to suggest nearby merchants for transactions.",
+        "UIBackgroundModes": ["fetch", "remote-notification"]
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,10 +38,48 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.fintrax.mobile",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#3B82F6"
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Fintrax to use Face ID for secure authentication."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Fintrax to access your camera for receipt scanning."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fintrax-mobile"
+      }
     }
   }
 }
