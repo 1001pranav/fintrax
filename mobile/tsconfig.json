@@ -14,7 +14,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
+      "@components": ["src/components"],
       "@screens/*": ["src/screens/*"],
+      "@screens": ["src/screens"],
       "@navigation/*": ["src/navigation/*"],
       "@store/*": ["src/store/*"],
       "@store": ["src/store"],
@@ -25,7 +27,8 @@
       "@hooks": ["src/hooks"],
       "@constants/*": ["src/constants/*"],
       "@app-types/*": ["src/types/*"],
-      "@theme/*": ["src/theme/*"]
+      "@theme/*": ["src/theme/*"],
+      "@theme": ["src/theme"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],

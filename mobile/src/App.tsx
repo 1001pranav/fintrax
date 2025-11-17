@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '@store/index';
 import { loadUserFromStorage } from '@store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '@hooks';
+import { LoginScreen } from '@screens/auth/LoginScreen';
+import { colors } from '@theme';
 
 /**
  * App Content Component
@@ -14,32 +15,33 @@ import { useAppDispatch, useAppSelector } from '@hooks';
 function AppContent() {
   const dispatch = useAppDispatch();
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
-  const { theme } = useAppSelector((state) => state.ui);
 
   // Load user from storage on app start
   useEffect(() => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
+  // Show loading spinner while checking authentication
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
 
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <LoginScreen />;
+  }
+
+  // Show dashboard (placeholder for now)
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Fintrax Mobile! 🚀</Text>
-      <Text style={styles.subtitle}>
-        {isAuthenticated ? 'You are logged in!' : 'Please log in to continue'}
-      </Text>
-      <Text style={styles.info}>Redux Store: ✅ Configured</Text>
-      <Text style={styles.info}>Redux Persist: ✅ Enabled</Text>
-      <Text style={styles.info}>Theme: {theme}</Text>
-      <StatusBar style="auto" />
+      <Text style={styles.title}>Welcome to Fintrax! 🚀</Text>
+      <Text style={styles.subtitle}>You are logged in</Text>
+      <Text style={styles.info}>Dashboard coming soon...</Text>
     </View>
   );
 }
@@ -54,7 +56,7 @@ export default function App() {
       <PersistGate
         loading={
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#3B82F6" />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.loadingText}>Loading app...</Text>
           </View>
         }
@@ -69,37 +71,37 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#1F2937',
+    color: colors.text,
   },
   subtitle: {
     fontSize: 16,
     marginBottom: 20,
-    color: '#6B7280',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   info: {
     fontSize: 14,
     marginVertical: 5,
-    color: '#3B82F6',
+    color: colors.primary,
   },
 });
