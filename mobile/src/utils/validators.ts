@@ -1,6 +1,9 @@
 /**
- * Form Validation Utilities
+ * Validation Utilities
+ * Helper functions for input validation
  */
+
+import { ERROR_MESSAGES } from '../constants/config';
 
 /**
  * Validate email format
@@ -15,10 +18,10 @@ export const validateEmail = (email: string): boolean => {
  */
 export const getEmailError = (email: string): string | null => {
   if (!email || email.trim() === '') {
-    return 'Email is required';
+    return ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD;
   }
   if (!validateEmail(email)) {
-    return 'Please enter a valid email address';
+    return ERROR_MESSAGES.VALIDATION.INVALID_EMAIL;
   }
   return null;
 };
@@ -35,10 +38,10 @@ export const validatePassword = (password: string): boolean => {
  */
 export const getPasswordError = (password: string): string | null => {
   if (!password || password.trim() === '') {
-    return 'Password is required';
+    return ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD;
   }
   if (password.length < 6) {
-    return 'Password must be at least 6 characters';
+    return ERROR_MESSAGES.VALIDATION.PASSWORD_TOO_SHORT;
   }
   return null;
 };
@@ -82,16 +85,16 @@ export const validateUsername = (username: string): boolean => {
  */
 export const getUsernameError = (username: string): string | null => {
   if (!username || username.trim() === '') {
-    return 'Username is required';
+    return ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD;
   }
   if (username.length < 3) {
-    return 'Username must be at least 3 characters';
+    return ERROR_MESSAGES.VALIDATION.USERNAME_TOO_SHORT;
   }
   if (username.length > 20) {
-    return 'Username must be less than 20 characters';
+    return ERROR_MESSAGES.VALIDATION.USERNAME_TOO_LONG;
   }
   if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    return 'Username can only contain letters, numbers, and underscores';
+    return ERROR_MESSAGES.VALIDATION.INVALID_USERNAME;
   }
   return null;
 };
@@ -126,10 +129,23 @@ export const validateOTP = (otp: string): boolean => {
  */
 export const getOTPError = (otp: string): string | null => {
   if (!otp || otp.trim() === '') {
-    return 'OTP is required';
+    return ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD;
   }
   if (!validateOTP(otp)) {
-    return 'OTP must be 4-6 digits';
+    return ERROR_MESSAGES.VALIDATION.INVALID_OTP;
+  }
+  return null;
+};
+
+/**
+ * Validate passwords match
+ */
+export const validatePasswordMatch = (
+  password: string,
+  confirmPassword: string
+): string | null => {
+  if (password !== confirmPassword) {
+    return ERROR_MESSAGES.VALIDATION.PASSWORDS_DONT_MATCH;
   }
   return null;
 };
