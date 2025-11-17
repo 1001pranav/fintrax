@@ -42,11 +42,12 @@ export class SQLiteService {
   }
 
   /**
-   * Create database tables
+   * Create database tables with indexes (US-4.1)
    */
   private async createTables(): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
+    // Tasks table
     const createTasksTable = `
       CREATE TABLE IF NOT EXISTS tasks (
         id TEXT PRIMARY KEY,
@@ -65,6 +66,7 @@ export class SQLiteService {
       );
     `;
 
+    // Projects table
     const createProjectsTable = `
       CREATE TABLE IF NOT EXISTS projects (
         id TEXT PRIMARY KEY,
@@ -80,6 +82,7 @@ export class SQLiteService {
       );
     `;
 
+    // Transactions table
     const createTransactionsTable = `
       CREATE TABLE IF NOT EXISTS transactions (
         id TEXT PRIMARY KEY,
@@ -97,6 +100,7 @@ export class SQLiteService {
       );
     `;
 
+    // Sync queue table
     const createSyncQueueTable = `
       CREATE TABLE IF NOT EXISTS sync_queue (
         id TEXT PRIMARY KEY,
@@ -112,11 +116,48 @@ export class SQLiteService {
       );
     `;
 
+    // Indexes for performance optimization (US-4.1)
+    const createIndexes = [
+      // Task indexes
+      'CREATE INDEX IF NOT EXISTS idx_tasks_userId ON tasks(userId)',
+      'CREATE INDEX IF NOT EXISTS idx_tasks_projectId ON tasks(projectId)',
+      'CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)',
+      'CREATE INDEX IF NOT EXISTS idx_tasks_syncStatus ON tasks(syncStatus)',
+      'CREATE INDEX IF NOT EXISTS idx_tasks_isDeleted ON tasks(isDeleted)',
+      'CREATE INDEX IF NOT EXISTS idx_tasks_updatedAt ON tasks(updatedAt DESC)',
+
+      // Project indexes
+      'CREATE INDEX IF NOT EXISTS idx_projects_userId ON projects(userId)',
+      'CREATE INDEX IF NOT EXISTS idx_projects_syncStatus ON projects(syncStatus)',
+      'CREATE INDEX IF NOT EXISTS idx_projects_isDeleted ON projects(isDeleted)',
+
+      // Transaction indexes
+      'CREATE INDEX IF NOT EXISTS idx_transactions_userId ON transactions(userId)',
+      'CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)',
+      'CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category)',
+      'CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_transactions_syncStatus ON transactions(syncStatus)',
+      'CREATE INDEX IF NOT EXISTS idx_transactions_isDeleted ON transactions(isDeleted)',
+
+      // Sync queue indexes
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_status ON sync_queue(status)',
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_entity ON sync_queue(entity)',
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_createdAt ON sync_queue(createdAt ASC)',
+    ];
+
     try {
+      // Create tables
       await this.db.execAsync(createTasksTable);
       await this.db.execAsync(createProjectsTable);
       await this.db.execAsync(createTransactionsTable);
       await this.db.execAsync(createSyncQueueTable);
+
+      // Create indexes
+      for (const indexSql of createIndexes) {
+        await this.db.execAsync(indexSql);
+      }
+
+      console.log('Database tables and indexes created successfully');
     } catch (error) {
       console.error('Error creating tables:', error);
       throw error;

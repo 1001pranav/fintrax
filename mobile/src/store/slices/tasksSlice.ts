@@ -1,13 +1,14 @@
 /**
- * Tasks Slice
+ * Tasks Slice (US-4.3)
  * Redux slice for task state management with offline support
+ * Uses Repository Pattern for data access abstraction
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { tasksApi } from '../../api';
-import { sqliteService, offlineManager } from '../../services';
+import { offlineManager } from '../../services';
+import { taskRepository } from '../../database/helpers';
 import { Task, SyncOperationType, SyncEntity, SyncStatus } from '../../constants/types';
-import { v4 as uuidv4 } from 'uuid';
 
 interface TasksState {
   tasks: Task[];
@@ -23,33 +24,49 @@ const initialState: TasksState = {
   lastSync: null,
 };
 
-// Async Thunks
+// Async Thunks (US-4.3 - Enhanced with Repository Pattern)
 export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
   async (_, { rejectWithValue }) => {
     try {
-      // Try to fetch from server
+      // Always load from local database first (offline-first)
+      const localTasks = await taskRepository.getAll();
+
+      // If online, fetch from server and update local database
       if (offlineManager.isConnected()) {
-        const tasks = await tasksApi.getTasks();
-        // Save to local database
-        for (const task of tasks) {
-          const existing = await sqliteService.getById<Task>('tasks', task.id);
-          if (existing) {
-            await sqliteService.update('tasks', task.id, task);
-          } else {
-            await sqliteService.insert('tasks', task);
+        try {
+          const serverTasks = await tasksApi.getTasks();
+
+          // Update local database with server data
+          for (const serverTask of serverTasks) {
+            const existing = await taskRepository.getById(serverTask.id);
+            if (existing) {
+              await taskRepository.update(serverTask.id, {
+                ...serverTask,
+                syncStatus: 'synced',
+              });
+            } else {
+              // Insert new task from server
+              await taskRepository.create({
+                ...serverTask,
+                syncStatus: 'synced',
+              });
+            }
           }
+
+          // Return updated local tasks
+          return await taskRepository.getAll();
+        } catch (serverError) {
+          console.warn('Server fetch failed, using local data:', serverError);
+          // Return local tasks if server fetch fails
+          return localTasks;
         }
-        return tasks;
-      } else {
-        // Fetch from local database
-        const tasks = await sqliteService.getAll<Task>('tasks');
-        return tasks;
       }
+
+      // Return local tasks if offline
+      return localTasks;
     } catch (error: any) {
-      // Fallback to local database on error
-      const tasks = await sqliteService.getAll<Task>('tasks');
-      return tasks;
+      return rejectWithValue(error.message || 'Failed to fetch tasks');
     }
   }
 );
@@ -58,9 +75,8 @@ export const createTask = createAsyncThunk(
   'tasks/createTask',
   async (taskData: Partial<Task>, { rejectWithValue }) => {
     try {
-      const localId = uuidv4();
-      const task: Task = {
-        id: localId,
+      // Create task using repository (US-4.3)
+      const task = await taskRepository.create({
         title: taskData.title || '',
         description: taskData.description || '',
         status: taskData.status!,
@@ -68,20 +84,14 @@ export const createTask = createAsyncThunk(
         dueDate: taskData.dueDate,
         projectId: taskData.projectId,
         userId: taskData.userId!,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        localId,
-        syncStatus: SyncStatus.PENDING,
-      };
-
-      // Save to local database
-      await sqliteService.insert('tasks', task);
+        syncStatus: 'pending',
+      });
 
       // Queue for sync
       await offlineManager.queueOperation(
         SyncOperationType.CREATE,
         SyncEntity.TASK,
-        localId,
+        task.id,
         taskData
       );
 
@@ -99,11 +109,10 @@ export const updateTask = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      // Update local database
-      await sqliteService.update('tasks', id, {
+      // Update using repository (US-4.3)
+      const task = await taskRepository.update(id, {
         ...updates,
-        updatedAt: new Date().toISOString(),
-        syncStatus: SyncStatus.PENDING,
+        syncStatus: 'pending',
       });
 
       // Queue for sync
@@ -114,9 +123,7 @@ export const updateTask = createAsyncThunk(
         updates
       );
 
-      // Get updated task
-      const task = await sqliteService.getById<Task>('tasks', id);
-      return task!;
+      return task;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to update task');
     }
@@ -127,8 +134,8 @@ export const deleteTask = createAsyncThunk(
   'tasks/deleteTask',
   async (id: string, { rejectWithValue }) => {
     try {
-      // Soft delete in local database
-      await sqliteService.delete('tasks', id);
+      // Soft delete using repository (US-4.3)
+      await taskRepository.delete(id);
 
       // Queue for sync
       await offlineManager.queueOperation(
