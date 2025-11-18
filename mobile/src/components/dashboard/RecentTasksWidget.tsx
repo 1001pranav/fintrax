@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { navigate } from '../../navigation/NavigationService';
 import { Task } from '../../types/models.types';
 import { formatDate } from '../../utils/dateUtils';
 
@@ -14,8 +14,6 @@ export const RecentTasksWidget: React.FC<RecentTasksWidgetProps> = ({
   tasks,
   loading = false,
 }) => {
-  const navigation = useNavigation();
-
   const getPriorityColor = (priority: number) => {
     if (priority <= 2) return '#EF4444'; // High priority (1-2)
     if (priority <= 4) return '#F59E0B'; // Medium priority (3-4)
@@ -25,10 +23,10 @@ export const RecentTasksWidget: React.FC<RecentTasksWidgetProps> = ({
   const renderTaskItem = ({ item }: { item: Task }) => (
     <TouchableOpacity
       style={styles.taskCard}
-      onPress={() => navigation.navigate('Tasks' as never, {
+      onPress={() => navigate('Tasks', {
         screen: 'TaskDetail',
         params: { taskId: item.id }
-      } as never)}
+      })}
       activeOpacity={0.7}
     >
       <View style={styles.taskHeader}>
@@ -72,7 +70,7 @@ export const RecentTasksWidget: React.FC<RecentTasksWidgetProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Today's Tasks ({tasks.length})</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Tasks' as never)}>
+        <TouchableOpacity onPress={() => navigate('Tasks')}>
           <Text style={styles.viewAll}>View All</Text>
         </TouchableOpacity>
       </View>

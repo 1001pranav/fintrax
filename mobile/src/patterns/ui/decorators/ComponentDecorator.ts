@@ -22,7 +22,7 @@ export interface ComponentDecorator {
    */
   decorateOnPress?(
     originalOnPress?: (event: GestureResponderEvent) => void
-  ): (event: GestureResponderEvent) => void;
+  ): ((event: GestureResponderEvent) => void) | undefined;
 
   /**
    * Decorate component style

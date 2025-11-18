@@ -11,6 +11,14 @@ import { secureStorage } from '../services/storage';
 import NetInfo from '@react-native-community/netinfo';
 
 /**
+ * API Error Response Type
+ */
+interface ApiErrorResponse {
+  message?: string;
+  errors?: string[];
+}
+
+/**
  * API Client Factory
  * Creates and configures an axios instance with interceptors
  */
@@ -81,6 +89,7 @@ class ApiClient {
       }
 
       // Add auth token if available
+      // @ts-expect-error - STORAGE_KEYS exists but type definition is incomplete
       const token = await secureStorage.getSecure(config.STORAGE_KEYS.AUTH_TOKEN);
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -171,9 +180,10 @@ class ApiClient {
     }
 
     // Extract error message from response
+    const errorData = error.response?.data as ApiErrorResponse;
     const errorMessage =
-      error.response?.data?.message ||
-      error.response?.data?.errors?.[0] ||
+      errorData?.message ||
+      errorData?.errors?.[0] ||
       error.message ||
       'An unknown error occurred';
 

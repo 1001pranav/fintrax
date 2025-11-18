@@ -50,7 +50,7 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
       style={[
         styles.skeleton,
         {
-          width,
+          width: width as any,
           height,
           borderRadius,
           opacity,

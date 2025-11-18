@@ -94,11 +94,11 @@ export class OfflineManager {
    */
   private constructor() {
     // Initialize sync strategies (Strategy Pattern)
-    this.syncStrategies = new Map([
+    this.syncStrategies = new Map<SyncOperationType, ISyncStrategy>([
       [SyncOperationType.CREATE, new CreateStrategy()],
       [SyncOperationType.UPDATE, new UpdateStrategy()],
       [SyncOperationType.DELETE, new DeleteStrategy()],
-    ]);
+    ] as const);
 
     // Monitor network connectivity
     this.initializeNetworkMonitoring();
@@ -192,7 +192,7 @@ export class OfflineManager {
       // Mark as synced
       await sqliteService.update('sync_queue', operation.id, {
         status: SyncStatus.SYNCED,
-      });
+      } as any);
 
       // Remove from queue (hard delete)
       await sqliteService.hardDelete('sync_queue', operation.id);
@@ -220,7 +220,7 @@ export class OfflineManager {
         retryCount: newRetryCount,
         lastAttempt: new Date().toISOString(),
         error: error.message,
-      });
+      } as any);
 
       // Update local entity sync status
       if (newStatus === SyncStatus.FAILED) {
@@ -260,7 +260,7 @@ export class OfflineManager {
   ): Promise<void> {
     try {
       const table = entity.toLowerCase() + 's'; // e.g., 'task' -> 'tasks'
-      await sqliteService.update(table, entityId, { syncStatus: status });
+      await sqliteService.update(table, entityId, { syncStatus: status } as any);
     } catch (error) {
       console.error('Error updating local entity sync status:', error);
     }
@@ -341,7 +341,7 @@ export class OfflineManager {
         status: SyncStatus.PENDING,
         retryCount: 0,
         error: null,
-      });
+      } as any);
     }
 
     // Trigger sync

@@ -171,7 +171,7 @@ export class SQLiteService {
     if (!this.db) throw new Error('Database not initialized');
 
     try {
-      const result = await this.db.getAllAsync(sql, params);
+      const result = await this.db.getAllAsync(sql, params || []);
       return result as T[];
     } catch (error) {
       console.error('Query error:', error);
@@ -186,7 +186,7 @@ export class SQLiteService {
     if (!this.db) throw new Error('Database not initialized');
 
     try {
-      await this.db.runAsync(sql, params);
+      await this.db.runAsync(sql, params || []);
     } catch (error) {
       console.error('Execute error:', error);
       throw error;

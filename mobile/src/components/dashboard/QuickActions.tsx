@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { navigate } from '../../navigation/NavigationService';
 
 interface QuickAction {
   id: string;
@@ -12,29 +12,27 @@ interface QuickAction {
 }
 
 export const QuickActions: React.FC = () => {
-  const navigation = useNavigation();
-
   const actions: QuickAction[] = [
     {
       id: 'add-task',
       icon: 'add-circle',
       label: 'Add Task',
       color: '#3B82F6',
-      onPress: () => navigation.navigate('Tasks' as never, { screen: 'AddTask' } as never),
+      onPress: () => navigate('Tasks', { screen: 'AddTask' }),
     },
     {
       id: 'add-transaction',
       icon: 'cash',
       label: 'Add Transaction',
       color: '#10B981',
-      onPress: () => navigation.navigate('Finance' as never),
+      onPress: () => navigate('Finance'),
     },
     {
       id: 'add-project',
       icon: 'folder',
       label: 'Add Project',
       color: '#F59E0B',
-      onPress: () => navigation.navigate('Projects' as never),
+      onPress: () => navigate('Projects'),
     },
   ];
 

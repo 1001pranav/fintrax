@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { createTask } from '../../store/slices/tasksSlice';
 import { formatDateForAPI } from '../../utils/dateUtils';
+import { TaskPriority, TaskStatus } from '../../constants/types';
 
 export const AddTaskScreen = () => {
   const navigation = useNavigation();
@@ -24,14 +25,14 @@ export const AddTaskScreen = () => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState(5); // Default: Low
-  const [status, setStatus] = useState(1); // Default: To Do
+  const [priority, setPriority] = useState<TaskPriority>(TaskPriority.LOW);
+  const [status, setStatus] = useState<TaskStatus>(TaskStatus.TODO);
   const [saving, setSaving] = useState(false);
 
   const priorityOptions = [
-    { value: 1, label: 'High', color: '#EF4444' },
-    { value: 3, label: 'Medium', color: '#F59E0B' },
-    { value: 5, label: 'Low', color: '#10B981' },
+    { value: TaskPriority.HIGH, label: 'High', color: '#EF4444' },
+    { value: TaskPriority.MEDIUM, label: 'Medium', color: '#F59E0B' },
+    { value: TaskPriority.LOW, label: 'Low', color: '#10B981' },
   ];
 
   const handleSave = async () => {
@@ -48,9 +49,9 @@ export const AddTaskScreen = () => {
           description: description.trim(),
           priority,
           status,
-          userId: user?.id || 0,
-          start_date: formatDateForAPI(new Date()),
-        })
+          userId: user?.id || '',
+          createdAt: formatDateForAPI(new Date()),
+        } as any)
       );
 
       Alert.alert('Success', 'Task created successfully', [
@@ -154,15 +155,15 @@ export const AddTaskScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.statusOption,
-                  status === 1 && styles.statusOptionActive,
+                  status === TaskStatus.TODO && styles.statusOptionActive,
                 ]}
-                onPress={() => setStatus(1)}
+                onPress={() => setStatus(TaskStatus.TODO)}
                 activeOpacity={0.7}
               >
                 <Text
                   style={[
                     styles.statusLabel,
-                    status === 1 && styles.statusLabelActive,
+                    status === TaskStatus.TODO && styles.statusLabelActive,
                   ]}
                 >
                   To Do
@@ -171,15 +172,15 @@ export const AddTaskScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.statusOption,
-                  status === 2 && styles.statusOptionActive,
+                  status === TaskStatus.IN_PROGRESS && styles.statusOptionActive,
                 ]}
-                onPress={() => setStatus(2)}
+                onPress={() => setStatus(TaskStatus.IN_PROGRESS)}
                 activeOpacity={0.7}
               >
                 <Text
                   style={[
                     styles.statusLabel,
-                    status === 2 && styles.statusLabelActive,
+                    status === TaskStatus.IN_PROGRESS && styles.statusLabelActive,
                   ]}
                 >
                   In Progress

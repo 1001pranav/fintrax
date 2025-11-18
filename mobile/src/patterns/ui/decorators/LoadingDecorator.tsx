@@ -25,7 +25,7 @@ export class LoadingDecorator implements ComponentDecorator {
 
   decorateOnPress(
     originalOnPress?: (event: GestureResponderEvent) => void
-  ): (event: GestureResponderEvent) => void | undefined {
+  ): ((event: GestureResponderEvent) => void) | undefined {
     if (this.isLoading && this.disableWhileLoading) {
       return () => {
         // Do nothing while loading

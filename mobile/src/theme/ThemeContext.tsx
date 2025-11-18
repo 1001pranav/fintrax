@@ -44,7 +44,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   useEffect(() => {
     // Update system theme for auto mode
-    themeManager.updateSystemTheme(systemTheme);
+    // Convert undefined to null to match expected type
+    themeManager.updateSystemTheme(systemTheme === undefined ? null : systemTheme);
   }, [systemTheme, themeManager]);
 
   const handleSetTheme = async (newMode: ThemeMode): Promise<void> => {

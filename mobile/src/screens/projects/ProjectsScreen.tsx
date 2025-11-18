@@ -72,7 +72,7 @@ export const ProjectsScreen: React.FC = () => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="folder-outline" size={64} color={colors.text.disabled} />
+      <Ionicons name="folder-outline" size={64} color={colors.textLight} />
       <Text style={styles.emptyTitle}>No Projects</Text>
       <Text style={styles.emptyText}>
         Create your first project to organize your tasks
@@ -141,7 +141,7 @@ export const ProjectsScreen: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Projects</Text>
         <TouchableOpacity onPress={handleAddProject}>
-          <Ionicons name="add-circle" size={32} color={colors.primary.main} />
+          <Ionicons name="add-circle" size={32} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -150,7 +150,6 @@ export const ProjectsScreen: React.FC = () => {
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholder="Search projects..."
-        style={styles.searchBar}
       />
 
       {/* Filters */}
@@ -172,7 +171,7 @@ export const ProjectsScreen: React.FC = () => {
           <RefreshControl
             refreshing={isLoading}
             onRefresh={loadProjects}
-            tintColor={colors.primary.main}
+            tintColor={colors.primary}
           />
         }
       />
@@ -180,7 +179,7 @@ export const ProjectsScreen: React.FC = () => {
       {/* FAB */}
       {filteredProjects.length > 0 && (
         <TouchableOpacity style={styles.fab} onPress={handleAddProject}>
-          <Ionicons name="add" size={28} color={colors.common.white} />
+          <Ionicons name="add" size={28} color={colors.white} />
         </TouchableOpacity>
       )}
     </View>
@@ -190,7 +189,7 @@ export const ProjectsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.default,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -203,11 +202,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  searchBar: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
+    color: colors.text,
   },
   filterContainer: {
     flexDirection: 'row',
@@ -219,18 +214,18 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 20,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.backgroundSecondary,
   },
   filterButtonActive: {
-    backgroundColor: colors.primary.main,
+    backgroundColor: colors.primary,
   },
   filterButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.text.secondary,
+    color: colors.textSecondary,
   },
   filterButtonTextActive: {
-    color: colors.common.white,
+    color: colors.white,
   },
   list: {
     paddingHorizontal: spacing.lg,
@@ -245,19 +240,19 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: colors.text,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
   emptyText: {
     fontSize: 14,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
     paddingHorizontal: spacing.xl,
   },
   emptyButton: {
-    backgroundColor: colors.primary.main,
+    backgroundColor: colors.primary,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
     borderRadius: 8,
@@ -265,7 +260,7 @@ const styles = StyleSheet.create({
   emptyButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.common.white,
+    color: colors.white,
   },
   fab: {
     position: 'absolute',
@@ -274,7 +269,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.primary.main,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

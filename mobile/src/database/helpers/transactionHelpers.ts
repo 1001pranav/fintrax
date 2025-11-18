@@ -217,7 +217,7 @@ export class TransactionRepository implements ITransactionRepository {
   async markPending(id: string): Promise<void> {
     await sqliteService.update(this.TABLE_NAME, id, {
       syncStatus: 'pending',
-    });
+    } as any);
   }
 
   /**

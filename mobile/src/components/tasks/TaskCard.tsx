@@ -3,14 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import * as Haptics from 'expo-haptics';
-import { Task } from '../../types/models.types';
+import { Task, TaskPriority, TaskStatus } from '../../constants/types';
 import { formatDate } from '../../utils/dateUtils';
 
 interface TaskCardProps {
   task: Task;
   onPress: () => void;
-  onComplete?: (taskId: number) => void;
-  onDelete?: (taskId: number) => void;
+  onComplete?: (taskId: string) => void;
+  onDelete?: (taskId: string) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
@@ -19,15 +19,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onComplete,
   onDelete,
 }) => {
-  const getPriorityColor = (priority: number) => {
-    if (priority <= 2) return '#EF4444'; // High priority (1-2)
-    if (priority <= 4) return '#F59E0B'; // Medium priority (3-4)
-    return '#10B981'; // Low priority (5)
+  const getPriorityColor = (priority: TaskPriority) => {
+    if (priority === TaskPriority.HIGH || priority === TaskPriority.URGENT) return '#EF4444';
+    if (priority === TaskPriority.MEDIUM) return '#F59E0B';
+    return '#10B981';
   };
 
-  const getPriorityLabel = (priority: number) => {
-    if (priority <= 2) return 'High';
-    if (priority <= 4) return 'Medium';
+  const getPriorityLabel = (priority: TaskPriority) => {
+    if (priority === TaskPriority.HIGH || priority === TaskPriority.URGENT) return 'High';
+    if (priority === TaskPriority.MEDIUM) return 'Medium';
     return 'Low';
   };
 
@@ -76,7 +76,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     </TouchableOpacity>
   );
 
-  const isCompleted = task.status === 6;
+  const isCompleted = task.status === TaskStatus.COMPLETED;
 
   return (
     <Swipeable
@@ -120,16 +120,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   {getPriorityLabel(task.priority)}
                 </Text>
               </View>
-              {task.project_id && (
+              {task.projectId && (
                 <View style={styles.projectBadge}>
                   <Ionicons name="folder-outline" size={12} color="#6B7280" />
                   <Text style={styles.projectText}>Project</Text>
                 </View>
               )}
             </View>
-            {task.end_date && (
+            {task.dueDate && (
               <Text style={styles.dueDate}>
-                {formatDate(task.end_date)}
+                {formatDate(task.dueDate)}
               </Text>
             )}
           </View>

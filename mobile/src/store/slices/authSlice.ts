@@ -33,8 +33,20 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const { user, tokens } = await authApi.login(credentials);
-      await authManager.saveTokens(tokens);
+      const response = await authApi.login(credentials);
+
+      // Transform API response to User type
+      const user: User = {
+        id: String(response.user_id),
+        email: response.email,
+        firstName: response.username, // Using username as firstName for now
+        lastName: '', // API doesn't provide lastName
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Save token and user
+      await authManager.saveTokens({ accessToken: response.token });
       await authManager.saveUser(user);
       return user;
     } catch (error: any) {
@@ -47,8 +59,15 @@ export const register = createAsyncThunk(
   'auth/register',
   async (data: RegisterData, { rejectWithValue }) => {
     try {
-      const response = await authApi.register(data);
-      return response.message;
+      // Transform RegisterData to RegisterRequest
+      const registerRequest = {
+        username: data.firstName, // Using firstName as username
+        email: data.email,
+        password: data.password,
+      };
+
+      const response = await authApi.register(registerRequest);
+      return `Registration successful. OTP sent: ${response.otp_sent}`;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Registration failed');
     }
@@ -71,7 +90,8 @@ export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async (email: string, { rejectWithValue }) => {
     try {
-      const response = await authApi.forgotPassword(email);
+      // First generate OTP
+      const response = await authApi.generateOTP({ email });
       return response.message;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Request failed');
@@ -83,7 +103,14 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async (data: ResetPasswordData, { rejectWithValue }) => {
     try {
-      const response = await authApi.resetPassword(data);
+      // Transform ResetPasswordData to ForgotPasswordRequest
+      const resetRequest = {
+        email: data.email,
+        otp: data.otp,
+        new_password: data.newPassword,
+      };
+
+      const response = await authApi.forgotPassword(resetRequest);
       return response.message;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Password reset failed');

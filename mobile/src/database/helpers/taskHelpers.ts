@@ -197,7 +197,7 @@ export class TaskRepository implements ITaskRepository {
    * Mark task as pending sync
    */
   async markPending(id: string): Promise<void> {
-    await sqliteService.update(this.TABLE_NAME, id, { syncStatus: 'pending' });
+    await sqliteService.update(this.TABLE_NAME, id, { syncStatus: 'pending' } as any);
   }
 
   /**

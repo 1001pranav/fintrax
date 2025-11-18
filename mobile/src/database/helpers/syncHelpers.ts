@@ -5,7 +5,7 @@
  */
 
 import { sqliteService } from '../../services/storage';
-import { SyncOperation, SyncStatus, SyncOperationType } from '../../constants/types';
+import { SyncOperation, SyncStatus, SyncOperationType, SyncEntity } from '../../constants/types';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 export interface ISyncRepository {
   enqueue(
     type: SyncOperationType,
-    entity: string,
+    entity: SyncEntity,
     entityId: string,
     payload: any
   ): Promise<SyncOperation>;
@@ -60,7 +60,7 @@ export class SyncRepository implements ISyncRepository {
    */
   async enqueue(
     type: SyncOperationType,
-    entity: string,
+    entity: SyncEntity,
     entityId: string,
     payload: any
   ): Promise<SyncOperation> {

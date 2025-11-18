@@ -95,7 +95,7 @@ export const ProjectDetailScreen: React.FC = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={colors.text.primary}
+            color={colors.text}
           />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -110,7 +110,7 @@ export const ProjectDetailScreen: React.FC = () => {
           <Ionicons
             name="ellipsis-horizontal"
             size={24}
-            color={colors.text.primary}
+            color={colors.text}
           />
         </TouchableOpacity>
       </View>
@@ -151,7 +151,7 @@ export const ProjectDetailScreen: React.FC = () => {
           <RefreshControl
             refreshing={isLoading}
             onRefresh={loadData}
-            tintColor={colors.primary.main}
+            tintColor={colors.primary}
           />
         }
       >
@@ -160,7 +160,7 @@ export const ProjectDetailScreen: React.FC = () => {
           title="To Do"
           tasks={todoTasks}
           icon="list-outline"
-          color={colors.info.main}
+          color={colors.info}
           onTaskPress={handleTaskPress}
           onAddTask={() => handleAddTask('1')}
         />
@@ -170,7 +170,7 @@ export const ProjectDetailScreen: React.FC = () => {
           title="In Progress"
           tasks={inProgressTasks}
           icon="play-circle-outline"
-          color={colors.warning.main}
+          color={colors.warning}
           onTaskPress={handleTaskPress}
           onAddTask={() => handleAddTask('2')}
         />
@@ -180,7 +180,7 @@ export const ProjectDetailScreen: React.FC = () => {
           title="Done"
           tasks={doneTasks}
           icon="checkmark-circle-outline"
-          color={colors.success.main}
+          color={colors.success}
           onTaskPress={handleTaskPress}
           onAddTask={() => handleAddTask('6')}
         />
@@ -192,17 +192,17 @@ export const ProjectDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.default,
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background.default,
+    backgroundColor: colors.background,
   },
   loadingText: {
     fontSize: 16,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
   },
   header: {
     flexDirection: 'row',
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 20,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: colors.text,
   },
   descriptionContainer: {
     paddingHorizontal: spacing.lg,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   statsContainer: {
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flex: 1,
-    backgroundColor: colors.background.paper,
+    backgroundColor: colors.backgroundSecondary,
     borderRadius: 8,
     padding: spacing.md,
     alignItems: 'center',
@@ -261,12 +261,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.text.primary,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
   statLabel: {
     fontSize: 12,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
   },
   kanbanContainer: {
     paddingHorizontal: spacing.lg,

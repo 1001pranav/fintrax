@@ -13,9 +13,10 @@ export interface AuthResult {
 export interface AuthenticationStrategy {
   /**
    * Perform authentication using this strategy
+   * @param credential - Optional credential (e.g., password for PasswordStrategy)
    * @returns Promise with authentication result
    */
-  authenticate(): Promise<AuthResult>;
+  authenticate(credential?: string): Promise<AuthResult>;
 
   /**
    * Check if this authentication method is available on the device

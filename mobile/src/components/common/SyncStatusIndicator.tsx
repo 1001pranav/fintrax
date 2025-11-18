@@ -68,15 +68,15 @@ export const SyncStatusIndicator: React.FC<SyncStatusProps> = ({
   const getStatusIcon = () => {
     if (!isOnline) {
       return (
-        <Ionicons name="cloud-offline" size={18} color={colors.text.secondary} />
+        <Ionicons name="cloud-offline" size={18} color={colors.textSecondary} />
       );
     }
 
     if (isSyncing || pendingCount > 0) {
-      return <ActivityIndicator size="small" color={colors.primary.main} />;
+      return <ActivityIndicator size="small" color={colors.primary} />;
     }
 
-    return <Ionicons name="cloud-done" size={18} color={colors.success.main} />;
+    return <Ionicons name="cloud-done" size={18} color={colors.success} />;
   };
 
   const getStatusText = () => {
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.backgroundSecondary,
   },
   content: {
     flexDirection: 'row',
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 12,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
     fontWeight: '500',
   },
 });
