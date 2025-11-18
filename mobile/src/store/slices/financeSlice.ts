@@ -15,6 +15,7 @@ import {
   FinanceSummary,
   SyncOperationType,
   SyncEntity,
+  SyncStatus,
 } from '../../constants/types';
 
 interface FinanceState {
@@ -68,12 +69,12 @@ export const fetchTransactions = createAsyncThunk(
             if (existing) {
               await transactionRepository.update(serverTransaction.id, {
                 ...serverTransaction,
-                syncStatus: 'synced',
+                syncStatus: SyncStatus.SYNCED,
               });
             } else {
               await transactionRepository.create({
                 ...serverTransaction,
-                syncStatus: 'synced',
+                syncStatus: SyncStatus.SYNCED,
               });
             }
           }
@@ -104,7 +105,7 @@ export const createTransaction = createAsyncThunk(
         type: transactionData.type!,
         date: transactionData.date!,
         userId: transactionData.userId!,
-        syncStatus: 'pending',
+        syncStatus: SyncStatus.PENDING,
       });
 
       await offlineManager.queueOperation(
@@ -131,7 +132,7 @@ export const updateTransaction = createAsyncThunk(
       // Update using repository (US-4.4)
       const transaction = await transactionRepository.update(id, {
         ...updates,
-        syncStatus: 'pending',
+        syncStatus: SyncStatus.PENDING,
       });
 
       await offlineManager.queueOperation(

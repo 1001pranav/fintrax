@@ -32,7 +32,7 @@ export const fetchDashboardData = createAsyncThunk(
   'dashboard/fetchData',
   async (_, { rejectWithValue }) => {
     try {
-      const data = await dashboardApi.getDashboardSummary();
+      const data = await dashboardApi.getSummary();
       return data;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to fetch dashboard data');

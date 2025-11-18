@@ -8,3 +8,4 @@ export { authApi } from './auth.api';
 export { tasksApi } from './tasks.api';
 export { projectsApi } from './projects.api';
 export { financeApi } from './finance.api';
+export { dashboardApi } from './dashboard.api';

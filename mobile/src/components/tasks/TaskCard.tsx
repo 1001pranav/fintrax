@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import * as Haptics from 'expo-haptics';
-import { Task, TaskPriority } from '../../constants/types';
+import { Task, TaskPriority, TaskStatus } from '../../constants/types';
 import { formatDate } from '../../utils/dateUtils';
 
 interface TaskCardProps {
@@ -76,7 +76,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     </TouchableOpacity>
   );
 
-  const isCompleted = task.status === 6;
+  const isCompleted = task.status === TaskStatus.COMPLETED;
 
   return (
     <Swipeable
@@ -120,16 +120,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   {getPriorityLabel(task.priority)}
                 </Text>
               </View>
-              {task.project_id && (
+              {task.projectId && (
                 <View style={styles.projectBadge}>
                   <Ionicons name="folder-outline" size={12} color="#6B7280" />
                   <Text style={styles.projectText}>Project</Text>
                 </View>
               )}
             </View>
-            {task.end_date && (
+            {task.dueDate && (
               <Text style={styles.dueDate}>
-                {formatDate(task.end_date)}
+                {formatDate(task.dueDate)}
               </Text>
             )}
           </View>

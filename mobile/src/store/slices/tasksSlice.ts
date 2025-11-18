@@ -43,13 +43,13 @@ export const fetchTasks = createAsyncThunk(
             if (existing) {
               await taskRepository.update(serverTask.id, {
                 ...serverTask,
-                syncStatus: 'synced',
+                syncStatus: SyncStatus.SYNCED,
               });
             } else {
               // Insert new task from server
               await taskRepository.create({
                 ...serverTask,
-                syncStatus: 'synced',
+                syncStatus: SyncStatus.SYNCED,
               });
             }
           }
@@ -84,7 +84,7 @@ export const createTask = createAsyncThunk(
         dueDate: taskData.dueDate,
         projectId: taskData.projectId,
         userId: taskData.userId!,
-        syncStatus: 'pending',
+        syncStatus: SyncStatus.PENDING,
       });
 
       // Queue for sync
@@ -112,7 +112,7 @@ export const updateTask = createAsyncThunk(
       // Update using repository (US-4.3)
       const task = await taskRepository.update(id, {
         ...updates,
-        syncStatus: 'pending',
+        syncStatus: SyncStatus.PENDING,
       });
 
       // Queue for sync
