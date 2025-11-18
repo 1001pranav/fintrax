@@ -13,7 +13,11 @@ export const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({
   onNotificationPress,
 }) => {
   const greeting = getGreeting();
-  const today = formatDate(new Date(), 'EEEE, MMM d');
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
 
   return (
     <View style={styles.container}>

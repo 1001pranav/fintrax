@@ -52,7 +52,7 @@ export const DashboardScreen = () => {
         }
       >
         <WelcomeHeader
-          userName={user?.username || 'User'}
+          userName={user?.firstName || 'User'}
           onNotificationPress={handleNotificationPress}
         />
 

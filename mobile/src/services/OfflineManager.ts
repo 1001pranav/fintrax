@@ -94,11 +94,11 @@ export class OfflineManager {
    */
   private constructor() {
     // Initialize sync strategies (Strategy Pattern)
-    this.syncStrategies = new Map([
+    this.syncStrategies = new Map<SyncOperationType, ISyncStrategy>([
       [SyncOperationType.CREATE, new CreateStrategy()],
       [SyncOperationType.UPDATE, new UpdateStrategy()],
       [SyncOperationType.DELETE, new DeleteStrategy()],
-    ]);
+    ] as const);
 
     // Monitor network connectivity
     this.initializeNetworkMonitoring();

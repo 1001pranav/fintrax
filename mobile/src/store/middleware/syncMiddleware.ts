@@ -4,7 +4,7 @@
  * Implements Observer Pattern
  */
 
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { offlineManager } from '../../services';
 import { logout } from '../slices/authSlice';
 
@@ -12,6 +12,7 @@ import { logout } from '../slices/authSlice';
  * Sync middleware that triggers sync on data changes
  */
 export const syncMiddleware: Middleware = (store) => (next) => (action) => {
+  const typedAction = action as AnyAction;
   const result = next(action);
 
   // List of actions that should trigger sync
@@ -28,7 +29,7 @@ export const syncMiddleware: Middleware = (store) => (next) => (action) => {
   ];
 
   // Trigger sync if action matches
-  if (syncActions.includes(action.type)) {
+  if (syncActions.includes(typedAction.type)) {
     // Trigger sync in background (don't await)
     offlineManager.syncAll().catch((error) => {
       console.error('Background sync failed:', error);
@@ -36,7 +37,7 @@ export const syncMiddleware: Middleware = (store) => (next) => (action) => {
   }
 
   // Clear local data on logout
-  if (logout.fulfilled.match(action)) {
+  if (logout.fulfilled.match(typedAction)) {
     // Clear local database
     const { sqliteService } = require('../../services/storage');
     sqliteService.clearAll().catch((error: Error) => {

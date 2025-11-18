@@ -75,7 +75,7 @@ export const TaskListScreen = () => {
   };
 
   const handleTaskPress = (taskId: string) => {
-    navigation.navigate('TaskDetail' as never, { taskId } as never);
+    (navigation.navigate as any)('TaskDetail', { taskId });
   };
 
   const handleComplete = async (taskId: string) => {

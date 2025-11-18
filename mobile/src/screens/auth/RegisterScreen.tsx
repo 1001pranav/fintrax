@@ -93,7 +93,12 @@ export const RegisterScreen: React.FC = () => {
 
     try {
       // Dispatch register action
-      await dispatch(register({ username, email, password })).unwrap();
+      await dispatch(register({
+        email,
+        password,
+        firstName: username,
+        lastName: ''
+      })).unwrap();
 
       // Registration successful - navigate to OTP verification
       navigation.navigate('VerifyEmail', { email });

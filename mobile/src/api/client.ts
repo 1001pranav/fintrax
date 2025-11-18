@@ -11,6 +11,14 @@ import { secureStorage } from '../services/storage';
 import NetInfo from '@react-native-community/netinfo';
 
 /**
+ * API Error Response Type
+ */
+interface ApiErrorResponse {
+  message?: string;
+  errors?: string[];
+}
+
+/**
  * API Client Factory
  * Creates and configures an axios instance with interceptors
  */
@@ -172,10 +180,10 @@ class ApiClient {
     }
 
     // Extract error message from response
-    // @ts-expect-error - API error responses have message/errors but types are incomplete
+    const errorData = error.response?.data as ApiErrorResponse;
     const errorMessage =
-      error.response?.data?.message ||
-      error.response?.data?.errors?.[0] ||
+      errorData?.message ||
+      errorData?.errors?.[0] ||
       error.message ||
       'An unknown error occurred';
 

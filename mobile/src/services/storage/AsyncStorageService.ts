@@ -130,7 +130,8 @@ export class AsyncStorageService implements IStorageService {
    */
   async getAllKeys(): Promise<string[]> {
     try {
-      return await AsyncStorage.getAllKeys();
+      const keys = await AsyncStorage.getAllKeys();
+      return [...keys]; // Convert readonly array to mutable array
     } catch (error) {
       console.error('AsyncStorage getAllKeys error:', error);
       return [];
