@@ -3,14 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import * as Haptics from 'expo-haptics';
-import { Task } from '../../types/models.types';
+import { Task, TaskPriority } from '../../constants/types';
 import { formatDate } from '../../utils/dateUtils';
 
 interface TaskCardProps {
   task: Task;
   onPress: () => void;
-  onComplete?: (taskId: number) => void;
-  onDelete?: (taskId: number) => void;
+  onComplete?: (taskId: string) => void;
+  onDelete?: (taskId: string) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
@@ -19,15 +19,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onComplete,
   onDelete,
 }) => {
-  const getPriorityColor = (priority: number) => {
-    if (priority <= 2) return '#EF4444'; // High priority (1-2)
-    if (priority <= 4) return '#F59E0B'; // Medium priority (3-4)
-    return '#10B981'; // Low priority (5)
+  const getPriorityColor = (priority: TaskPriority) => {
+    if (priority === TaskPriority.HIGH || priority === TaskPriority.URGENT) return '#EF4444';
+    if (priority === TaskPriority.MEDIUM) return '#F59E0B';
+    return '#10B981';
   };
 
-  const getPriorityLabel = (priority: number) => {
-    if (priority <= 2) return 'High';
-    if (priority <= 4) return 'Medium';
+  const getPriorityLabel = (priority: TaskPriority) => {
+    if (priority === TaskPriority.HIGH || priority === TaskPriority.URGENT) return 'High';
+    if (priority === TaskPriority.MEDIUM) return 'Medium';
     return 'Low';
   };
 

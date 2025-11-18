@@ -15,21 +15,22 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { updateTask, deleteTask } from '../../store/slices/tasksSlice';
 import { formatDate } from '../../utils/dateUtils';
+import { TaskPriority, TaskStatus } from '../../constants/types';
 
 export const TaskDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useAppDispatch();
 
-  const { taskId } = route.params as { taskId: number };
+  const { taskId } = route.params as { taskId: string };
   const { tasks } = useAppSelector((state) => state.tasks);
   const task = tasks.find((t) => t.id === taskId);
 
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState(5);
-  const [status, setStatus] = useState(1);
+  const [priority, setPriority] = useState<TaskPriority>(TaskPriority.LOW);
+  const [status, setStatus] = useState<TaskStatus>(TaskStatus.TODO);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -53,9 +54,9 @@ export const TaskDetailScreen = () => {
   }
 
   const priorityOptions = [
-    { value: 1, label: 'High', color: '#EF4444' },
-    { value: 3, label: 'Medium', color: '#F59E0B' },
-    { value: 5, label: 'Low', color: '#10B981' },
+    { value: TaskPriority.HIGH, label: 'High', color: '#EF4444' },
+    { value: TaskPriority.MEDIUM, label: 'Medium', color: '#F59E0B' },
+    { value: TaskPriority.LOW, label: 'Low', color: '#10B981' },
   ];
 
   const handleSave = async () => {
@@ -68,7 +69,7 @@ export const TaskDetailScreen = () => {
     try {
       await dispatch(
         updateTask({
-          id: taskId.toString(),
+          id: taskId,
           updates: {
             title: title.trim(),
             description: description.trim(),
@@ -97,7 +98,7 @@ export const TaskDetailScreen = () => {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
-            await dispatch(deleteTask(taskId.toString()));
+            await dispatch(deleteTask(taskId));
             navigation.goBack();
           },
         },
@@ -221,9 +222,9 @@ export const TaskDetailScreen = () => {
           {isEditing ? (
             <View style={styles.statusContainer}>
               {[
-                { value: 1, label: 'To Do' },
-                { value: 2, label: 'In Progress' },
-                { value: 6, label: 'Completed' },
+                { value: TaskStatus.TODO, label: 'To Do' },
+                { value: TaskStatus.IN_PROGRESS, label: 'In Progress' },
+                { value: TaskStatus.COMPLETED, label: 'Completed' },
               ].map((option) => (
                 <TouchableOpacity
                   key={option.value}
@@ -247,7 +248,11 @@ export const TaskDetailScreen = () => {
             </View>
           ) : (
             <Text style={styles.value}>
-              {task.status === 1 ? 'To Do' : task.status === 2 ? 'In Progress' : 'Completed'}
+              {task.status === TaskStatus.TODO
+                ? 'To Do'
+                : task.status === TaskStatus.IN_PROGRESS
+                ? 'In Progress'
+                : 'Completed'}
             </Text>
           )}
         </View>
@@ -255,13 +260,13 @@ export const TaskDetailScreen = () => {
         {/* Metadata */}
         <View style={styles.section}>
           <Text style={styles.label}>Created</Text>
-          <Text style={styles.value}>{formatDate(task.created_at)}</Text>
+          <Text style={styles.value}>{formatDate(task.createdAt)}</Text>
         </View>
 
-        {task.end_date && (
+        {task.dueDate && (
           <View style={styles.section}>
             <Text style={styles.label}>Due Date</Text>
-            <Text style={styles.value}>{formatDate(task.end_date)}</Text>
+            <Text style={styles.value}>{formatDate(task.dueDate)}</Text>
           </View>
         )}
 

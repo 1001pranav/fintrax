@@ -16,6 +16,7 @@ import { TaskCard } from '../../components/tasks/TaskCard';
 import { TaskFilters } from '../../components/tasks/TaskFilters';
 import { SearchBar } from '../../components/common/SearchBar';
 import { EmptyState } from '../../components/common/EmptyState';
+import { TaskPriority, TaskStatus } from '../../constants/types';
 
 export const TaskListScreen = () => {
   const navigation = useNavigation();
@@ -24,9 +25,9 @@ export const TaskListScreen = () => {
   const { tasks, isLoading } = useAppSelector((state) => state.tasks);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<number | null>(null);
-  const [filterPriority, setFilterPriority] = useState<number | null>(null);
-  const [filterProject, setFilterProject] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<TaskStatus | null>(null);
+  const [filterPriority, setFilterPriority] = useState<TaskPriority | null>(null);
+  const [filterProject, setFilterProject] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchTasks());
@@ -40,8 +41,8 @@ export const TaskListScreen = () => {
 
   // Filter tasks based on criteria
   const filteredTasks = tasks.filter((task) => {
-    // Exclude deleted tasks (status = 5)
-    if (task.status === 5) return false;
+    // Exclude archived tasks
+    if (task.status === TaskStatus.ARCHIVED) return false;
 
     // Search filter
     if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -54,15 +55,12 @@ export const TaskListScreen = () => {
     }
 
     // Priority filter
-    if (filterPriority !== null) {
-      // High priority: 1-2, Medium: 3-4, Low: 5
-      if (filterPriority === 1 && task.priority > 2) return false;
-      if (filterPriority === 3 && (task.priority < 3 || task.priority > 4)) return false;
-      if (filterPriority === 5 && task.priority !== 5) return false;
+    if (filterPriority !== null && task.priority !== filterPriority) {
+      return false;
     }
 
     // Project filter
-    if (filterProject !== null && task.project_id !== filterProject) {
+    if (filterProject !== null && task.projectId !== filterProject) {
       return false;
     }
 
@@ -71,21 +69,21 @@ export const TaskListScreen = () => {
 
   // Group tasks by priority
   const groupedTasks = {
-    high: filteredTasks.filter((t) => t.priority <= 2),
-    medium: filteredTasks.filter((t) => t.priority >= 3 && t.priority <= 4),
-    low: filteredTasks.filter((t) => t.priority === 5),
+    high: filteredTasks.filter((t) => t.priority === TaskPriority.HIGH || t.priority === TaskPriority.URGENT),
+    medium: filteredTasks.filter((t) => t.priority === TaskPriority.MEDIUM),
+    low: filteredTasks.filter((t) => t.priority === TaskPriority.LOW),
   };
 
-  const handleTaskPress = (taskId: number) => {
+  const handleTaskPress = (taskId: string) => {
     navigation.navigate('TaskDetail' as never, { taskId } as never);
   };
 
-  const handleComplete = async (taskId: number) => {
-    await dispatch(updateTask({ id: taskId.toString(), updates: { status: 6 } }));
+  const handleComplete = async (taskId: string) => {
+    await dispatch(updateTask({ id: taskId, updates: { status: TaskStatus.COMPLETED } }));
   };
 
-  const handleDelete = async (taskId: number) => {
-    await dispatch(deleteTask(taskId.toString()));
+  const handleDelete = async (taskId: string) => {
+    await dispatch(deleteTask(taskId));
   };
 
   const handleAddTask = () => {

@@ -1,14 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { TaskStatus, TaskPriority } from '../../constants/types';
 
 interface TaskFiltersProps {
-  selectedStatus: number | null;
-  selectedPriority: number | null;
-  selectedProject: number | null;
-  onStatusChange: (status: number | null) => void;
-  onPriorityChange: (priority: number | null) => void;
-  onProjectChange: (project: number | null) => void;
+  selectedStatus: TaskStatus | null;
+  selectedPriority: TaskPriority | null;
+  selectedProject: string | null;
+  onStatusChange: (status: TaskStatus | null) => void;
+  onPriorityChange: (priority: TaskPriority | null) => void;
+  onProjectChange: (project: string | null) => void;
 }
 
 export const TaskFilters: React.FC<TaskFiltersProps> = ({
@@ -20,17 +21,17 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
   onProjectChange,
 }) => {
   const statusOptions = [
-    { value: null, label: 'All Status' },
-    { value: 1, label: 'To Do' },
-    { value: 2, label: 'In Progress' },
-    { value: 6, label: 'Completed' },
+    { value: null as null, label: 'All Status' },
+    { value: TaskStatus.TODO, label: 'To Do' },
+    { value: TaskStatus.IN_PROGRESS, label: 'In Progress' },
+    { value: TaskStatus.COMPLETED, label: 'Completed' },
   ];
 
   const priorityOptions = [
-    { value: null, label: 'All Priority' },
-    { value: 1, label: 'High' },
-    { value: 3, label: 'Medium' },
-    { value: 5, label: 'Low' },
+    { value: null as null, label: 'All Priority' },
+    { value: TaskPriority.HIGH, label: 'High' },
+    { value: TaskPriority.MEDIUM, label: 'Medium' },
+    { value: TaskPriority.LOW, label: 'Low' },
   ];
 
   const hasActiveFilters = selectedStatus !== null || selectedPriority !== null || selectedProject !== null;
