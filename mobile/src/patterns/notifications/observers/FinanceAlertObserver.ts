@@ -6,7 +6,7 @@
 
 import { NotificationObserver } from './NotificationObserver';
 import { NotificationData, NotificationType } from '../types';
-import { navigationRef } from '../../../navigation/NavigationService';
+import { navigate } from '../../../navigation/NavigationService';
 
 export class FinanceAlertObserver implements NotificationObserver {
   readonly id = 'finance_alert_observer';
@@ -40,16 +40,16 @@ export class FinanceAlertObserver implements NotificationObserver {
     switch (notification.type) {
       case NotificationType.BUDGET_LIMIT:
       case NotificationType.FINANCE_ALERT:
-        navigationRef.navigate('Finance');
+        navigate('Finance');
         break;
       case NotificationType.SAVINGS_GOAL:
-        navigationRef.navigate('Savings');
+        navigate('Savings');
         break;
       case NotificationType.LOAN_PAYMENT:
-        navigationRef.navigate('Loans');
+        navigate('Loans');
         break;
       default:
-        navigationRef.navigate('Finance');
+        navigate('Finance');
     }
   }
 

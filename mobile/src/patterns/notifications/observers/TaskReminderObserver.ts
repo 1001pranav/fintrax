@@ -6,7 +6,7 @@
 
 import { NotificationObserver } from './NotificationObserver';
 import { NotificationData, NotificationType } from '../types';
-import { navigationRef } from '../../../navigation/NavigationService';
+import { navigate } from '../../../navigation/NavigationService';
 
 export class TaskReminderObserver implements NotificationObserver {
   readonly id = 'task_reminder_observer';
@@ -26,12 +26,12 @@ export class TaskReminderObserver implements NotificationObserver {
 
     // Navigate to task detail screen if task ID is provided
     if (notification.data?.taskId) {
-      navigationRef.navigate('TaskDetail', {
+      navigate('TaskDetail', {
         taskId: notification.data.taskId,
       });
     } else {
       // Navigate to tasks list
-      navigationRef.navigate('Tasks');
+      navigate('Tasks');
     }
   }
 
