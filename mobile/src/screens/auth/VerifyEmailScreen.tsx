@@ -36,7 +36,7 @@ export const VerifyEmailScreen: React.FC = () => {
   const { error: authError } = useAppSelector((state) => state.auth);
 
   const [email] = useState(route.params.email);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);

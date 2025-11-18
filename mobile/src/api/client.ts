@@ -6,7 +6,7 @@
 
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
-import { config } from '../constants/config';
+import { config as appConfig } from '../constants/config';
 import { secureStorage } from '../services/storage';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -34,9 +34,15 @@ class ApiClient {
    * Create axios instance with default configuration
    */
   private static createInstance(): AxiosInstance {
+    console.log('🌐 API Client Configuration:', {
+      baseURL: appConfig.API_URL,
+      timeout: appConfig.API_TIMEOUT,
+      env: process.env.EXPO_PUBLIC_API_URL,
+    });
+
     const instance = axios.create({
-      baseURL: config.API_URL,
-      timeout: config.API_TIMEOUT,
+      baseURL: appConfig.API_URL,
+      timeout: appConfig.API_TIMEOUT,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -45,7 +51,7 @@ class ApiClient {
 
     // Configure retry logic for failed requests
     axiosRetry(instance, {
-      retries: config.SYNC.MAX_RETRIES,
+      retries: appConfig.SYNC.MAX_RETRIES,
       retryDelay: (retryCount) => {
         return retryCount * 1000; // Exponential backoff
       },
@@ -82,21 +88,33 @@ class ApiClient {
     config: InternalAxiosRequestConfig
   ): Promise<InternalAxiosRequestConfig> {
     try {
+      console.log('📡 Making request to:', {
+        baseURL: config.baseURL,
+        url: config.url,
+        fullURL: `${config.baseURL}${config.url}`,
+        method: config.method,
+      });
+
       // Check network connectivity
       const netInfo = await NetInfo.fetch();
+      console.log('📶 Network status:', {
+        isConnected: netInfo.isConnected,
+        type: netInfo.type,
+      });
+
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
       // Add auth token if available
-      // @ts-expect-error - STORAGE_KEYS exists but type definition is incomplete
-      const token = await secureStorage.getSecure(config.STORAGE_KEYS.AUTH_TOKEN);
+      const token = await secureStorage.getSecure(appConfig.STORAGE_KEYS.AUTH_TOKEN);
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
 
       return config;
     } catch (error) {
+      console.error('❌ Request interceptor error:', error);
       return Promise.reject(error);
     }
   }
@@ -109,8 +127,12 @@ class ApiClient {
       _retry?: boolean;
     };
 
-    // Handle 401 Unauthorized - token expired
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Skip token refresh for auth endpoints (login, register, etc.)
+    const authEndpoints = ['/user/login', '/user/register', '/user/verify-email', '/user/forgot-password', '/user/reset-password'];
+    const isAuthEndpoint = authEndpoints.some(endpoint => originalRequest.url?.includes(endpoint));
+
+    // Handle 401 Unauthorized - token expired (but not for auth endpoints)
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (this.isRefreshing) {
         // Queue this request while token is being refreshed
         return new Promise((resolve, reject) => {
@@ -133,7 +155,7 @@ class ApiClient {
       try {
         // Try to refresh token
         const refreshToken = await secureStorage.getSecure(
-          config.STORAGE_KEYS.REFRESH_TOKEN
+          appConfig.STORAGE_KEYS.REFRESH_TOKEN
         );
 
         if (!refreshToken) {
@@ -141,7 +163,7 @@ class ApiClient {
         }
 
         const response = await axios.post(
-          `${config.API_URL}/user/refresh`,
+          `${appConfig.API_URL}/user/refresh`,
           { refreshToken }
         );
 
@@ -149,7 +171,7 @@ class ApiClient {
 
         // Store new token
         await secureStorage.setSecure(
-          config.STORAGE_KEYS.AUTH_TOKEN,
+          appConfig.STORAGE_KEYS.AUTH_TOKEN,
           accessToken
         );
 
@@ -166,9 +188,9 @@ class ApiClient {
         this.processQueue(refreshError, null);
 
         // Clear auth data and redirect to login
-        await secureStorage.deleteSecure(config.STORAGE_KEYS.AUTH_TOKEN);
-        await secureStorage.deleteSecure(config.STORAGE_KEYS.REFRESH_TOKEN);
-        await secureStorage.deleteSecure(config.STORAGE_KEYS.USER_DATA);
+        await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.AUTH_TOKEN);
+        await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.REFRESH_TOKEN);
+        await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.USER_DATA);
 
         // Emit logout event (will be handled by navigation)
         // This is where you'd dispatch a Redux action or emit an event

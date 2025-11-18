@@ -16,13 +16,13 @@ export const config = {
 
   // Storage Keys
   STORAGE_KEYS: {
-    AUTH_TOKEN: '@fintrax:auth_token',
-    REFRESH_TOKEN: '@fintrax:refresh_token',
-    USER_DATA: '@fintrax:user_data',
-    REMEMBER_ME: '@fintrax:remember_me',
-    APP_SETTINGS: '@fintrax:app_settings',
-    SYNC_QUEUE: '@fintrax:sync_queue',
-    LAST_SYNC: '@fintrax:last_sync',
+    AUTH_TOKEN: 'fintrax.auth_token',
+    REFRESH_TOKEN: 'fintrax.refresh_token',
+    USER_DATA: 'fintrax.user_data',
+    REMEMBER_ME: 'fintrax.remember_me',
+    APP_SETTINGS: 'fintrax.app_settings',
+    SYNC_QUEUE: 'fintrax.sync_queue',
+    LAST_SYNC: 'fintrax.last_sync',
   },
 
   // Sync Configuration

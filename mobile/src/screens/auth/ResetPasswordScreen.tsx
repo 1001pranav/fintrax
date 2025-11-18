@@ -32,7 +32,7 @@ export const ResetPasswordScreen: React.FC = () => {
   const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
   const route = useRoute<ResetPasswordScreenRouteProp>();
   const [email] = useState(route.params.email);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otpError, setOtpError] = useState<string | null>(null);

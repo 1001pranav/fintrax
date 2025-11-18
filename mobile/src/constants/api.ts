@@ -5,7 +5,7 @@ import { EXPO_PUBLIC_API_URL } from '@env';
  */
 
 // Base API URL from environment variables
-export const API_BASE_URL = EXPO_PUBLIC_API_URL || 'http://localhost:80/api';
+export const API_BASE_URL = EXPO_PUBLIC_API_URL || 'http://172.19.186.29:80/';
 
 /**
  * API Endpoints
