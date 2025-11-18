@@ -81,6 +81,7 @@ class ApiClient {
       }
 
       // Add auth token if available
+      // @ts-expect-error - STORAGE_KEYS exists but type definition is incomplete
       const token = await secureStorage.getSecure(config.STORAGE_KEYS.AUTH_TOKEN);
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -171,6 +172,7 @@ class ApiClient {
     }
 
     // Extract error message from response
+    // @ts-expect-error - API error responses have message/errors but types are incomplete
     const errorMessage =
       error.response?.data?.message ||
       error.response?.data?.errors?.[0] ||
