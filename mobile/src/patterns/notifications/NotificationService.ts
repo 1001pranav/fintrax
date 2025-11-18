@@ -30,6 +30,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -274,7 +276,7 @@ export class NotificationService {
           vibrate: payload.vibrate,
           badge: payload.badge,
         },
-        trigger: payload.trigger || null,
+        trigger: payload.trigger as Notifications.NotificationTriggerInput || null,
       });
 
       return {
@@ -352,15 +354,15 @@ export class NotificationService {
   ): Notifications.AndroidNotificationPriority {
     switch (priority) {
       case 'min':
-        return Notifications.AndroidImportance.MIN;
+        return Notifications.AndroidNotificationPriority.MIN;
       case 'low':
-        return Notifications.AndroidImportance.LOW;
+        return Notifications.AndroidNotificationPriority.LOW;
       case 'high':
-        return Notifications.AndroidImportance.HIGH;
+        return Notifications.AndroidNotificationPriority.HIGH;
       case 'max':
-        return Notifications.AndroidImportance.MAX;
+        return Notifications.AndroidNotificationPriority.MAX;
       default:
-        return Notifications.AndroidImportance.DEFAULT;
+        return Notifications.AndroidNotificationPriority.DEFAULT;
     }
   }
 

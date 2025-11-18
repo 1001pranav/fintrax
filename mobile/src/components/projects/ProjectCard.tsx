@@ -57,7 +57,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <Ionicons
           name="chevron-forward"
           size={20}
-          color={colors.text.secondary}
+          color={colors.textSecondary}
         />
       </View>
 
@@ -90,7 +90,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           <Ionicons
             name="list-outline"
             size={16}
-            color={colors.text.secondary}
+            color={colors.textSecondary}
           />
           <Text style={styles.statText}>
             {stats.total} {stats.total === 1 ? 'task' : 'tasks'}
@@ -100,7 +100,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           <Ionicons
             name="checkmark-circle-outline"
             size={16}
-            color={colors.success.main}
+            color={colors.success}
           />
           <Text style={styles.statText}>
             {stats.completed} completed
@@ -111,7 +111,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       {/* Sync Status Indicator */}
       {project.syncStatus === 'pending' && (
         <View style={styles.syncBadge}>
-          <Ionicons name="cloud-upload-outline" size={12} color={colors.primary.main} />
+          <Ionicons name="cloud-upload-outline" size={12} color={colors.primary} />
         </View>
       )}
     </TouchableOpacity>
@@ -120,7 +120,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background.paper,
+    backgroundColor: colors.background,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -146,11 +146,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: colors.text,
   },
   description: {
     fontSize: 14,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
     marginBottom: spacing.md,
     lineHeight: 20,
   },
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   progressBackground: {
     flex: 1,
     height: 8,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.backgroundSecondary,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.text.secondary,
+    color: colors.textSecondary,
     marginLeft: spacing.sm,
     minWidth: 35,
     textAlign: 'right',
@@ -189,13 +189,13 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 12,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
   },
   syncBadge: {
     position: 'absolute',
     top: spacing.sm,
     right: spacing.sm,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.backgroundSecondary,
     borderRadius: 12,
     padding: 4,
   },

@@ -11,14 +11,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   ViewStyle,
-} from 'react';
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useAnimatedStyle,
   withSpring,
   interpolateColor,
 } from 'react-native-reanimated';
-import { Task } from '../../constants/types';
+import { Task, TaskPriority } from '../../constants/types';
 import { colors, spacing } from '../../theme';
 
 interface KanbanColumnProps {
@@ -60,16 +60,16 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
             styles.priorityBadge,
             {
               backgroundColor:
-                item.priority === '1'
-                  ? colors.error.light
-                  : item.priority === '2'
-                  ? colors.warning.light
-                  : colors.success.light,
+                item.priority === TaskPriority.HIGH || item.priority === TaskPriority.URGENT
+                  ? colors.errorLight
+                  : item.priority === TaskPriority.MEDIUM
+                  ? colors.warningLight
+                  : colors.successLight,
             },
           ]}
         >
           <Text style={styles.priorityText}>
-            {item.priority === '1' ? 'High' : item.priority === '2' ? 'Med' : 'Low'}
+            {item.priority === TaskPriority.HIGH || item.priority === TaskPriority.URGENT ? 'High' : item.priority === TaskPriority.MEDIUM ? 'Med' : 'Low'}
           </Text>
         </View>
         {item.dueDate && (
@@ -77,7 +77,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
             <Ionicons
               name="calendar-outline"
               size={12}
-              color={colors.text.secondary}
+              color={colors.textSecondary}
             />
             <Text style={styles.dueDateText}>
               {new Date(item.dueDate).toLocaleDateString('en-US', {
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   container: {
     width: 280,
     marginRight: spacing.md,
-    backgroundColor: colors.background.paper,
+    backgroundColor: colors.background,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: colors.text,
   },
   badge: {
     minWidth: 24,
@@ -159,13 +159,13 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.common.white,
+    color: colors.white,
   },
   list: {
     padding: spacing.md,
   },
   taskCard: {
-    backgroundColor: colors.background.default,
+    backgroundColor: colors.background,
     borderRadius: 8,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -179,12 +179,12 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
   taskDescription: {
     fontSize: 12,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   taskFooter: {
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   priorityText: {
     fontSize: 10,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: colors.text,
   },
   dueDate: {
     flexDirection: 'row',
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   dueDateText: {
     fontSize: 11,
-    color: colors.text.secondary,
+    color: colors.textSecondary,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -217,6 +217,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    color: colors.text.disabled,
+    color: colors.textLight,
   },
 });
