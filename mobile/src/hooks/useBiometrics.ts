@@ -7,98 +7,137 @@ import { useState, useEffect, useCallback } from 'react';
 import { authManager } from '../services';
 import * as LocalAuthentication from 'expo-local-authentication';
 
+interface AuthResult {
+  success: boolean;
+  error?: string;
+}
+
+const MAX_RETRY_ATTEMPTS = 3;
+
 export const useBiometrics = () => {
-  const [isAvailable, setIsAvailable] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const [supportedTypes, setSupportedTypes] = useState<
     LocalAuthentication.AuthenticationType[]
   >([]);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [retryAttempts, setRetryAttempts] = useState(0);
+  const [biometricType, setBiometricType] = useState('Biometric');
 
   // Check availability on mount
   useEffect(() => {
     const checkAvailability = async () => {
-      const available = await authManager.isBiometricAvailable();
-      setIsAvailable(available);
+      setIsLoading(true);
+      try {
+        const available = await authManager.isBiometricAvailable();
+        setIsSupported(available);
 
-      const enabled = await authManager.isBiometricsEnabled();
-      setIsEnabled(enabled);
+        const enabled = await authManager.isBiometricsEnabled();
+        setIsEnabled(enabled);
 
-      const types = await authManager.getSupportedBiometrics();
-      setSupportedTypes(types);
+        const types = await authManager.getSupportedBiometrics();
+        setSupportedTypes(types);
+
+        // Determine biometric type name
+        if (
+          types.includes(
+            LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
+          )
+        ) {
+          setBiometricType('Face ID');
+        } else if (
+          types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)
+        ) {
+          setBiometricType('Touch ID / Fingerprint');
+        } else if (
+          types.includes(LocalAuthentication.AuthenticationType.IRIS)
+        ) {
+          setBiometricType('Iris');
+        } else {
+          setBiometricType('Biometric');
+        }
+      } catch (error) {
+        console.error('Error checking biometric availability:', error);
+        setIsSupported(false);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     checkAvailability();
   }, []);
 
   // Authenticate with biometrics
-  const authenticate = useCallback(async (): Promise<boolean> => {
-    if (!isAvailable) return false;
+  const authenticate = useCallback(async (): Promise<AuthResult> => {
+    if (!isSupported) {
+      return {
+        success: false,
+        error: 'Biometric authentication is not available',
+      };
+    }
 
-    setIsAuthenticating(true);
     try {
       const success = await authManager.authenticateWithBiometrics();
-      return success;
+
+      if (success) {
+        setRetryAttempts(0);
+        return { success: true };
+      } else {
+        setRetryAttempts((prev) => prev + 1);
+        const remaining = MAX_RETRY_ATTEMPTS - (retryAttempts + 1);
+
+        if (remaining <= 0) {
+          return {
+            success: false,
+            error: 'Maximum retry attempts reached. Please use password.',
+          };
+        }
+
+        return {
+          success: false,
+          error: `Authentication failed. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`,
+        };
+      }
     } catch (error) {
-      console.error('Biometric authentication failed:', error);
-      return false;
-    } finally {
-      setIsAuthenticating(false);
+      setRetryAttempts((prev) => prev + 1);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Authentication failed',
+      };
     }
-  }, [isAvailable]);
+  }, [isSupported, retryAttempts]);
 
   // Enable biometrics
-  const enable = useCallback(async (): Promise<boolean> => {
-    if (!isAvailable) return false;
+  const enableBiometric = useCallback(async (): Promise<void> => {
+    if (!isSupported) {
+      throw new Error('Biometric authentication is not available');
+    }
 
     const success = await authManager.enableBiometrics();
     setIsEnabled(success);
-    return success;
-  }, [isAvailable]);
+    setRetryAttempts(0);
+  }, [isSupported]);
 
   // Disable biometrics
-  const disable = useCallback(async () => {
+  const disableBiometric = useCallback(async (): Promise<void> => {
     await authManager.disableBiometrics();
     setIsEnabled(false);
+    setRetryAttempts(0);
   }, []);
 
-  // Get biometric type name for display
-  const getBiometricTypeName = useCallback((): string => {
-    if (!isAvailable) return 'None';
-
-    if (
-      supportedTypes.includes(
-        LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
-      )
-    ) {
-      return 'Face ID';
-    }
-
-    if (
-      supportedTypes.includes(
-        LocalAuthentication.AuthenticationType.FINGERPRINT
-      )
-    ) {
-      return 'Touch ID / Fingerprint';
-    }
-
-    if (
-      supportedTypes.includes(LocalAuthentication.AuthenticationType.IRIS)
-    ) {
-      return 'Iris';
-    }
-
-    return 'Biometric';
-  }, [supportedTypes, isAvailable]);
+  // Calculate remaining attempts
+  const remainingAttempts = Math.max(0, MAX_RETRY_ATTEMPTS - retryAttempts);
 
   return {
-    isAvailable,
+    isSupported,
     isEnabled,
     supportedTypes,
-    isAuthenticating,
+    isLoading,
+    biometricType,
+    retryAttempts,
+    remainingAttempts,
     authenticate,
-    enable,
-    disable,
-    getBiometricTypeName,
+    enableBiometric,
+    disableBiometric,
   };
 };
