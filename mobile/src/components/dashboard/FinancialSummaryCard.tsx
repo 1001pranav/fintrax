@@ -56,7 +56,7 @@ export const FinancialSummaryCard: React.FC<FinancialSummaryCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFFF0',
     margin: 16,
     padding: 20,
     borderRadius: 12,
