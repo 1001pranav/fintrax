@@ -4,14 +4,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  RefreshControl,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../hooks';
@@ -74,9 +68,7 @@ export const ProjectsScreen: React.FC = () => {
     <View style={styles.emptyContainer}>
       <Ionicons name="folder-outline" size={64} color={colors.textLight} />
       <Text style={styles.emptyTitle}>No Projects</Text>
-      <Text style={styles.emptyText}>
-        Create your first project to organize your tasks
-      </Text>
+      <Text style={styles.emptyText}>Create your first project to organize your tasks</Text>
       <TouchableOpacity style={styles.emptyButton} onPress={handleAddProject}>
         <Text style={styles.emptyButtonText}>Create Project</Text>
       </TouchableOpacity>
@@ -89,43 +81,26 @@ export const ProjectsScreen: React.FC = () => {
         style={[styles.filterButton, filter === 'all' && styles.filterButtonActive]}
         onPress={() => setFilter('all')}
       >
-        <Text
-          style={[
-            styles.filterButtonText,
-            filter === 'all' && styles.filterButtonTextActive,
-          ]}
-        >
+        <Text style={[styles.filterButtonText, filter === 'all' && styles.filterButtonTextActive]}>
           All
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[
-          styles.filterButton,
-          filter === 'active' && styles.filterButtonActive,
-        ]}
+        style={[styles.filterButton, filter === 'active' && styles.filterButtonActive]}
         onPress={() => setFilter('active')}
       >
         <Text
-          style={[
-            styles.filterButtonText,
-            filter === 'active' && styles.filterButtonTextActive,
-          ]}
+          style={[styles.filterButtonText, filter === 'active' && styles.filterButtonTextActive]}
         >
           Active
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[
-          styles.filterButton,
-          filter === 'completed' && styles.filterButtonActive,
-        ]}
+        style={[styles.filterButton, filter === 'completed' && styles.filterButtonActive]}
         onPress={() => setFilter('completed')}
       >
         <Text
-          style={[
-            styles.filterButtonText,
-            filter === 'completed' && styles.filterButtonTextActive,
-          ]}
+          style={[styles.filterButtonText, filter === 'completed' && styles.filterButtonTextActive]}
         >
           Completed
         </Text>
@@ -136,7 +111,7 @@ export const ProjectsScreen: React.FC = () => {
   const filteredProjects = filterProjects();
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Projects</Text>
@@ -159,10 +134,7 @@ export const ProjectsScreen: React.FC = () => {
       <FlatList
         data={filteredProjects}
         renderItem={({ item }) => (
-          <ProjectCard
-            project={item}
-            onPress={() => handleProjectPress(item)}
-          />
+          <ProjectCard project={item} onPress={() => handleProjectPress(item)} />
         )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
@@ -182,7 +154,7 @@ export const ProjectsScreen: React.FC = () => {
           <Ionicons name="add" size={28} color={colors.white} />
         </TouchableOpacity>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

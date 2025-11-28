@@ -4,13 +4,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TransactionType } from '../../constants/types';
 import { ALL_CATEGORIES } from '../../constants/financeCategories';
@@ -36,9 +30,7 @@ export const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     onFilterChange({ ...filters, type });
   };
 
-  const handleDateRangeChange = (
-    dateRange: 'all' | 'today' | 'week' | 'month' | 'custom'
-  ) => {
+  const handleDateRangeChange = (dateRange: 'all' | 'today' | 'week' | 'month' | 'custom') => {
     onFilterChange({ ...filters, dateRange });
   };
 
@@ -50,9 +42,7 @@ export const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
   };
 
   const hasActiveFilters =
-    filters.type !== 'all' ||
-    filters.categories.length > 0 ||
-    filters.dateRange !== 'all';
+    filters.type !== 'all' || filters.categories.length > 0 || filters.dateRange !== 'all';
 
   return (
     <View style={styles.container}>
@@ -131,11 +121,7 @@ export const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
               <Ionicons
                 name={category.icon as any}
                 size={16}
-                color={
-                  filters.categories.includes(category.id)
-                    ? category.color
-                    : '#6B7280'
-                }
+                color={filters.categories.includes(category.id) ? category.color : '#6B7280'}
               />
               <Text
                 style={[
@@ -189,14 +175,7 @@ const FilterChip: React.FC<FilterChipProps> = ({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <Text
-        style={[
-          styles.chipText,
-          isSelected && { color, fontWeight: '600' },
-        ]}
-      >
-        {label}
-      </Text>
+      <Text style={[styles.chipText, isSelected && { color, fontWeight: '600' }]}>{label}</Text>
     </TouchableOpacity>
   );
 };

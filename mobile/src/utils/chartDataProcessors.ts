@@ -151,9 +151,7 @@ export const filterTransactionsByDateRange = (
   const cutoffDate = new Date();
   cutoffDate.setMonth(cutoffDate.getMonth() - rangeInMonths);
 
-  return transactions.filter(
-    (transaction) => new Date(transaction.date) >= cutoffDate
-  );
+  return transactions.filter((transaction) => new Date(transaction.date) >= cutoffDate);
 };
 
 /**

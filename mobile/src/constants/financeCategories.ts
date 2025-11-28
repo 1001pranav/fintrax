@@ -139,10 +139,7 @@ export const EXPENSE_CATEGORIES: FinanceCategory[] = [
 ];
 
 // All Categories
-export const ALL_CATEGORIES: FinanceCategory[] = [
-  ...INCOME_CATEGORIES,
-  ...EXPENSE_CATEGORIES,
-];
+export const ALL_CATEGORIES: FinanceCategory[] = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
 // Helper Functions
 export const getCategoryById = (id: string): FinanceCategory | undefined => {

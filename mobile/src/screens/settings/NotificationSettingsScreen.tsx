@@ -5,25 +5,14 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Switch,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNotifications } from '../../hooks/useNotifications';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const NotificationSettingsScreen: React.FC = () => {
-  const {
-    hasPermission,
-    scheduledNotifications,
-    cancelAllNotifications,
-    requestPermissions,
-  } = useNotifications();
+  const { hasPermission, scheduledNotifications, cancelAllNotifications, requestPermissions } =
+    useNotifications();
 
   // Local state for notification preferences
   const [taskReminders, setTaskReminders] = useState(true);
@@ -64,214 +53,185 @@ export const NotificationSettingsScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Notification Permission Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notification Permission</Text>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
+        {/* Notification Permission Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Notification Permission</Text>
 
-        {!hasPermission ? (
-          <View style={styles.card}>
-            <Icon
-              name="bell-off"
-              size={48}
-              color="#F59E0B"
-              style={styles.centerIcon}
-            />
-            <Text style={styles.warningText}>Notifications are disabled</Text>
-            <Text style={styles.warningSubtext}>
-              Enable notifications to receive important alerts about your tasks and
-              finances.
-            </Text>
-            <TouchableOpacity
-              style={styles.enableButton}
-              onPress={handleEnableNotifications}
-              activeOpacity={0.7}
-            >
-              <Icon name="bell-ring" size={20} color="#FFFFFF" />
-              <Text style={styles.enableButtonText}>Enable Notifications</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.card}>
-            <View style={styles.row}>
-              <Icon
-                name="bell-check"
-                size={24}
-                color="#10B981"
-                style={styles.settingIcon}
-              />
-              <Text style={styles.successText}>Notifications are enabled</Text>
-            </View>
-          </View>
-        )}
-      </View>
-
-      {/* Notification Types Section */}
-      {hasPermission && (
-        <>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Notification Types</Text>
-
+          {!hasPermission ? (
             <View style={styles.card}>
-              <View style={styles.settingItem}>
-                <View style={styles.iconTextContainer}>
-                  <Icon
-                    name="checkbox-marked-circle"
-                    size={24}
-                    color="#4F46E5"
-                    style={styles.settingIcon}
-                  />
-                  <View style={styles.textContainer}>
-                    <Text style={styles.settingLabel}>Task Reminders</Text>
-                    <Text style={styles.settingDescription}>
-                      Get reminded about upcoming and overdue tasks
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={taskReminders}
-                  onValueChange={setTaskReminders}
-                  trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
-                  thumbColor={taskReminders ? '#4F46E5' : '#F3F4F6'}
-                  ios_backgroundColor="#D1D5DB"
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingItem}>
-                <View style={styles.iconTextContainer}>
-                  <Icon
-                    name="cash"
-                    size={24}
-                    color="#4F46E5"
-                    style={styles.settingIcon}
-                  />
-                  <View style={styles.textContainer}>
-                    <Text style={styles.settingLabel}>Finance Alerts</Text>
-                    <Text style={styles.settingDescription}>
-                      Transaction confirmations and financial updates
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={financeAlerts}
-                  onValueChange={setFinanceAlerts}
-                  trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
-                  thumbColor={financeAlerts ? '#4F46E5' : '#F3F4F6'}
-                  ios_backgroundColor="#D1D5DB"
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingItem}>
-                <View style={styles.iconTextContainer}>
-                  <Icon
-                    name="chart-line"
-                    size={24}
-                    color="#4F46E5"
-                    style={styles.settingIcon}
-                  />
-                  <View style={styles.textContainer}>
-                    <Text style={styles.settingLabel}>Budget Alerts</Text>
-                    <Text style={styles.settingDescription}>
-                      Notifications when approaching budget limits
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={budgetAlerts}
-                  onValueChange={setBudgetAlerts}
-                  trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
-                  thumbColor={budgetAlerts ? '#4F46E5' : '#F3F4F6'}
-                  ios_backgroundColor="#D1D5DB"
-                />
-              </View>
+              <Icon name="bell-off" size={48} color="#F59E0B" style={styles.centerIcon} />
+              <Text style={styles.warningText}>Notifications are disabled</Text>
+              <Text style={styles.warningSubtext}>
+                Enable notifications to receive important alerts about your tasks and finances.
+              </Text>
+              <TouchableOpacity
+                style={styles.enableButton}
+                onPress={handleEnableNotifications}
+                activeOpacity={0.7}
+              >
+                <Icon name="bell-ring" size={20} color="#FFFFFF" />
+                <Text style={styles.enableButtonText}>Enable Notifications</Text>
+              </TouchableOpacity>
             </View>
-          </View>
-
-          {/* Notification Settings Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Notification Settings</Text>
-
-            <View style={styles.card}>
-              <View style={styles.settingItem}>
-                <View style={styles.iconTextContainer}>
-                  <Icon
-                    name="volume-high"
-                    size={24}
-                    color="#4F46E5"
-                    style={styles.settingIcon}
-                  />
-                  <Text style={styles.settingLabel}>Sound</Text>
-                </View>
-                <Switch
-                  value={soundEnabled}
-                  onValueChange={setSoundEnabled}
-                  trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
-                  thumbColor={soundEnabled ? '#4F46E5' : '#F3F4F6'}
-                  ios_backgroundColor="#D1D5DB"
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingItem}>
-                <View style={styles.iconTextContainer}>
-                  <Icon
-                    name="vibrate"
-                    size={24}
-                    color="#4F46E5"
-                    style={styles.settingIcon}
-                  />
-                  <Text style={styles.settingLabel}>Vibration</Text>
-                </View>
-                <Switch
-                  value={vibrationEnabled}
-                  onValueChange={setVibrationEnabled}
-                  trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
-                  thumbColor={vibrationEnabled ? '#4F46E5' : '#F3F4F6'}
-                  ios_backgroundColor="#D1D5DB"
-                />
-              </View>
-            </View>
-          </View>
-
-          {/* Scheduled Notifications Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Scheduled Notifications</Text>
-
+          ) : (
             <View style={styles.card}>
               <View style={styles.row}>
-                <Text style={styles.infoLabel}>Active Notifications:</Text>
-                <Text style={styles.infoValue}>{scheduledNotifications.length}</Text>
+                <Icon name="bell-check" size={24} color="#10B981" style={styles.settingIcon} />
+                <Text style={styles.successText}>Notifications are enabled</Text>
               </View>
-
-              {scheduledNotifications.length > 0 && (
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={handleClearAllNotifications}
-                  activeOpacity={0.7}
-                >
-                  <Icon name="delete-sweep" size={20} color="#EF4444" />
-                  <Text style={styles.clearButtonText}>Clear All</Text>
-                </TouchableOpacity>
-              )}
             </View>
-          </View>
-        </>
-      )}
+          )}
+        </View>
 
-      {/* Info Section */}
-      <View style={styles.infoSection}>
-        <Icon name="information" size={20} color="#6B7280" />
-        <Text style={styles.infoText}>
-          Notifications help you stay on top of your tasks and finances. You can
-          customize which notifications you receive.
-        </Text>
-      </View>
-    </ScrollView>
+        {/* Notification Types Section */}
+        {hasPermission && (
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Notification Types</Text>
+
+              <View style={styles.card}>
+                <View style={styles.settingItem}>
+                  <View style={styles.iconTextContainer}>
+                    <Icon
+                      name="checkbox-marked-circle"
+                      size={24}
+                      color="#4F46E5"
+                      style={styles.settingIcon}
+                    />
+                    <View style={styles.textContainer}>
+                      <Text style={styles.settingLabel}>Task Reminders</Text>
+                      <Text style={styles.settingDescription}>
+                        Get reminded about upcoming and overdue tasks
+                      </Text>
+                    </View>
+                  </View>
+                  <Switch
+                    value={taskReminders}
+                    onValueChange={setTaskReminders}
+                    trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                    thumbColor={taskReminders ? '#4F46E5' : '#F3F4F6'}
+                    ios_backgroundColor="#D1D5DB"
+                  />
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.settingItem}>
+                  <View style={styles.iconTextContainer}>
+                    <Icon name="cash" size={24} color="#4F46E5" style={styles.settingIcon} />
+                    <View style={styles.textContainer}>
+                      <Text style={styles.settingLabel}>Finance Alerts</Text>
+                      <Text style={styles.settingDescription}>
+                        Transaction confirmations and financial updates
+                      </Text>
+                    </View>
+                  </View>
+                  <Switch
+                    value={financeAlerts}
+                    onValueChange={setFinanceAlerts}
+                    trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                    thumbColor={financeAlerts ? '#4F46E5' : '#F3F4F6'}
+                    ios_backgroundColor="#D1D5DB"
+                  />
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.settingItem}>
+                  <View style={styles.iconTextContainer}>
+                    <Icon name="chart-line" size={24} color="#4F46E5" style={styles.settingIcon} />
+                    <View style={styles.textContainer}>
+                      <Text style={styles.settingLabel}>Budget Alerts</Text>
+                      <Text style={styles.settingDescription}>
+                        Notifications when approaching budget limits
+                      </Text>
+                    </View>
+                  </View>
+                  <Switch
+                    value={budgetAlerts}
+                    onValueChange={setBudgetAlerts}
+                    trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                    thumbColor={budgetAlerts ? '#4F46E5' : '#F3F4F6'}
+                    ios_backgroundColor="#D1D5DB"
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/* Notification Settings Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Notification Settings</Text>
+
+              <View style={styles.card}>
+                <View style={styles.settingItem}>
+                  <View style={styles.iconTextContainer}>
+                    <Icon name="volume-high" size={24} color="#4F46E5" style={styles.settingIcon} />
+                    <Text style={styles.settingLabel}>Sound</Text>
+                  </View>
+                  <Switch
+                    value={soundEnabled}
+                    onValueChange={setSoundEnabled}
+                    trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                    thumbColor={soundEnabled ? '#4F46E5' : '#F3F4F6'}
+                    ios_backgroundColor="#D1D5DB"
+                  />
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.settingItem}>
+                  <View style={styles.iconTextContainer}>
+                    <Icon name="vibrate" size={24} color="#4F46E5" style={styles.settingIcon} />
+                    <Text style={styles.settingLabel}>Vibration</Text>
+                  </View>
+                  <Switch
+                    value={vibrationEnabled}
+                    onValueChange={setVibrationEnabled}
+                    trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                    thumbColor={vibrationEnabled ? '#4F46E5' : '#F3F4F6'}
+                    ios_backgroundColor="#D1D5DB"
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/* Scheduled Notifications Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Scheduled Notifications</Text>
+
+              <View style={styles.card}>
+                <View style={styles.row}>
+                  <Text style={styles.infoLabel}>Active Notifications:</Text>
+                  <Text style={styles.infoValue}>{scheduledNotifications.length}</Text>
+                </View>
+
+                {scheduledNotifications.length > 0 && (
+                  <TouchableOpacity
+                    style={styles.clearButton}
+                    onPress={handleClearAllNotifications}
+                    activeOpacity={0.7}
+                  >
+                    <Icon name="delete-sweep" size={20} color="#EF4444" />
+                    <Text style={styles.clearButtonText}>Clear All</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          </>
+        )}
+
+        {/* Info Section */}
+        <View style={styles.infoSection}>
+          <Icon name="information" size={20} color="#6B7280" />
+          <Text style={styles.infoText}>
+            Notifications help you stay on top of your tasks and finances. You can customize which
+            notifications you receive.
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -279,6 +239,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  flex: {
+    flex: 1,
   },
   content: {
     padding: 16,

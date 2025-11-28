@@ -24,10 +24,7 @@ export const TasksNavigator = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="TaskList"
-        component={TaskListScreen}
-      />
+      <Stack.Screen name="TaskList" component={TaskListScreen} />
       <Stack.Screen
         name="TaskDetail"
         component={TaskDetailScreen}

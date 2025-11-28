@@ -184,9 +184,17 @@ const authSlice = createSlice({
     });
 
     // Check Auth
+    builder.addCase(checkAuth.pending, (state) => {
+      state.isLoading = true;
+    });
     builder.addCase(checkAuth.fulfilled, (state, action) => {
+      state.isLoading = false;
       state.user = action.payload;
       state.isAuthenticated = action.payload !== null;
+    });
+    builder.addCase(checkAuth.rejected, (state) => {
+      state.isLoading = false;
+      state.isAuthenticated = false;
     });
   },
 });

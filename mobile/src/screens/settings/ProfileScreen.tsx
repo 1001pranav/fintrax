@@ -15,6 +15,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ProfileController } from '../../controllers/ProfileController';
 import { UserProfileModel, UserProfile } from '../../models/UserProfileModel';
@@ -123,148 +124,147 @@ export const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={dynamicStyles.container} contentContainerStyle={styles.content}>
-      {/* Profile Header */}
-      <View style={[dynamicStyles.card, styles.headerCard]}>
-        <View style={styles.avatarContainer}>
-          {profile?.avatar ? (
-            <Image source={{ uri: profile.avatar }} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary }]}>
-              <Text style={styles.avatarText}>{controller.getUserInitials()}</Text>
-            </View>
-          )}
-          <TouchableOpacity style={styles.avatarButton}>
-            <Icon name="camera" size={20} color="#FFFFFF" />
+    <SafeAreaView style={dynamicStyles.container} edges={['top', 'bottom']}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
+        {/* Profile Header */}
+        <View style={[dynamicStyles.card, styles.headerCard]}>
+          <View style={styles.avatarContainer}>
+            {profile?.avatar ? (
+              <Image source={{ uri: profile.avatar }} style={styles.avatar} />
+            ) : (
+              <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary }]}>
+                <Text style={styles.avatarText}>{controller.getUserInitials()}</Text>
+              </View>
+            )}
+            <TouchableOpacity style={styles.avatarButton}>
+              <Icon name="camera" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.username, { color: colors.text }]}>
+            {profile?.username || 'Guest'}
+          </Text>
+          <Text style={[styles.email, { color: colors.textSecondary }]}>
+            {profile?.email || 'No email set'}
+          </Text>
+        </View>
+
+        {/* Profile Information */}
+        <View style={dynamicStyles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>Profile Information</Text>
+            {!isEditing ? (
+              <TouchableOpacity onPress={() => setIsEditing(true)}>
+                <Icon name="pencil" size={24} color={colors.primary} />
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.editActions}>
+                <TouchableOpacity onPress={handleCancel} style={styles.actionButton}>
+                  <Text style={[styles.actionText, { color: colors.textSecondary }]}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleSave}
+                  disabled={isSaving}
+                  style={styles.actionButton}
+                >
+                  <Text style={[styles.actionText, { color: colors.primary }]}>
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.field}>
+            <Text style={dynamicStyles.label}>Full Name</Text>
+            {isEditing ? (
+              <TextInput
+                style={dynamicStyles.input}
+                value={fullName}
+                onChangeText={setFullName}
+                placeholder="Enter your full name"
+                placeholderTextColor={colors.placeholder}
+              />
+            ) : (
+              <Text style={dynamicStyles.value}>{fullName || 'Not set'}</Text>
+            )}
+          </View>
+
+          <View style={styles.field}>
+            <Text style={dynamicStyles.label}>Email</Text>
+            {isEditing ? (
+              <TextInput
+                style={dynamicStyles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter your email"
+                placeholderTextColor={colors.placeholder}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            ) : (
+              <Text style={dynamicStyles.value}>{email || 'Not set'}</Text>
+            )}
+          </View>
+
+          <View style={styles.field}>
+            <Text style={dynamicStyles.label}>Phone Number</Text>
+            {isEditing ? (
+              <TextInput
+                style={dynamicStyles.input}
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholder="Enter your phone number"
+                placeholderTextColor={colors.placeholder}
+                keyboardType="phone-pad"
+              />
+            ) : (
+              <Text style={dynamicStyles.value}>{phoneNumber || 'Not set'}</Text>
+            )}
+          </View>
+
+          <View style={styles.field}>
+            <Text style={dynamicStyles.label}>Username</Text>
+            <Text style={dynamicStyles.value}>{profile?.username || 'Not set'}</Text>
+          </View>
+
+          <View style={styles.field}>
+            <Text style={dynamicStyles.label}>Member Since</Text>
+            <Text style={dynamicStyles.value}>
+              {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'Unknown'}
+            </Text>
+          </View>
+        </View>
+
+        {/* Danger Zone */}
+        <View style={[dynamicStyles.card, styles.dangerCard]}>
+          <Text style={[styles.cardTitle, { color: colors.error }]}>Danger Zone</Text>
+          <TouchableOpacity
+            style={[styles.dangerButton, { borderColor: colors.error }]}
+            onPress={() => {
+              Alert.alert(
+                'Delete Account',
+                'Are you sure you want to delete your account? This action cannot be undone.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Delete', style: 'destructive' },
+                ]
+              );
+            }}
+          >
+            <Icon name="delete" size={20} color={colors.error} />
+            <Text style={[styles.dangerButtonText, { color: colors.error }]}>Delete Account</Text>
           </TouchableOpacity>
         </View>
-        <Text style={[styles.username, { color: colors.text }]}>
-          {profile?.username || 'Guest'}
-        </Text>
-        <Text style={[styles.email, { color: colors.textSecondary }]}>
-          {profile?.email || 'No email set'}
-        </Text>
-      </View>
-
-      {/* Profile Information */}
-      <View style={dynamicStyles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>Profile Information</Text>
-          {!isEditing ? (
-            <TouchableOpacity onPress={() => setIsEditing(true)}>
-              <Icon name="pencil" size={24} color={colors.primary} />
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.editActions}>
-              <TouchableOpacity onPress={handleCancel} style={styles.actionButton}>
-                <Text style={[styles.actionText, { color: colors.textSecondary }]}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleSave}
-                disabled={isSaving}
-                style={styles.actionButton}
-              >
-                <Text style={[styles.actionText, { color: colors.primary }]}>
-                  {isSaving ? 'Saving...' : 'Save'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.field}>
-          <Text style={dynamicStyles.label}>Full Name</Text>
-          {isEditing ? (
-            <TextInput
-              style={dynamicStyles.input}
-              value={fullName}
-              onChangeText={setFullName}
-              placeholder="Enter your full name"
-              placeholderTextColor={colors.placeholder}
-            />
-          ) : (
-            <Text style={dynamicStyles.value}>{fullName || 'Not set'}</Text>
-          )}
-        </View>
-
-        <View style={styles.field}>
-          <Text style={dynamicStyles.label}>Email</Text>
-          {isEditing ? (
-            <TextInput
-              style={dynamicStyles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-              placeholderTextColor={colors.placeholder}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          ) : (
-            <Text style={dynamicStyles.value}>{email || 'Not set'}</Text>
-          )}
-        </View>
-
-        <View style={styles.field}>
-          <Text style={dynamicStyles.label}>Phone Number</Text>
-          {isEditing ? (
-            <TextInput
-              style={dynamicStyles.input}
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              placeholder="Enter your phone number"
-              placeholderTextColor={colors.placeholder}
-              keyboardType="phone-pad"
-            />
-          ) : (
-            <Text style={dynamicStyles.value}>{phoneNumber || 'Not set'}</Text>
-          )}
-        </View>
-
-        <View style={styles.field}>
-          <Text style={dynamicStyles.label}>Username</Text>
-          <Text style={dynamicStyles.value}>{profile?.username || 'Not set'}</Text>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={dynamicStyles.label}>Member Since</Text>
-          <Text style={dynamicStyles.value}>
-            {profile?.createdAt
-              ? new Date(profile.createdAt).toLocaleDateString()
-              : 'Unknown'}
-          </Text>
-        </View>
-      </View>
-
-      {/* Danger Zone */}
-      <View style={[dynamicStyles.card, styles.dangerCard]}>
-        <Text style={[styles.cardTitle, { color: colors.error }]}>Danger Zone</Text>
-        <TouchableOpacity
-          style={[styles.dangerButton, { borderColor: colors.error }]}
-          onPress={() => {
-            Alert.alert(
-              'Delete Account',
-              'Are you sure you want to delete your account? This action cannot be undone.',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive' },
-              ]
-            );
-          }}
-        >
-          <Icon name="delete" size={20} color={colors.error} />
-          <Text style={[styles.dangerButtonText, { color: colors.error }]}>
-            Delete Account
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  flex: {
     flex: 1,
   },
   content: {

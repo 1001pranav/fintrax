@@ -14,6 +14,7 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import {
@@ -43,15 +44,11 @@ export const AddTransactionScreen: React.FC = () => {
   const [transactionType, setTransactionType] = useState<TransactionType>(
     existingTransaction?.type || TransactionType.EXPENSE
   );
-  const [amount, setAmount] = useState(
-    existingTransaction?.amount.toString() || ''
-  );
+  const [amount, setAmount] = useState(existingTransaction?.amount.toString() || '');
   const [category, setCategory] = useState(
     existingTransaction?.category || DEFAULT_EXPENSE_CATEGORY.id
   );
-  const [description, setDescription] = useState(
-    existingTransaction?.description || ''
-  );
+  const [description, setDescription] = useState(existingTransaction?.description || '');
   const [date, setDate] = useState(
     existingTransaction?.date || new Date().toISOString().split('T')[0]
   );
@@ -117,154 +114,140 @@ export const AddTransactionScreen: React.FC = () => {
   };
 
   const handleDelete = () => {
-    Alert.alert(
-      'Delete Transaction',
-      'Are you sure you want to delete this transaction?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await dispatch(deleteTransaction(transactionId)).unwrap();
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert(
-                'Error',
-                error.message || 'Failed to delete transaction'
-              );
-            }
-          },
+    Alert.alert('Delete Transaction', 'Are you sure you want to delete this transaction?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await dispatch(deleteTransaction(transactionId)).unwrap();
+            navigation.goBack();
+          } catch (error: any) {
+            Alert.alert('Error', error.message || 'Failed to delete transaction');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.cancelButton}>Cancel</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {isEditing ? 'Edit Transaction' : 'Add Transaction'}
-        </Text>
-        <View style={{ width: 60 }} />
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* Type Toggle */}
-        <View style={styles.typeToggle}>
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              styles.typeButtonLeft,
-              transactionType === TransactionType.INCOME &&
-                styles.typeButtonActive,
-              transactionType === TransactionType.INCOME && {
-                backgroundColor: '#10B981',
-              },
-            ]}
-            onPress={() => handleTypeToggle(TransactionType.INCOME)}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.typeButtonText,
-                transactionType === TransactionType.INCOME &&
-                  styles.typeButtonTextActive,
-              ]}
-            >
-              Income
-            </Text>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.cancelButton}>Cancel</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              styles.typeButtonRight,
-              transactionType === TransactionType.EXPENSE &&
-                styles.typeButtonActive,
-              transactionType === TransactionType.EXPENSE && {
-                backgroundColor: '#EF4444',
-              },
-            ]}
-            onPress={() => handleTypeToggle(TransactionType.EXPENSE)}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.typeButtonText,
-                transactionType === TransactionType.EXPENSE &&
-                  styles.typeButtonTextActive,
-              ]}
-            >
-              Expense
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.headerTitle}>
+            {isEditing ? 'Edit Transaction' : 'Add Transaction'}
+          </Text>
+          <View style={{ width: 60 }} />
         </View>
 
-        {/* Amount Input */}
-        <AmountInput
-          value={amount}
-          onChangeText={setAmount}
-          label="Amount"
-          placeholder="0.00"
-        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Type Toggle */}
+          <View style={styles.typeToggle}>
+            <TouchableOpacity
+              style={[
+                styles.typeButton,
+                styles.typeButtonLeft,
+                transactionType === TransactionType.INCOME && styles.typeButtonActive,
+                transactionType === TransactionType.INCOME && {
+                  backgroundColor: '#10B981',
+                },
+              ]}
+              onPress={() => handleTypeToggle(TransactionType.INCOME)}
+              activeOpacity={0.8}
+            >
+              <Text
+                style={[
+                  styles.typeButtonText,
+                  transactionType === TransactionType.INCOME && styles.typeButtonTextActive,
+                ]}
+              >
+                Income
+              </Text>
+            </TouchableOpacity>
 
-        {/* Category Picker */}
-        <CategoryPicker
-          selectedCategory={category}
-          onSelectCategory={setCategory}
-          transactionType={transactionType}
-        />
+            <TouchableOpacity
+              style={[
+                styles.typeButton,
+                styles.typeButtonRight,
+                transactionType === TransactionType.EXPENSE && styles.typeButtonActive,
+                transactionType === TransactionType.EXPENSE && {
+                  backgroundColor: '#EF4444',
+                },
+              ]}
+              onPress={() => handleTypeToggle(TransactionType.EXPENSE)}
+              activeOpacity={0.8}
+            >
+              <Text
+                style={[
+                  styles.typeButtonText,
+                  transactionType === TransactionType.EXPENSE && styles.typeButtonTextActive,
+                ]}
+              >
+                Expense
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Description */}
-        <InputField
-          label="Description"
-          value={description}
-          onChangeText={setDescription}
-          placeholder="What was this for?"
-          multiline
-          numberOfLines={3}
-        />
+          {/* Amount Input */}
+          <AmountInput value={amount} onChangeText={setAmount} label="Amount" placeholder="0.00" />
 
-        {/* Date */}
-        <InputField
-          label="Date"
-          value={date}
-          onChangeText={setDate}
-          placeholder="YYYY-MM-DD"
-          keyboardType="default"
-        />
-
-        {/* Save Button */}
-        <Button
-          title={isEditing ? 'Update Transaction' : 'Save Transaction'}
-          onPress={handleSave}
-          loading={isLoading}
-          style={styles.saveButton}
-        />
-
-        {/* Delete Button (only when editing) */}
-        {isEditing && (
-          <Button
-            title="Delete Transaction"
-            onPress={handleDelete}
-            variant="secondary"
-            style={styles.deleteButton}
+          {/* Category Picker */}
+          <CategoryPicker
+            selectedCategory={category}
+            onSelectCategory={setCategory}
+            transactionType={transactionType}
           />
-        )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+          {/* Description */}
+          <InputField
+            label="Description"
+            value={description}
+            onChangeText={setDescription}
+            placeholder="What was this for?"
+            multiline
+            numberOfLines={3}
+          />
+
+          {/* Date */}
+          <InputField
+            label="Date"
+            value={date}
+            onChangeText={setDate}
+            placeholder="YYYY-MM-DD"
+            keyboardType="default"
+          />
+
+          {/* Save Button */}
+          <Button
+            title={isEditing ? 'Update Transaction' : 'Save Transaction'}
+            onPress={handleSave}
+            loading={isLoading}
+            style={styles.saveButton}
+          />
+
+          {/* Delete Button (only when editing) */}
+          {isEditing && (
+            <Button
+              title="Delete Transaction"
+              onPress={handleDelete}
+              variant="secondary"
+              style={styles.deleteButton}
+            />
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -272,6 +255,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  flex: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',

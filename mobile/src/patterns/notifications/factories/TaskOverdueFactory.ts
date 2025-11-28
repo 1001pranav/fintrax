@@ -20,9 +20,7 @@ export class TaskOverdueFactory implements NotificationFactory {
 
     // Calculate how long overdue
     const now = new Date();
-    const overdueDays = Math.floor(
-      (now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const overdueDays = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
 
     const notificationTitle = '🚨 Task Overdue';
     const notificationBody =

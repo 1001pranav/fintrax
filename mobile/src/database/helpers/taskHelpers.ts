@@ -49,9 +49,7 @@ export class TaskRepository implements ITaskRepository {
   /**
    * Create a new task
    */
-  async create(
-    taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<Task> {
+  async create(taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Promise<Task> {
     const now = new Date().toISOString();
     const task: Task = {
       ...taskData,
@@ -106,10 +104,7 @@ export class TaskRepository implements ITaskRepository {
    * Get all tasks
    */
   async getAll(includeDeleted = false): Promise<Task[]> {
-    const results = await sqliteService.getAll<any>(
-      this.TABLE_NAME,
-      includeDeleted
-    );
+    const results = await sqliteService.getAll<any>(this.TABLE_NAME, includeDeleted);
     return results.map((r) => this.fromDbFormat(r));
   }
 
@@ -144,10 +139,7 @@ export class TaskRepository implements ITaskRepository {
       ORDER BY updatedAt DESC
     `;
     const searchTerm = `%${query}%`;
-    const results = await sqliteService.query<any>(sql, [
-      searchTerm,
-      searchTerm,
-    ]);
+    const results = await sqliteService.query<any>(sql, [searchTerm, searchTerm]);
     return results.map((r) => this.fromDbFormat(r));
   }
 

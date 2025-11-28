@@ -5,13 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { offlineManager } from '../../services';
 import { colors } from '../../theme';
@@ -20,9 +14,7 @@ interface SyncStatusProps {
   onPress?: () => void;
 }
 
-export const SyncStatusIndicator: React.FC<SyncStatusProps> = ({
-  onPress,
-}) => {
+export const SyncStatusIndicator: React.FC<SyncStatusProps> = ({ onPress }) => {
   const [isOnline, setIsOnline] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -67,9 +59,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusProps> = ({
 
   const getStatusIcon = () => {
     if (!isOnline) {
-      return (
-        <Ionicons name="cloud-offline" size={18} color={colors.textSecondary} />
-      );
+      return <Ionicons name="cloud-offline" size={18} color={colors.textSecondary} />;
     }
 
     if (isSyncing || pendingCount > 0) {
@@ -95,9 +85,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusProps> = ({
     if (lastSyncTime) {
       const time = new Date(lastSyncTime);
       const now = new Date();
-      const diffMinutes = Math.floor(
-        (now.getTime() - time.getTime()) / 60000
-      );
+      const diffMinutes = Math.floor((now.getTime() - time.getTime()) / 60000);
 
       if (diffMinutes < 1) return 'Just now';
       if (diffMinutes < 60) return `${diffMinutes}m ago`;
@@ -109,11 +97,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={handleManualSync}
-      activeOpacity={0.7}
-    >
+    <TouchableOpacity style={styles.container} onPress={handleManualSync} activeOpacity={0.7}>
       <View style={styles.content}>
         {getStatusIcon()}
         <Text style={styles.text}>{getStatusText()}</Text>

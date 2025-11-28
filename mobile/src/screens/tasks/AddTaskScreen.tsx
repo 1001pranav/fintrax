@@ -5,12 +5,12 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -68,7 +68,7 @@ export const AddTaskScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -132,9 +132,7 @@ export const AddTaskScreen = () => {
                   onPress={() => setPriority(option.value)}
                   activeOpacity={0.7}
                 >
-                  <View
-                    style={[styles.priorityDot, { backgroundColor: option.color }]}
-                  />
+                  <View style={[styles.priorityDot, { backgroundColor: option.color }]} />
                   <Text
                     style={[
                       styles.priorityLabel,

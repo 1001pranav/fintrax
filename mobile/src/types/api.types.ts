@@ -85,12 +85,12 @@ export interface RegisterRequest {
 
 export interface VerifyEmailRequest {
   email: string;
-  otp: string;
+  otp: number;
 }
 
 export interface ForgotPasswordRequest {
   email: string;
-  otp: string;
+  otp: number;
   new_password: string;
 }
 

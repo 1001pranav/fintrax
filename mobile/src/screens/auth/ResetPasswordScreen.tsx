@@ -10,6 +10,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -97,6 +98,7 @@ export const ResetPasswordScreen: React.FC = () => {
     }
 
     const otpString = otp.join('');
+    const otpNumber = parseInt(otpString, 10);
 
     try {
       setIsLoading(true);
@@ -104,7 +106,7 @@ export const ResetPasswordScreen: React.FC = () => {
       // Call forgot password API
       await authApi.forgotPassword({
         email,
-        otp: otpString,
+        otp: otpNumber,
         new_password: newPassword,
       });
 
@@ -136,132 +138,134 @@ export const ResetPasswordScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <StatusBar style="dark" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        {/* Back Button */}
-        <TouchableOpacity style={styles.backButton} onPress={handleBackToLogin}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Ionicons name="key-outline" size={48} color={colors.primary} />
-          </View>
-          <Text style={styles.title}>Reset Password</Text>
-          <Text style={styles.subtitle}>
-            Enter the verification code sent to{'\n'}
-            <Text style={styles.emailText}>{email || 'your email'}</Text>
-          </Text>
-        </View>
-
-        {/* OTP Input */}
-        <View style={styles.otpContainer}>
-          <Text style={styles.otpLabel}>Verification Code</Text>
-          <View style={styles.otpInputsContainer}>
-            {otp.map((digit, index) => (
-              <TextInput
-                key={index}
-                ref={(ref) => {
-                  inputRefs.current[index] = ref;
-                }}
-                style={[styles.otpInput, otpError && styles.otpInputError]}
-                value={digit}
-                onChangeText={(value) => handleOtpChange(value, index)}
-                onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
-                keyboardType="number-pad"
-                maxLength={1}
-                selectTextOnFocus
-                editable={!isLoading}
-                testID={`otp-input-${index}`}
-              />
-            ))}
-          </View>
-          {otpError && <Text style={styles.errorText}>{otpError}</Text>}
-        </View>
-
-        {/* Password Inputs */}
-        <View style={styles.form}>
-          <InputField
-            label="New Password"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChangeText={(text) => {
-              setNewPassword(text);
-              setNewPasswordError(null);
-            }}
-            error={newPasswordError}
-            type="password"
-            showPasswordToggle
-            autoCapitalize="none"
-            autoComplete="password-new"
-            leftIcon="lock-closed-outline"
-            editable={!isLoading}
-            testID="new-password-input"
-          />
-
-          {/* Password Strength Indicator */}
-          {newPassword.length > 0 && (
-            <View style={styles.passwordStrengthContainer}>
-              <PasswordStrengthIndicator password={newPassword} />
-            </View>
-          )}
-
-          <InputField
-            label="Confirm New Password"
-            placeholder="Re-enter new password"
-            value={confirmPassword}
-            onChangeText={(text) => {
-              setConfirmPassword(text);
-              setConfirmPasswordError(null);
-            }}
-            error={confirmPasswordError}
-            type="password"
-            showPasswordToggle
-            autoCapitalize="none"
-            autoComplete="password-new"
-            leftIcon="lock-closed-outline"
-            editable={!isLoading}
-            testID="confirm-password-input"
-          />
-        </View>
-
-        {/* Reset Password Button */}
-        <Button
-          title="Reset Password"
-          onPress={handleResetPassword}
-          loading={isLoading}
-          disabled={isLoading || otp.some((digit) => !digit) || !newPassword || !confirmPassword}
-          fullWidth
-          testID="reset-password-button"
-        />
-
-        {/* Back to Login Link */}
-        <View style={styles.loginContainer}>
-          <TouchableOpacity onPress={handleBackToLogin} disabled={isLoading}>
-            <Text style={styles.loginLink}>Back to Sign In</Text>
+        <StatusBar style="dark" />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Back Button */}
+          <TouchableOpacity style={styles.backButton} onPress={handleBackToLogin}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-        </View>
 
-        {/* Help Text */}
-        <View style={styles.helpContainer}>
-          <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
-          <Text style={styles.helpText}>
-            Make sure your new password is at least 6 characters long. For better security, use a
-            mix of uppercase, lowercase, numbers, and special characters.
-          </Text>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="key-outline" size={48} color={colors.primary} />
+            </View>
+            <Text style={styles.title}>Reset Password</Text>
+            <Text style={styles.subtitle}>
+              Enter the verification code sent to{'\n'}
+              <Text style={styles.emailText}>{email || 'your email'}</Text>
+            </Text>
+          </View>
+
+          {/* OTP Input */}
+          <View style={styles.otpContainer}>
+            <Text style={styles.otpLabel}>Verification Code</Text>
+            <View style={styles.otpInputsContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => {
+                    inputRefs.current[index] = ref;
+                  }}
+                  style={[styles.otpInput, otpError && styles.otpInputError]}
+                  value={digit}
+                  onChangeText={(value) => handleOtpChange(value, index)}
+                  onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  selectTextOnFocus
+                  editable={!isLoading}
+                  testID={`otp-input-${index}`}
+                />
+              ))}
+            </View>
+            {otpError && <Text style={styles.errorText}>{otpError}</Text>}
+          </View>
+
+          {/* Password Inputs */}
+          <View style={styles.form}>
+            <InputField
+              label="New Password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChangeText={(text) => {
+                setNewPassword(text);
+                setNewPasswordError(null);
+              }}
+              error={newPasswordError}
+              type="password"
+              showPasswordToggle
+              autoCapitalize="none"
+              autoComplete="password-new"
+              leftIcon="lock-closed-outline"
+              editable={!isLoading}
+              testID="new-password-input"
+            />
+
+            {/* Password Strength Indicator */}
+            {newPassword.length > 0 && (
+              <View style={styles.passwordStrengthContainer}>
+                <PasswordStrengthIndicator password={newPassword} />
+              </View>
+            )}
+
+            <InputField
+              label="Confirm New Password"
+              placeholder="Re-enter new password"
+              value={confirmPassword}
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                setConfirmPasswordError(null);
+              }}
+              error={confirmPasswordError}
+              type="password"
+              showPasswordToggle
+              autoCapitalize="none"
+              autoComplete="password-new"
+              leftIcon="lock-closed-outline"
+              editable={!isLoading}
+              testID="confirm-password-input"
+            />
+          </View>
+
+          {/* Reset Password Button */}
+          <Button
+            title="Reset Password"
+            onPress={handleResetPassword}
+            loading={isLoading}
+            disabled={isLoading || otp.some((digit) => !digit) || !newPassword || !confirmPassword}
+            fullWidth
+            testID="reset-password-button"
+          />
+
+          {/* Back to Login Link */}
+          <View style={styles.loginContainer}>
+            <TouchableOpacity onPress={handleBackToLogin} disabled={isLoading}>
+              <Text style={styles.loginLink}>Back to Sign In</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Help Text */}
+          <View style={styles.helpContainer}>
+            <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
+            <Text style={styles.helpText}>
+              Make sure your new password is at least 6 characters long. For better security, use a
+              mix of uppercase, lowercase, numbers, and special characters.
+            </Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -269,6 +273,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+
+  flex: {
+    flex: 1,
   },
 
   scrollContent: {

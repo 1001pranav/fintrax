@@ -26,10 +26,7 @@ export class SystemNotificationObserver implements NotificationObserver {
   }
 
   async onNotificationDismissed(notification: NotificationData): Promise<void> {
-    console.log(
-      '[SystemNotificationObserver] Notification dismissed:',
-      notification.title
-    );
+    console.log('[SystemNotificationObserver] Notification dismissed:', notification.title);
   }
 
   shouldHandle(notification: NotificationData): boolean {

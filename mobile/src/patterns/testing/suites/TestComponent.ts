@@ -141,16 +141,18 @@ export class TestSuite implements ITestComponent {
     }
 
     const duration = Date.now() - startTime;
-    const passed = this.results.every(r => r.passed);
-    const passedCount = this.results.filter(r => r.passed).length;
+    const passed = this.results.every((r) => r.passed);
+    const passedCount = this.results.filter((r) => r.passed).length;
 
-    console.log(`\nSuite "${this.name}" completed: ${passedCount}/${this.results.length} passed (${duration}ms)`);
+    console.log(
+      `\nSuite "${this.name}" completed: ${passedCount}/${this.results.length} passed (${duration}ms)`
+    );
 
     return {
       name: this.name,
       passed,
       duration,
-      errors: this.results.flatMap(r => r.errors),
+      errors: this.results.flatMap((r) => r.errors),
       timestamp: new Date().toISOString(),
     };
   }
@@ -168,7 +170,7 @@ export class TestSuite implements ITestComponent {
    */
   getSummary(): TestSuiteSummary {
     const totalTests = this.results.length;
-    const passedTests = this.results.filter(r => r.passed).length;
+    const passedTests = this.results.filter((r) => r.passed).length;
     const failedTests = totalTests - passedTests;
     const totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0);
 

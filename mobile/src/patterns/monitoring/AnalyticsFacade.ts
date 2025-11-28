@@ -111,10 +111,8 @@ export class AnalyticsFacade {
     try {
       // Set in Firebase
       // await analytics().setUserId(userId);
-
       // Set in Sentry
       // Sentry.setUser({ id: userId });
-
       // Set in Mixpanel
       // mixpanel.identify(userId);
     } catch (error) {
@@ -159,10 +157,8 @@ export class AnalyticsFacade {
     try {
       // Reset in Firebase
       // await analytics().resetAnalyticsData();
-
       // Reset in Sentry
       // Sentry.setUser(null);
-
       // Reset in Mixpanel
       // mixpanel.reset();
     } catch (error) {
@@ -209,13 +205,19 @@ export class AnalyticsFacade {
     // await Mixpanel.init(config.mixpanelToken);
   }
 
-  private async trackFirebaseEvent(eventName: string, properties?: Record<string, any>): Promise<void> {
+  private async trackFirebaseEvent(
+    eventName: string,
+    properties?: Record<string, any>
+  ): Promise<void> {
     // In real implementation:
     // import analytics from '@react-native-firebase/analytics';
     // await analytics().logEvent(eventName, properties);
   }
 
-  private async trackMixpanelEvent(eventName: string, properties?: Record<string, any>): Promise<void> {
+  private async trackMixpanelEvent(
+    eventName: string,
+    properties?: Record<string, any>
+  ): Promise<void> {
     // In real implementation:
     // mixpanel.track(eventName, properties);
   }

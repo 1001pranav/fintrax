@@ -8,10 +8,7 @@ interface WelcomeHeaderProps {
   onNotificationPress?: () => void;
 }
 
-export const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({
-  userName,
-  onNotificationPress,
-}) => {
+export const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({ userName, onNotificationPress }) => {
   const greeting = getGreeting();
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',

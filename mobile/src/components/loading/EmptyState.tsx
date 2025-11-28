@@ -31,11 +31,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <Text style={styles.title}>{title}</Text>
       {message && <Text style={styles.message}>{message}</Text>}
       {actionLabel && onAction && (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={onAction}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity style={styles.button} onPress={onAction} activeOpacity={0.7}>
           <Text style={styles.buttonText}>{actionLabel}</Text>
         </TouchableOpacity>
       )}

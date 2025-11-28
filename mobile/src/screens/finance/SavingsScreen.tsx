@@ -4,14 +4,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  RefreshControl,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, FlatList, RefreshControl, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -44,7 +38,7 @@ export const SavingsScreen: React.FC = () => {
   const totalGoals = savings.reduce((sum, s) => sum + s.goal, 0);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -80,9 +74,7 @@ export const SavingsScreen: React.FC = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <SavingsCard savings={item} />}
           contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
           showsVerticalScrollIndicator={false}
         />
       ) : (
@@ -94,7 +86,7 @@ export const SavingsScreen: React.FC = () => {
           />
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

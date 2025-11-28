@@ -10,6 +10,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -116,6 +117,7 @@ export const VerifyEmailScreen: React.FC = () => {
     }
 
     const otpString = otp.join('');
+    const otpNumber = parseInt(otpString, 10);
 
     try {
       setIsVerifying(true);
@@ -123,7 +125,7 @@ export const VerifyEmailScreen: React.FC = () => {
       // Call verify email API
       await authApi.verifyEmail({
         email,
-        otp: otpString,
+        otp: otpNumber,
       });
 
       // Verification successful
@@ -188,99 +190,101 @@ export const VerifyEmailScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <StatusBar style="dark" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Ionicons name="mail-outline" size={48} color={colors.primary} />
-          </View>
-          <Text style={styles.title}>Verify Your Email</Text>
-          <Text style={styles.subtitle}>
-            We've sent a verification code to{'\n'}
-            <Text style={styles.emailText}>{email || 'your email'}</Text>
-          </Text>
-        </View>
-
-        {/* OTP Input */}
-        <View style={styles.otpContainer}>
-          <Text style={styles.otpLabel}>Enter Verification Code</Text>
-          <View style={styles.otpInputsContainer}>
-            {otp.map((digit, index) => (
-              <TextInput
-                key={index}
-                ref={(ref) => {
-                  inputRefs.current[index] = ref;
-                }}
-                style={[styles.otpInput, otpError && styles.otpInputError]}
-                value={digit}
-                onChangeText={(value) => handleOtpChange(value, index)}
-                onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
-                keyboardType="number-pad"
-                maxLength={1}
-                selectTextOnFocus
-                editable={!isVerifying && !isResending}
-                testID={`otp-input-${index}`}
-              />
-            ))}
-          </View>
-          {otpError && <Text style={styles.errorText}>{otpError}</Text>}
-        </View>
-
-        {/* Verify Button */}
-        <Button
-          title="Verify Email"
-          onPress={handleVerify}
-          loading={isVerifying}
-          disabled={isVerifying || isResending || otp.some((digit) => !digit)}
-          fullWidth
-          testID="verify-button"
-        />
-
-        {/* Resend OTP */}
-        <View style={styles.resendContainer}>
-          <Text style={styles.resendText}>Didn't receive the code? </Text>
-          <TouchableOpacity
-            onPress={handleResendOtp}
-            disabled={isVerifying || isResending || resendCooldown > 0}
-          >
-            <Text
-              style={[
-                styles.resendLink,
-                (isResending || resendCooldown > 0) && styles.resendLinkDisabled,
-              ]}
-            >
-              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend OTP'}
+        <StatusBar style="dark" />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="mail-outline" size={48} color={colors.primary} />
+            </View>
+            <Text style={styles.title}>Verify Your Email</Text>
+            <Text style={styles.subtitle}>
+              We've sent a verification code to{'\n'}
+              <Text style={styles.emailText}>{email || 'your email'}</Text>
             </Text>
-          </TouchableOpacity>
-        </View>
+          </View>
 
-        {/* Back to Login Link */}
-        <View style={styles.loginContainer}>
-          <TouchableOpacity onPress={handleLoginNavigation} disabled={isVerifying || isResending}>
-            <Text style={styles.loginLink}>Back to Sign In</Text>
-          </TouchableOpacity>
-        </View>
+          {/* OTP Input */}
+          <View style={styles.otpContainer}>
+            <Text style={styles.otpLabel}>Enter Verification Code</Text>
+            <View style={styles.otpInputsContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => {
+                    inputRefs.current[index] = ref;
+                  }}
+                  style={[styles.otpInput, otpError && styles.otpInputError]}
+                  value={digit}
+                  onChangeText={(value) => handleOtpChange(value, index)}
+                  onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  selectTextOnFocus
+                  editable={!isVerifying && !isResending}
+                  testID={`otp-input-${index}`}
+                />
+              ))}
+            </View>
+            {otpError && <Text style={styles.errorText}>{otpError}</Text>}
+          </View>
 
-        {/* Help Text */}
-        <View style={styles.helpContainer}>
-          <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
-          <Text style={styles.helpText}>
-            The verification code is valid for 10 minutes. If you don't receive it, check your spam
-            folder or request a new code.
-          </Text>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* Verify Button */}
+          <Button
+            title="Verify Email"
+            onPress={handleVerify}
+            loading={isVerifying}
+            disabled={isVerifying || isResending || otp.some((digit) => !digit)}
+            fullWidth
+            testID="verify-button"
+          />
+
+          {/* Resend OTP */}
+          <View style={styles.resendContainer}>
+            <Text style={styles.resendText}>Didn't receive the code? </Text>
+            <TouchableOpacity
+              onPress={handleResendOtp}
+              disabled={isVerifying || isResending || resendCooldown > 0}
+            >
+              <Text
+                style={[
+                  styles.resendLink,
+                  (isResending || resendCooldown > 0) && styles.resendLinkDisabled,
+                ]}
+              >
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend OTP'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Back to Login Link */}
+          <View style={styles.loginContainer}>
+            <TouchableOpacity onPress={handleLoginNavigation} disabled={isVerifying || isResending}>
+              <Text style={styles.loginLink}>Back to Sign In</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Help Text */}
+          <View style={styles.helpContainer}>
+            <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
+            <Text style={styles.helpText}>
+              The verification code is valid for 10 minutes. If you don't receive it, check your
+              spam folder or request a new code.
+            </Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -288,6 +292,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+
+  flex: {
+    flex: 1,
   },
 
   scrollContent: {

@@ -165,9 +165,7 @@ export class SyncRepository implements ISyncRepository {
       SyncStatus.SYNCED,
       SyncStatus.FAILED,
     ]);
-    return (
-      results[0] || { pending: 0, synced: 0, failed: 0, total: 0 }
-    );
+    return results[0] || { pending: 0, synced: 0, failed: 0, total: 0 };
   }
 
   /**

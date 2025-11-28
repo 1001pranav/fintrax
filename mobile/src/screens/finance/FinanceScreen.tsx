@@ -4,21 +4,12 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  RefreshControl,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import {
-  fetchDashboard,
-  fetchTransactions,
-} from '../../store/slices/financeSlice';
+import { fetchDashboard, fetchTransactions } from '../../store/slices/financeSlice';
 import { BalanceCard } from '../../components/finance/BalanceCard';
 import { MonthlySummary } from '../../components/finance/MonthlySummary';
 import { TransactionCard } from '../../components/finance/TransactionCard';
@@ -27,9 +18,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 export const FinanceScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { summary, transactions, isLoading } = useAppSelector(
-    (state) => state.finance
-  );
+  const { summary, transactions, isLoading } = useAppSelector((state) => state.finance);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -37,10 +26,7 @@ export const FinanceScreen: React.FC = () => {
   }, []);
 
   const loadData = async () => {
-    await Promise.all([
-      dispatch(fetchDashboard()),
-      dispatch(fetchTransactions()),
-    ]);
+    await Promise.all([dispatch(fetchDashboard()), dispatch(fetchTransactions())]);
   };
 
   const handleRefresh = async () => {
@@ -64,13 +50,11 @@ export const FinanceScreen: React.FC = () => {
   const recentTransactions = transactions.slice(0, 10);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -81,21 +65,12 @@ export const FinanceScreen: React.FC = () => {
         {/* Balance Card */}
         <BalanceCard
           balance={summary?.balance || 0}
-          trend={
-            summary && summary.totalIncome > summary.totalExpense
-              ? 'up'
-              : 'down'
-          }
-          trendAmount={
-            summary ? summary.totalIncome - summary.totalExpense : 0
-          }
+          trend={summary && summary.totalIncome > summary.totalExpense ? 'up' : 'down'}
+          trendAmount={summary ? summary.totalIncome - summary.totalExpense : 0}
         />
 
         {/* Monthly Summary */}
-        <MonthlySummary
-          income={summary?.totalIncome || 0}
-          expense={summary?.totalExpense || 0}
-        />
+        <MonthlySummary income={summary?.totalIncome || 0} expense={summary?.totalExpense || 0} />
 
         {/* Quick Actions */}
         <View style={styles.quickActions}>
@@ -155,14 +130,10 @@ export const FinanceScreen: React.FC = () => {
       </ScrollView>
 
       {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={handleAddTransaction}
-        activeOpacity={0.8}
-      >
+      <TouchableOpacity style={styles.fab} onPress={handleAddTransaction} activeOpacity={0.8}>
         <Ionicons name="add" size={28} color="#FFFFFF" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -173,18 +144,9 @@ interface QuickActionButtonProps {
   onPress: () => void;
 }
 
-const QuickActionButton: React.FC<QuickActionButtonProps> = ({
-  icon,
-  label,
-  color,
-  onPress,
-}) => {
+const QuickActionButton: React.FC<QuickActionButtonProps> = ({ icon, label, color, onPress }) => {
   return (
-    <TouchableOpacity
-      style={styles.quickActionButton}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
+    <TouchableOpacity style={styles.quickActionButton} onPress={onPress} activeOpacity={0.7}>
       <View style={[styles.quickActionIcon, { backgroundColor: color + '20' }]}>
         <Ionicons name={icon as any} size={24} color={color} />
       </View>

@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -93,12 +94,14 @@ export const RegisterScreen: React.FC = () => {
 
     try {
       // Dispatch register action
-      await dispatch(register({
-        email,
-        password,
-        firstName: username,
-        lastName: ''
-      })).unwrap();
+      await dispatch(
+        register({
+          email,
+          password,
+          firstName: username,
+          lastName: '',
+        })
+      ).unwrap();
 
       // Registration successful - navigate to OTP verification
       navigation.navigate('VerifyEmail', { email });
@@ -113,118 +116,120 @@ export const RegisterScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <StatusBar style="dark" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Ionicons name="person-add-outline" size={48} color={colors.primary} />
+        <StatusBar style="dark" />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="person-add-outline" size={48} color={colors.primary} />
+            </View>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Sign up to get started with Fintrax</Text>
           </View>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Sign up to get started with Fintrax</Text>
-        </View>
 
-        {/* Form */}
-        <View style={styles.form}>
-          <InputField
-            label="Username"
-            placeholder="Enter your username"
-            value={username}
-            onChangeText={(text) => {
-              setUsername(text);
-              setUsernameError(null);
-            }}
-            type="text"
-            leftIcon="person-outline"
-            error={usernameError}
-            autoFocus
-            editable={!isLoading}
-            testID="username-input"
-          />
+          {/* Form */}
+          <View style={styles.form}>
+            <InputField
+              label="Username"
+              placeholder="Enter your username"
+              value={username}
+              onChangeText={(text) => {
+                setUsername(text);
+                setUsernameError(null);
+              }}
+              type="text"
+              leftIcon="person-outline"
+              error={usernameError}
+              autoFocus
+              editable={!isLoading}
+              testID="username-input"
+            />
 
-          <InputField
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setEmailError(null);
-            }}
-            type="email"
-            leftIcon="mail-outline"
-            error={emailError}
-            editable={!isLoading}
-            testID="email-input"
-          />
+            <InputField
+              label="Email"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailError(null);
+              }}
+              type="email"
+              leftIcon="mail-outline"
+              error={emailError}
+              editable={!isLoading}
+              testID="email-input"
+            />
 
-          <InputField
-            label="Password"
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              setPasswordError(null);
-            }}
-            type="password"
-            leftIcon="lock-closed-outline"
-            error={passwordError}
-            editable={!isLoading}
-            testID="password-input"
-          />
+            <InputField
+              label="Password"
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setPasswordError(null);
+              }}
+              type="password"
+              leftIcon="lock-closed-outline"
+              error={passwordError}
+              editable={!isLoading}
+              testID="password-input"
+            />
 
-          {/* Password Strength Indicator */}
-          <PasswordStrengthIndicator password={password} />
+            {/* Password Strength Indicator */}
+            <PasswordStrengthIndicator password={password} />
 
-          <InputField
-            label="Confirm Password"
-            placeholder="Re-enter your password"
-            value={confirmPassword}
-            onChangeText={(text) => {
-              setConfirmPassword(text);
-              setConfirmPasswordError(null);
-            }}
-            type="password"
-            leftIcon="lock-closed-outline"
-            error={confirmPasswordError}
-            editable={!isLoading}
-            testID="confirm-password-input"
-          />
+            <InputField
+              label="Confirm Password"
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                setConfirmPasswordError(null);
+              }}
+              type="password"
+              leftIcon="lock-closed-outline"
+              error={confirmPasswordError}
+              editable={!isLoading}
+              testID="confirm-password-input"
+            />
 
-          {/* Terms and Conditions */}
-          <Text style={styles.termsText}>
-            By signing up, you agree to our <Text style={styles.termsLink}>Terms of Service</Text>{' '}
-            and <Text style={styles.termsLink}>Privacy Policy</Text>
-          </Text>
+            {/* Terms and Conditions */}
+            <Text style={styles.termsText}>
+              By signing up, you agree to our <Text style={styles.termsLink}>Terms of Service</Text>{' '}
+              and <Text style={styles.termsLink}>Privacy Policy</Text>
+            </Text>
 
-          {/* Register Button */}
-          <Button
-            title="Create Account"
-            onPress={handleRegister}
-            loading={isLoading}
-            disabled={isLoading}
-            fullWidth
-            testID="register-button"
-          />
+            {/* Register Button */}
+            <Button
+              title="Create Account"
+              onPress={handleRegister}
+              loading={isLoading}
+              disabled={isLoading}
+              fullWidth
+              testID="register-button"
+            />
 
-          {/* Sign In Link */}
-          <View style={styles.signInContainer}>
-            <Text style={styles.signInText}>Already have an account? </Text>
-            <TouchableOpacity onPress={handleLoginNavigation} disabled={isLoading}>
-              <Text style={styles.signInLink}>Sign In</Text>
-            </TouchableOpacity>
+            {/* Sign In Link */}
+            <View style={styles.signInContainer}>
+              <Text style={styles.signInText}>Already have an account? </Text>
+              <TouchableOpacity onPress={handleLoginNavigation} disabled={isLoading}>
+                <Text style={styles.signInLink}>Sign In</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -232,6 +237,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+
+  flex: {
+    flex: 1,
   },
 
   scrollContent: {

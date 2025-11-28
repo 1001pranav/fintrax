@@ -48,7 +48,7 @@ export abstract class TestExecutionStrategy implements ITestExecutionStrategy {
   protected async runTest(test: Test): Promise<void> {
     // This would be implemented with actual test execution logic
     // For now, simulate with a delay
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Randomly pass/fail for demonstration
     if (Math.random() > 0.9) {

@@ -4,13 +4,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  KeyboardType,
-} from 'react-native';
+import { View, Text, TextInput, StyleSheet, KeyboardType } from 'react-native';
 import { formatCurrency } from '../../utils/formatters';
 
 interface AmountInputProps {
@@ -51,9 +45,7 @@ export const AmountInput: React.FC<AmountInputProps> = ({
   };
 
   const numericValue = parseFloat(value) || 0;
-  const formattedValue = showFormatted && numericValue > 0
-    ? formatCurrency(numericValue)
-    : '';
+  const formattedValue = showFormatted && numericValue > 0 ? formatCurrency(numericValue) : '';
 
   return (
     <View style={styles.container}>

@@ -15,7 +15,7 @@ export type LoadingStateName = 'idle' | 'loading' | 'refreshing' | 'success' | '
 
 export class LoadingContext {
   private currentState: LoadingState;
-  private listeners: Array<(state: LoadingState) => void> = [];
+  private listeners: ((state: LoadingState) => void)[] = [];
 
   constructor(initialState?: LoadingState) {
     this.currentState = initialState || new IdleState();

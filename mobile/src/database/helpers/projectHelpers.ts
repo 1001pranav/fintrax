@@ -12,9 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
  * Project Repository Interface (Repository Pattern)
  */
 export interface IProjectRepository {
-  create(
-    project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<Project>;
+  create(project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project>;
   update(id: string, updates: Partial<Project>): Promise<Project>;
   delete(id: string): Promise<void>;
   getById(id: string): Promise<Project | null>;
@@ -51,9 +49,7 @@ export class ProjectRepository implements IProjectRepository {
   /**
    * Create a new project
    */
-  async create(
-    projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<Project> {
+  async create(projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project> {
     const now = new Date().toISOString();
     const project: Project = {
       ...projectData,
@@ -106,10 +102,7 @@ export class ProjectRepository implements IProjectRepository {
    * Get all projects
    */
   async getAll(includeDeleted = false): Promise<Project[]> {
-    const results = await sqliteService.getAll<any>(
-      this.TABLE_NAME,
-      includeDeleted
-    );
+    const results = await sqliteService.getAll<any>(this.TABLE_NAME, includeDeleted);
     return results.map((r) => this.fromDbFormat(r));
   }
 
@@ -124,10 +117,7 @@ export class ProjectRepository implements IProjectRepository {
       ORDER BY updatedAt DESC
     `;
     const searchTerm = `%${query}%`;
-    const results = await sqliteService.query<any>(sql, [
-      searchTerm,
-      searchTerm,
-    ]);
+    const results = await sqliteService.query<any>(sql, [searchTerm, searchTerm]);
     return results.map((r) => this.fromDbFormat(r));
   }
 

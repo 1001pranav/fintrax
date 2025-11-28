@@ -40,12 +40,7 @@ export const LoanCard: React.FC<LoanCardProps> = ({ loan }) => {
       {/* Progress Bar */}
       <View style={styles.progressContainer}>
         <View style={styles.progressBackground}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${Math.min(paidPercentage, 100)}%` },
-            ]}
-          />
+          <View style={[styles.progressFill, { width: `${Math.min(paidPercentage, 100)}%` }]} />
         </View>
       </View>
 

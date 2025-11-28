@@ -12,9 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
  * Transaction Repository Interface (Repository Pattern)
  */
 export interface ITransactionRepository {
-  create(
-    transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<Transaction>;
+  create(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>): Promise<Transaction>;
   update(id: string, updates: Partial<Transaction>): Promise<Transaction>;
   delete(id: string): Promise<void>;
   getById(id: string): Promise<Transaction | null>;
@@ -71,10 +69,7 @@ export class TransactionRepository implements ITransactionRepository {
   /**
    * Update an existing transaction
    */
-  async update(
-    id: string,
-    updates: Partial<Transaction>
-  ): Promise<Transaction> {
+  async update(id: string, updates: Partial<Transaction>): Promise<Transaction> {
     const existing = await this.getById(id);
     if (!existing) {
       throw new Error(`Transaction not found: ${id}`);
@@ -110,10 +105,7 @@ export class TransactionRepository implements ITransactionRepository {
    * Get all transactions
    */
   async getAll(includeDeleted = false): Promise<Transaction[]> {
-    const results = await sqliteService.getAll<any>(
-      this.TABLE_NAME,
-      includeDeleted
-    );
+    const results = await sqliteService.getAll<any>(this.TABLE_NAME, includeDeleted);
     return results.map((r) => this.fromDbFormat(r));
   }
 
@@ -140,10 +132,7 @@ export class TransactionRepository implements ITransactionRepository {
   /**
    * Get transactions within date range
    */
-  async getByDateRange(
-    startDate: string,
-    endDate: string
-  ): Promise<Transaction[]> {
+  async getByDateRange(startDate: string, endDate: string): Promise<Transaction[]> {
     const sql = `
       SELECT * FROM ${this.TABLE_NAME}
       WHERE isDeleted = 0
@@ -166,10 +155,7 @@ export class TransactionRepository implements ITransactionRepository {
       ORDER BY date DESC
     `;
     const searchTerm = `%${query}%`;
-    const results = await sqliteService.query<any>(sql, [
-      searchTerm,
-      searchTerm,
-    ]);
+    const results = await sqliteService.query<any>(sql, [searchTerm, searchTerm]);
     return results.map((r) => this.fromDbFormat(r));
   }
 

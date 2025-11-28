@@ -142,7 +142,9 @@ export class EnvironmentManager {
     return this.strategy.getName() === 'staging';
   }
 
-  private createStrategy(environment: 'development' | 'staging' | 'production'): IEnvironmentStrategy {
+  private createStrategy(
+    environment: 'development' | 'staging' | 'production'
+  ): IEnvironmentStrategy {
     switch (environment) {
       case 'development':
         return new DevelopmentEnvironment();

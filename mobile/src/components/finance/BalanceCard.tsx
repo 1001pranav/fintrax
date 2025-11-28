@@ -27,9 +27,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
       <Text style={styles.label}>Current Balance</Text>
       <Text style={[styles.amount, isNegative && styles.amountNegative]}>
         {formatCurrency(Math.abs(balance))}
-        {isNegative && (
-          <Text style={styles.negativeIndicator}> (Negative)</Text>
-        )}
+        {isNegative && <Text style={styles.negativeIndicator}> (Negative)</Text>}
       </Text>
 
       {trendAmount !== undefined && trendAmount !== 0 && (

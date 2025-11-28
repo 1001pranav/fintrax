@@ -43,7 +43,7 @@ export class FeedbackRepository implements IFeedbackRepository {
     try {
       console.log(`[Feedback Repository] Fetching feedback: ${id}`);
       const allFeedback = await this.getAll();
-      return allFeedback.find(f => f.id === id) || null;
+      return allFeedback.find((f) => f.id === id) || null;
     } catch (error) {
       console.error(`[Feedback Repository] Error fetching feedback ${id}:`, error);
       throw error;
@@ -111,7 +111,7 @@ export class FeedbackRepository implements IFeedbackRepository {
     try {
       console.log(`[Feedback Repository] Fetching feedback by category: ${category}`);
       const allFeedback = await this.getAll();
-      return allFeedback.filter(f => f.category === category);
+      return allFeedback.filter((f) => f.category === category);
     } catch (error) {
       console.error(`[Feedback Repository] Error fetching feedback by category:`, error);
       throw error;
@@ -122,7 +122,7 @@ export class FeedbackRepository implements IFeedbackRepository {
     try {
       console.log(`[Feedback Repository] Fetching feedback by status: ${status}`);
       const allFeedback = await this.getAll();
-      return allFeedback.filter(f => f.status === status);
+      return allFeedback.filter((f) => f.status === status);
     } catch (error) {
       console.error(`[Feedback Repository] Error fetching feedback by status:`, error);
       throw error;
@@ -133,7 +133,7 @@ export class FeedbackRepository implements IFeedbackRepository {
     try {
       console.log(`[Feedback Repository] Fetching unresolved feedback...`);
       const allFeedback = await this.getAll();
-      return allFeedback.filter(f => f.status === 'new' || f.status === 'reviewed');
+      return allFeedback.filter((f) => f.status === 'new' || f.status === 'reviewed');
     } catch (error) {
       console.error(`[Feedback Repository] Error fetching unresolved feedback:`, error);
       throw error;

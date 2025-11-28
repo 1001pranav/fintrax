@@ -5,14 +5,8 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeContext';
 import { ThemeMode } from '../../patterns/theme/ThemeManager';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,12 +15,12 @@ export const AppearanceSettingsScreen: React.FC = () => {
   const { colors, mode, isDark, setTheme } = useTheme();
   const [isChanging, setIsChanging] = useState(false);
 
-  const themeOptions: Array<{
+  const themeOptions: {
     mode: ThemeMode;
     title: string;
     description: string;
     icon: string;
-  }> = [
+  }[] = [
     {
       mode: 'light',
       title: 'Light',
@@ -54,9 +48,7 @@ export const AppearanceSettingsScreen: React.FC = () => {
     try {
       await setTheme(newMode);
     } catch (error) {
-      Alert.alert('Error', 'Failed to change theme. Please try again.', [
-        { text: 'OK' },
-      ]);
+      Alert.alert('Error', 'Failed to change theme. Please try again.', [{ text: 'OK' }]);
     } finally {
       setIsChanging(false);
     }
@@ -106,151 +98,131 @@ export const AppearanceSettingsScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={dynamicStyles.container} contentContainerStyle={styles.content}>
-      {/* Theme Selection Section */}
-      <View style={dynamicStyles.section}>
-        <Text style={dynamicStyles.sectionTitle}>Theme</Text>
+    <SafeAreaView style={dynamicStyles.container} edges={['top', 'bottom']}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
+        {/* Theme Selection Section */}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Theme</Text>
 
-        <View style={dynamicStyles.card}>
-          {themeOptions.map((option, index) => {
-            const isActive = option.mode === mode;
+          <View style={dynamicStyles.card}>
+            {themeOptions.map((option, index) => {
+              const isActive = option.mode === mode;
 
-            return (
-              <React.Fragment key={option.mode}>
-                <TouchableOpacity
-                  style={[
-                    dynamicStyles.themeOption,
-                    isActive && dynamicStyles.themeOptionActive,
-                  ]}
-                  onPress={() => handleThemeChange(option.mode)}
-                  disabled={isChanging || isActive}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.themeContent}>
-                    <Icon
-                      name={option.icon}
-                      size={32}
-                      color={isActive ? colors.primary : colors.textSecondary}
-                      style={styles.themeIcon}
-                    />
-                    <View style={styles.themeTextContainer}>
-                      <Text style={dynamicStyles.themeTitle}>{option.title}</Text>
-                      <Text style={dynamicStyles.themeDescription}>
-                        {option.description}
-                      </Text>
+              return (
+                <React.Fragment key={option.mode}>
+                  <TouchableOpacity
+                    style={[dynamicStyles.themeOption, isActive && dynamicStyles.themeOptionActive]}
+                    onPress={() => handleThemeChange(option.mode)}
+                    disabled={isChanging || isActive}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.themeContent}>
+                      <Icon
+                        name={option.icon}
+                        size={32}
+                        color={isActive ? colors.primary : colors.textSecondary}
+                        style={styles.themeIcon}
+                      />
+                      <View style={styles.themeTextContainer}>
+                        <Text style={dynamicStyles.themeTitle}>{option.title}</Text>
+                        <Text style={dynamicStyles.themeDescription}>{option.description}</Text>
+                      </View>
                     </View>
-                  </View>
-                  {isActive && (
-                    <Icon name="check-circle" size={24} color={colors.primary} />
+                    {isActive && <Icon name="check-circle" size={24} color={colors.primary} />}
+                  </TouchableOpacity>
+
+                  {index < themeOptions.length - 1 && (
+                    <View style={[styles.divider, { backgroundColor: colors.divider }]} />
                   )}
-                </TouchableOpacity>
-
-                {index < themeOptions.length - 1 && (
-                  <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-                )}
-              </React.Fragment>
-            );
-          })}
+                </React.Fragment>
+              );
+            })}
+          </View>
         </View>
-      </View>
 
-      {/* Current Theme Preview Section */}
-      <View style={dynamicStyles.section}>
-        <Text style={dynamicStyles.sectionTitle}>Preview</Text>
+        {/* Current Theme Preview Section */}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Preview</Text>
 
-        <View style={dynamicStyles.card}>
-          <View style={styles.previewContainer}>
-            <View style={styles.previewRow}>
-              <Text style={dynamicStyles.themeTitle}>Current Theme:</Text>
-              <Text style={[dynamicStyles.themeTitle, { color: colors.primary }]}>
-                {mode.charAt(0).toUpperCase() + mode.slice(1)}
-              </Text>
-            </View>
-
-            <View style={styles.previewRow}>
-              <Text style={dynamicStyles.themeTitle}>Dark Mode:</Text>
-              <Text style={[dynamicStyles.themeTitle, { color: colors.primary }]}>
-                {isDark ? 'Yes' : 'No'}
-              </Text>
-            </View>
-
-            <View style={styles.colorPreviewContainer}>
-              <View style={styles.colorPreviewRow}>
-                <View style={styles.colorBox}>
-                  <View
-                    style={[styles.colorCircle, { backgroundColor: colors.primary }]}
-                  />
-                  <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
-                    Primary
-                  </Text>
-                </View>
-
-                <View style={styles.colorBox}>
-                  <View
-                    style={[styles.colorCircle, { backgroundColor: colors.accent }]}
-                  />
-                  <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
-                    Accent
-                  </Text>
-                </View>
-
-                <View style={styles.colorBox}>
-                  <View
-                    style={[styles.colorCircle, { backgroundColor: colors.success }]}
-                  />
-                  <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
-                    Success
-                  </Text>
-                </View>
+          <View style={dynamicStyles.card}>
+            <View style={styles.previewContainer}>
+              <View style={styles.previewRow}>
+                <Text style={dynamicStyles.themeTitle}>Current Theme:</Text>
+                <Text style={[dynamicStyles.themeTitle, { color: colors.primary }]}>
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </Text>
               </View>
 
-              <View style={styles.colorPreviewRow}>
-                <View style={styles.colorBox}>
-                  <View
-                    style={[styles.colorCircle, { backgroundColor: colors.warning }]}
-                  />
-                  <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
-                    Warning
-                  </Text>
+              <View style={styles.previewRow}>
+                <Text style={dynamicStyles.themeTitle}>Dark Mode:</Text>
+                <Text style={[dynamicStyles.themeTitle, { color: colors.primary }]}>
+                  {isDark ? 'Yes' : 'No'}
+                </Text>
+              </View>
+
+              <View style={styles.colorPreviewContainer}>
+                <View style={styles.colorPreviewRow}>
+                  <View style={styles.colorBox}>
+                    <View style={[styles.colorCircle, { backgroundColor: colors.primary }]} />
+                    <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
+                      Primary
+                    </Text>
+                  </View>
+
+                  <View style={styles.colorBox}>
+                    <View style={[styles.colorCircle, { backgroundColor: colors.accent }]} />
+                    <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Accent</Text>
+                  </View>
+
+                  <View style={styles.colorBox}>
+                    <View style={[styles.colorCircle, { backgroundColor: colors.success }]} />
+                    <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
+                      Success
+                    </Text>
+                  </View>
                 </View>
 
-                <View style={styles.colorBox}>
-                  <View
-                    style={[styles.colorCircle, { backgroundColor: colors.error }]}
-                  />
-                  <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
-                    Error
-                  </Text>
-                </View>
+                <View style={styles.colorPreviewRow}>
+                  <View style={styles.colorBox}>
+                    <View style={[styles.colorCircle, { backgroundColor: colors.warning }]} />
+                    <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
+                      Warning
+                    </Text>
+                  </View>
 
-                <View style={styles.colorBox}>
-                  <View
-                    style={[styles.colorCircle, { backgroundColor: colors.info }]}
-                  />
-                  <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>
-                    Info
-                  </Text>
+                  <View style={styles.colorBox}>
+                    <View style={[styles.colorCircle, { backgroundColor: colors.error }]} />
+                    <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Error</Text>
+                  </View>
+
+                  <View style={styles.colorBox}>
+                    <View style={[styles.colorCircle, { backgroundColor: colors.info }]} />
+                    <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Info</Text>
+                  </View>
                 </View>
               </View>
             </View>
           </View>
         </View>
-      </View>
 
-      {/* Info Section */}
-      <View style={dynamicStyles.infoSection}>
-        <Icon name="information" size={20} color={colors.textSecondary} />
-        <Text style={dynamicStyles.infoText}>
-          The theme setting applies to the entire app. Auto mode will automatically switch
-          between light and dark themes based on your device settings.
-        </Text>
-      </View>
-    </ScrollView>
+        {/* Info Section */}
+        <View style={dynamicStyles.infoSection}>
+          <Icon name="information" size={20} color={colors.textSecondary} />
+          <Text style={dynamicStyles.infoText}>
+            The theme setting applies to the entire app. Auto mode will automatically switch between
+            light and dark themes based on your device settings.
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  flex: {
     flex: 1,
   },
   content: {

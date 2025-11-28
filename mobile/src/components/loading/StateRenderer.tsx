@@ -38,15 +38,8 @@ export const StateRenderer: React.FC<StateRendererProps> = ({
   showEmpty = false,
   scrollable = true,
 }) => {
-  const {
-    isLoading,
-    isRefreshing,
-    isError,
-    stateData,
-    setRefreshing,
-    setSuccess,
-    setError,
-  } = loadingState;
+  const { isLoading, isRefreshing, isError, stateData, setRefreshing, setSuccess, setError } =
+    loadingState;
 
   // Handle refresh
   const handleRefresh = async () => {

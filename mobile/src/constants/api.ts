@@ -1,11 +1,11 @@
-import { EXPO_PUBLIC_API_URL } from '@env';
+import { getApiHost } from '../utils/apiConfig';
 
 /**
  * API Configuration Constants
  */
 
-// Base API URL from environment variables
-export const API_BASE_URL = EXPO_PUBLIC_API_URL || 'http://172.19.186.29:80/';
+// Base API URL - dynamically detected or from environment variables
+export const API_BASE_URL = getApiHost();
 
 /**
  * API Endpoints

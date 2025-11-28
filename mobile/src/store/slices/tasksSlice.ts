@@ -25,51 +25,48 @@ const initialState: TasksState = {
 };
 
 // Async Thunks (US-4.3 - Enhanced with Repository Pattern)
-export const fetchTasks = createAsyncThunk(
-  'tasks/fetchTasks',
-  async (_, { rejectWithValue }) => {
-    try {
-      // Always load from local database first (offline-first)
-      const localTasks = await taskRepository.getAll();
+export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (_, { rejectWithValue }) => {
+  try {
+    // Always load from local database first (offline-first)
+    const localTasks = await taskRepository.getAll();
 
-      // If online, fetch from server and update local database
-      if (offlineManager.isConnected()) {
-        try {
-          const serverTasks = await tasksApi.getTasks();
+    // If online, fetch from server and update local database
+    if (offlineManager.isConnected()) {
+      try {
+        const serverTasks = await tasksApi.getTasks();
 
-          // Update local database with server data
-          for (const serverTask of serverTasks) {
-            const existing = await taskRepository.getById(serverTask.id);
-            if (existing) {
-              await taskRepository.update(serverTask.id, {
-                ...serverTask,
-                syncStatus: SyncStatus.SYNCED,
-              });
-            } else {
-              // Insert new task from server
-              await taskRepository.create({
-                ...serverTask,
-                syncStatus: SyncStatus.SYNCED,
-              });
-            }
+        // Update local database with server data
+        for (const serverTask of serverTasks) {
+          const existing = await taskRepository.getById(serverTask.id);
+          if (existing) {
+            await taskRepository.update(serverTask.id, {
+              ...serverTask,
+              syncStatus: SyncStatus.SYNCED,
+            });
+          } else {
+            // Insert new task from server
+            await taskRepository.create({
+              ...serverTask,
+              syncStatus: SyncStatus.SYNCED,
+            });
           }
-
-          // Return updated local tasks
-          return await taskRepository.getAll();
-        } catch (serverError) {
-          console.warn('Server fetch failed, using local data:', serverError);
-          // Return local tasks if server fetch fails
-          return localTasks;
         }
-      }
 
-      // Return local tasks if offline
-      return localTasks;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch tasks');
+        // Return updated local tasks
+        return await taskRepository.getAll();
+      } catch (serverError) {
+        console.warn('Server fetch failed, using local data:', serverError);
+        // Return local tasks if server fetch fails
+        return localTasks;
+      }
     }
+
+    // Return local tasks if offline
+    return localTasks;
+  } catch (error: any) {
+    return rejectWithValue(error.message || 'Failed to fetch tasks');
   }
-);
+});
 
 export const createTask = createAsyncThunk(
   'tasks/createTask',
@@ -104,10 +101,7 @@ export const createTask = createAsyncThunk(
 
 export const updateTask = createAsyncThunk(
   'tasks/updateTask',
-  async (
-    { id, updates }: { id: string; updates: Partial<Task> },
-    { rejectWithValue }
-  ) => {
+  async ({ id, updates }: { id: string; updates: Partial<Task> }, { rejectWithValue }) => {
     try {
       // Update using repository (US-4.3)
       const task = await taskRepository.update(id, {
@@ -116,12 +110,7 @@ export const updateTask = createAsyncThunk(
       });
 
       // Queue for sync
-      await offlineManager.queueOperation(
-        SyncOperationType.UPDATE,
-        SyncEntity.TASK,
-        id,
-        updates
-      );
+      await offlineManager.queueOperation(SyncOperationType.UPDATE, SyncEntity.TASK, id, updates);
 
       return task;
     } catch (error: any) {
@@ -138,12 +127,7 @@ export const deleteTask = createAsyncThunk(
       await taskRepository.delete(id);
 
       // Queue for sync
-      await offlineManager.queueOperation(
-        SyncOperationType.DELETE,
-        SyncEntity.TASK,
-        id,
-        {}
-      );
+      await offlineManager.queueOperation(SyncOperationType.DELETE, SyncEntity.TASK, id, {});
 
       return id;
     } catch (error: any) {

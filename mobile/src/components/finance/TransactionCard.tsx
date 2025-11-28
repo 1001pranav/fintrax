@@ -28,18 +28,14 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({
 
   const handleDelete = () => {
     if (onDelete) {
-      Alert.alert(
-        'Delete Transaction',
-        'Are you sure you want to delete this transaction?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: onDelete,
-          },
-        ]
-      );
+      Alert.alert('Delete Transaction', 'Are you sure you want to delete this transaction?', [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: onDelete,
+        },
+      ]);
     }
   };
 
@@ -60,18 +56,11 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({
           <Text style={styles.description} numberOfLines={1}>
             {transaction.description || 'No description'}
           </Text>
-          <Text style={styles.date}>
-            {formatRelativeTime(new Date(transaction.date))}
-          </Text>
+          <Text style={styles.date}>{formatRelativeTime(new Date(transaction.date))}</Text>
         </View>
 
         <View style={styles.amountContainer}>
-          <Text
-            style={[
-              styles.amount,
-              { color: isIncome ? '#10B981' : '#EF4444' },
-            ]}
-          >
+          <Text style={[styles.amount, { color: isIncome ? '#10B981' : '#EF4444' }]}>
             {isIncome ? '+' : '-'}
             {formatCurrency(Math.abs(transaction.amount))}
           </Text>

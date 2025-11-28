@@ -4,14 +4,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../hooks';
@@ -43,10 +37,7 @@ export const ProjectDetailScreen: React.FC = () => {
 
   const loadData = async () => {
     try {
-      await Promise.all([
-        dispatch(fetchProjects()).unwrap(),
-        dispatch(fetchTasks()).unwrap(),
-      ]);
+      await Promise.all([dispatch(fetchProjects()).unwrap(), dispatch(fetchTasks()).unwrap()]);
     } catch (error) {
       console.error('Error loading project data:', error);
     }
@@ -85,33 +76,20 @@ export const ProjectDetailScreen: React.FC = () => {
   const doneTasks = getTasksByStatus('6');
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={colors.text}
-          />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <View
-            style={[styles.colorDot, { backgroundColor: project.color }]}
-          />
+          <View style={[styles.colorDot, { backgroundColor: project.color }]} />
           <Text style={styles.projectName} numberOfLines={1}>
             {project.name}
           </Text>
         </View>
         <TouchableOpacity onPress={handleEditProject}>
-          <Ionicons
-            name="ellipsis-horizontal"
-            size={24}
-            color={colors.text}
-          />
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -148,11 +126,7 @@ export const ProjectDetailScreen: React.FC = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.kanbanContainer}
         refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={loadData}
-            tintColor={colors.primary}
-          />
+          <RefreshControl refreshing={isLoading} onRefresh={loadData} tintColor={colors.primary} />
         }
       >
         {/* To Do Column */}
@@ -185,7 +159,7 @@ export const ProjectDetailScreen: React.FC = () => {
           onAddTask={() => handleAddTask('6')}
         />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

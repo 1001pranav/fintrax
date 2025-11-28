@@ -101,11 +101,12 @@ export class AsyncStorageService implements IStorageService {
   /**
    * Set multiple values in AsyncStorage
    */
-  async multiSet(keyValuePairs: Array<[string, any]>): Promise<void> {
+  async multiSet(keyValuePairs: [string, any][]): Promise<void> {
     try {
-      const serializedPairs: Array<[string, string]> = keyValuePairs.map(
-        ([key, value]) => [key, JSON.stringify(value)]
-      );
+      const serializedPairs: [string, string][] = keyValuePairs.map(([key, value]) => [
+        key,
+        JSON.stringify(value),
+      ]);
       await AsyncStorage.multiSet(serializedPairs);
     } catch (error) {
       console.error('AsyncStorage multiSet error:', error);

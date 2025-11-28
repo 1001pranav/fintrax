@@ -15,16 +15,12 @@ interface CategoryPieChartProps {
   transactions: Transaction[];
 }
 
-export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
-  transactions,
-}) => {
+export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions }) => {
   const screenWidth = Dimensions.get('window').width;
 
   const chartData = useMemo(() => {
     // Get only expense transactions
-    const expenseTransactions = transactions.filter(
-      (t) => t.type === TransactionType.EXPENSE
-    );
+    const expenseTransactions = transactions.filter((t) => t.type === TransactionType.EXPENSE);
 
     // Get category colors
     const categoryColors: { [key: string]: string } = {};
@@ -34,10 +30,7 @@ export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
       }
     });
 
-    const categoryData = getCategoryBreakdown(
-      expenseTransactions,
-      categoryColors
-    );
+    const categoryData = getCategoryBreakdown(expenseTransactions, categoryColors);
 
     return categoryData.map((category) => ({
       name: category.name,
@@ -80,9 +73,7 @@ export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
             <Text style={styles.legendText} numberOfLines={1}>
               {item.name}
             </Text>
-            <Text style={styles.legendAmount}>
-              {formatCurrency(item.amount)}
-            </Text>
+            <Text style={styles.legendAmount}>{formatCurrency(item.amount)}</Text>
           </View>
         ))}
       </View>

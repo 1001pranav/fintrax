@@ -17,7 +17,9 @@ export class SequentialTestStrategy extends TestExecutionStrategy {
   }
 
   async execute(tests: Test[]): Promise<TestResult[]> {
-    console.log(`[Sequential Strategy] Running ${tests.length} tests sequentially${this.failFast ? ' (fail-fast mode)' : ''}...`);
+    console.log(
+      `[Sequential Strategy] Running ${tests.length} tests sequentially${this.failFast ? ' (fail-fast mode)' : ''}...`
+    );
 
     const results: TestResult[] = [];
 
@@ -34,7 +36,7 @@ export class SequentialTestStrategy extends TestExecutionStrategy {
       }
     }
 
-    const passedCount = results.filter(r => r.passed).length;
+    const passedCount = results.filter((r) => r.passed).length;
     console.log(`[Sequential Strategy] Completed: ${passedCount}/${results.length} passed`);
 
     return results;

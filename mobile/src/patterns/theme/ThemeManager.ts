@@ -26,7 +26,7 @@ export class ThemeManager {
   private currentMode: ThemeMode = 'auto';
 
   // Theme change listeners
-  private listeners: Array<(colors: ColorScheme, mode: ThemeMode) => void> = [];
+  private listeners: ((colors: ColorScheme, mode: ThemeMode) => void)[] = [];
 
   // Private constructor for Singleton pattern
   private constructor() {

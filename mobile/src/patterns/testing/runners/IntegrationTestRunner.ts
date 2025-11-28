@@ -12,10 +12,7 @@ export class IntegrationTestRunner extends TestRunner {
   private testFunction: (context: IntegrationTestContext) => Promise<void>;
   private context: IntegrationTestContext;
 
-  constructor(
-    testName: string,
-    testFunction: (context: IntegrationTestContext) => Promise<void>
-  ) {
+  constructor(testName: string, testFunction: (context: IntegrationTestContext) => Promise<void>) {
     super();
     this.testName = testName;
     this.testFunction = testFunction;

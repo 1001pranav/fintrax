@@ -70,8 +70,7 @@ export abstract class BiometricStrategy implements AuthenticationStrategy {
       }
 
       // Check if specific authentication type is supported
-      const supportedTypes =
-        await LocalAuthentication.supportedAuthenticationTypesAsync();
+      const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
       return supportedTypes.includes(this.authenticationType);
     } catch (error) {
       console.error(`Error checking ${this.getType()} availability:`, error);

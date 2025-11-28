@@ -4,20 +4,9 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  interpolateColor,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withSpring, interpolateColor } from 'react-native-reanimated';
 import { Task, TaskPriority } from '../../constants/types';
 import { colors, spacing } from '../../theme';
 
@@ -63,22 +52,22 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
                 item.priority === TaskPriority.HIGH || item.priority === TaskPriority.URGENT
                   ? colors.errorLight
                   : item.priority === TaskPriority.MEDIUM
-                  ? colors.warningLight
-                  : colors.successLight,
+                    ? colors.warningLight
+                    : colors.successLight,
             },
           ]}
         >
           <Text style={styles.priorityText}>
-            {item.priority === TaskPriority.HIGH || item.priority === TaskPriority.URGENT ? 'High' : item.priority === TaskPriority.MEDIUM ? 'Med' : 'Low'}
+            {item.priority === TaskPriority.HIGH || item.priority === TaskPriority.URGENT
+              ? 'High'
+              : item.priority === TaskPriority.MEDIUM
+                ? 'Med'
+                : 'Low'}
           </Text>
         </View>
         {item.dueDate && (
           <View style={styles.dueDate}>
-            <Ionicons
-              name="calendar-outline"
-              size={12}
-              color={colors.textSecondary}
-            />
+            <Ionicons name="calendar-outline" size={12} color={colors.textSecondary} />
             <Text style={styles.dueDateText}>
               {new Date(item.dueDate).toLocaleDateString('en-US', {
                 month: 'short',

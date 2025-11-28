@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -115,119 +116,121 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <StatusBar style="dark" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Ionicons name="wallet-outline" size={48} color={colors.primary} />
+        <StatusBar style="dark" />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="wallet-outline" size={48} color={colors.primary} />
+            </View>
+            <Text style={styles.title}>Welcome Back!</Text>
+            <Text style={styles.subtitle}>Sign in to continue to Fintrax</Text>
           </View>
-          <Text style={styles.title}>Welcome Back!</Text>
-          <Text style={styles.subtitle}>Sign in to continue to Fintrax</Text>
-        </View>
 
-        {/* Form */}
-        <View style={styles.form}>
-          <InputField
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setEmailError(null);
-            }}
-            type="email"
-            leftIcon="mail-outline"
-            error={emailError}
-            autoFocus
-            editable={!isLoading}
-            testID="email-input"
-          />
+          {/* Form */}
+          <View style={styles.form}>
+            <InputField
+              label="Email"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailError(null);
+              }}
+              type="email"
+              leftIcon="mail-outline"
+              error={emailError}
+              autoFocus
+              editable={!isLoading}
+              testID="email-input"
+            />
 
-          <InputField
-            label="Password"
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              setPasswordError(null);
-            }}
-            type="password"
-            leftIcon="lock-closed-outline"
-            error={passwordError}
-            editable={!isLoading}
-            testID="password-input"
-          />
+            <InputField
+              label="Password"
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setPasswordError(null);
+              }}
+              type="password"
+              leftIcon="lock-closed-outline"
+              error={passwordError}
+              editable={!isLoading}
+              testID="password-input"
+            />
 
-          {/* Remember Me & Forgot Password */}
-          <View style={styles.optionsRow}>
-            <TouchableOpacity
-              style={styles.rememberMeContainer}
-              onPress={() => setRememberMe(!rememberMe)}
+            {/* Remember Me & Forgot Password */}
+            <View style={styles.optionsRow}>
+              <TouchableOpacity
+                style={styles.rememberMeContainer}
+                onPress={() => setRememberMe(!rememberMe)}
+                disabled={isLoading}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                  {rememberMe && <Ionicons name="checkmark" size={16} color={colors.white} />}
+                </View>
+                <Text style={styles.rememberMeText}>Remember Me</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleForgotPassword}
+                disabled={isLoading}
+                hitSlop={{ top: 10, bottom: 10 }}
+              >
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Login Button */}
+            <Button
+              title="Sign In"
+              onPress={handleLogin}
+              loading={isLoading}
               disabled={isLoading}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-                {rememberMe && <Ionicons name="checkmark" size={16} color={colors.white} />}
-              </View>
-              <Text style={styles.rememberMeText}>Remember Me</Text>
-            </TouchableOpacity>
+              fullWidth
+              testID="login-button"
+            />
 
-            <TouchableOpacity
-              onPress={handleForgotPassword}
-              disabled={isLoading}
-              hitSlop={{ top: 10, bottom: 10 }}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Social Login (Placeholder) */}
+            <View style={styles.socialButtons}>
+              <TouchableOpacity style={styles.socialButton} disabled>
+                <Ionicons name="logo-google" size={24} color={colors.gray400} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton} disabled>
+                <Ionicons name="logo-apple" size={24} color={colors.gray400} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Sign Up Link */}
+            <View style={styles.signUpContainer}>
+              <Text style={styles.signUpText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
+                <Text style={styles.signUpLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          {/* Login Button */}
-          <Button
-            title="Sign In"
-            onPress={handleLogin}
-            loading={isLoading}
-            disabled={isLoading}
-            fullWidth
-            testID="login-button"
-          />
-
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Social Login (Placeholder) */}
-          <View style={styles.socialButtons}>
-            <TouchableOpacity style={styles.socialButton} disabled>
-              <Ionicons name="logo-google" size={24} color={colors.gray400} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton} disabled>
-              <Ionicons name="logo-apple" size={24} color={colors.gray400} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Sign Up Link */}
-          <View style={styles.signUpContainer}>
-            <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -235,6 +238,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+
+  flex: {
+    flex: 1,
   },
 
   scrollContent: {

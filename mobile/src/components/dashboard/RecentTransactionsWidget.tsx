@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Transaction } from '../../types/models.types';
@@ -19,10 +26,10 @@ export const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> =
 
   const getCategoryIcon = (category?: string): keyof typeof Ionicons.glyphMap => {
     const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
-      'Food': 'fast-food',
-      'Transport': 'car',
-      'Shopping': 'cart',
-      'Income': 'cash',
+      Food: 'fast-food',
+      Transport: 'car',
+      Shopping: 'cart',
+      Income: 'cash',
     };
     return icons[category || 'default'] || 'wallet';
   };
@@ -32,16 +39,9 @@ export const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> =
     const amountColor = isIncome ? '#10B981' : '#EF4444';
 
     return (
-      <TouchableOpacity
-        style={styles.transactionCard}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={styles.transactionCard} activeOpacity={0.7}>
         <View style={styles.iconContainer}>
-          <Ionicons
-            name={getCategoryIcon(item.category)}
-            size={24}
-            color="#3B82F6"
-          />
+          <Ionicons name={getCategoryIcon(item.category)} size={24} color="#3B82F6" />
         </View>
 
         <View style={styles.transactionDetails}>
@@ -52,7 +52,8 @@ export const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> =
         </View>
 
         <Text style={[styles.amount, { color: amountColor }]}>
-          {isIncome ? '+' : '-'}{formatCurrency(item.amount)}
+          {isIncome ? '+' : '-'}
+          {formatCurrency(item.amount)}
         </Text>
       </TouchableOpacity>
     );

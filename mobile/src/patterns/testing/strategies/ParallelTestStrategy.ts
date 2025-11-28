@@ -17,19 +17,19 @@ export class ParallelTestStrategy extends TestExecutionStrategy {
   }
 
   async execute(tests: Test[]): Promise<TestResult[]> {
-    console.log(`[Parallel Strategy] Running ${tests.length} tests in parallel (max concurrency: ${this.maxConcurrency})...`);
+    console.log(
+      `[Parallel Strategy] Running ${tests.length} tests in parallel (max concurrency: ${this.maxConcurrency})...`
+    );
 
     const results: TestResult[] = [];
     const batches = this.createBatches(tests, this.maxConcurrency);
 
     for (const batch of batches) {
-      const batchResults = await Promise.all(
-        batch.map(test => this.executeTest(test))
-      );
+      const batchResults = await Promise.all(batch.map((test) => this.executeTest(test)));
       results.push(...batchResults);
     }
 
-    const passedCount = results.filter(r => r.passed).length;
+    const passedCount = results.filter((r) => r.passed).length;
     console.log(`[Parallel Strategy] Completed: ${passedCount}/${tests.length} passed`);
 
     return results;

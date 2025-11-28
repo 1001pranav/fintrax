@@ -17,9 +17,9 @@ const MAX_RETRY_ATTEMPTS = 3;
 export const useBiometrics = () => {
   const [isSupported, setIsSupported] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [supportedTypes, setSupportedTypes] = useState<
-    LocalAuthentication.AuthenticationType[]
-  >([]);
+  const [supportedTypes, setSupportedTypes] = useState<LocalAuthentication.AuthenticationType[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [retryAttempts, setRetryAttempts] = useState(0);
   const [biometricType, setBiometricType] = useState('Biometric');
@@ -39,19 +39,11 @@ export const useBiometrics = () => {
         setSupportedTypes(types);
 
         // Determine biometric type name
-        if (
-          types.includes(
-            LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
-          )
-        ) {
+        if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
           setBiometricType('Face ID');
-        } else if (
-          types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)
-        ) {
+        } else if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
           setBiometricType('Touch ID / Fingerprint');
-        } else if (
-          types.includes(LocalAuthentication.AuthenticationType.IRIS)
-        ) {
+        } else if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) {
           setBiometricType('Iris');
         } else {
           setBiometricType('Biometric');

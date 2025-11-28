@@ -8,7 +8,7 @@ import { UserProfileModel, UserProfile, UserPreferences } from '../models/UserPr
 
 export class ProfileController {
   private model: UserProfileModel;
-  private listeners: Array<() => void> = [];
+  private listeners: (() => void)[] = [];
 
   constructor(model: UserProfileModel) {
     this.model = model;

@@ -34,7 +34,8 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
     { value: TaskPriority.LOW, label: 'Low' },
   ];
 
-  const hasActiveFilters = selectedStatus !== null || selectedPriority !== null || selectedProject !== null;
+  const hasActiveFilters =
+    selectedStatus !== null || selectedPriority !== null || selectedProject !== null;
 
   const clearFilters = () => {
     onStatusChange(null);
@@ -44,7 +45,11 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Status Filter */}
         <View style={styles.filterGroup}>
           {statusOptions.map((option) => (

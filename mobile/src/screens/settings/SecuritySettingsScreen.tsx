@@ -5,15 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Switch,
-  Alert,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, Switch, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBiometrics } from '../../hooks/useBiometrics';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -44,11 +37,9 @@ export const SecuritySettingsScreen: React.FC = () => {
 
         if (authResult.success) {
           await enableBiometric();
-          Alert.alert(
-            'Success',
-            `${biometricType} authentication has been enabled for Fintrax.`,
-            [{ text: 'OK' }]
-          );
+          Alert.alert('Success', `${biometricType} authentication has been enabled for Fintrax.`, [
+            { text: 'OK' },
+          ]);
         } else {
           Alert.alert(
             'Authentication Failed',
@@ -57,11 +48,9 @@ export const SecuritySettingsScreen: React.FC = () => {
           );
         }
       } catch (error) {
-        Alert.alert(
-          'Error',
-          'An error occurred while enabling biometric authentication.',
-          [{ text: 'OK' }]
-        );
+        Alert.alert('Error', 'An error occurred while enabling biometric authentication.', [
+          { text: 'OK' },
+        ]);
       } finally {
         setIsSwitchLoading(false);
       }
@@ -82,11 +71,9 @@ export const SecuritySettingsScreen: React.FC = () => {
               setIsSwitchLoading(true);
               try {
                 await disableBiometric();
-                Alert.alert(
-                  'Success',
-                  'Biometric authentication has been disabled.',
-                  [{ text: 'OK' }]
-                );
+                Alert.alert('Success', 'Biometric authentication has been disabled.', [
+                  { text: 'OK' },
+                ]);
               } catch (error) {
                 Alert.alert('Error', 'Failed to disable biometric authentication.', [
                   { text: 'OK' },
@@ -115,157 +102,147 @@ export const SecuritySettingsScreen: React.FC = () => {
         );
       }
     } catch (error) {
-      Alert.alert('Error', 'An error occurred during authentication.', [
-        { text: 'OK' },
-      ]);
+      Alert.alert('Error', 'An error occurred during authentication.', [{ text: 'OK' }]);
     }
   };
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Biometric Authentication Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Biometric Authentication</Text>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
+        {/* Biometric Authentication Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Biometric Authentication</Text>
 
-        {!isSupported ? (
-          <View style={styles.card}>
-            <Icon name="alert-circle" size={48} color="#FF6B6B" style={styles.icon} />
-            <Text style={styles.notSupportedText}>
-              Biometric authentication is not available on this device.
-            </Text>
-            <Text style={styles.notSupportedSubtext}>
-              Make sure you have set up Face ID, Touch ID, or Fingerprint in your device
-              settings.
-            </Text>
-          </View>
-        ) : (
-          <>
+          {!isSupported ? (
             <View style={styles.card}>
-              <View style={styles.row}>
-                <View style={styles.iconTextContainer}>
-                  <Icon
-                    name={
-                      biometricType.includes('Face')
-                        ? 'face-recognition'
-                        : 'fingerprint'
-                    }
-                    size={24}
-                    color="#4F46E5"
-                    style={styles.settingIcon}
-                  />
-                  <View style={styles.textContainer}>
-                    <Text style={styles.settingLabel}>Use {biometricType}</Text>
-                    <Text style={styles.settingDescription}>
-                      Unlock Fintrax with {biometricType} for quick and secure access
-                    </Text>
+              <Icon name="alert-circle" size={48} color="#FF6B6B" style={styles.icon} />
+              <Text style={styles.notSupportedText}>
+                Biometric authentication is not available on this device.
+              </Text>
+              <Text style={styles.notSupportedSubtext}>
+                Make sure you have set up Face ID, Touch ID, or Fingerprint in your device settings.
+              </Text>
+            </View>
+          ) : (
+            <>
+              <View style={styles.card}>
+                <View style={styles.row}>
+                  <View style={styles.iconTextContainer}>
+                    <Icon
+                      name={biometricType.includes('Face') ? 'face-recognition' : 'fingerprint'}
+                      size={24}
+                      color="#4F46E5"
+                      style={styles.settingIcon}
+                    />
+                    <View style={styles.textContainer}>
+                      <Text style={styles.settingLabel}>Use {biometricType}</Text>
+                      <Text style={styles.settingDescription}>
+                        Unlock Fintrax with {biometricType} for quick and secure access
+                      </Text>
+                    </View>
                   </View>
+                  <Switch
+                    value={isEnabled}
+                    onValueChange={handleToggleBiometric}
+                    disabled={isSwitchLoading}
+                    trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                    thumbColor={isEnabled ? '#4F46E5' : '#F3F4F6'}
+                    ios_backgroundColor="#D1D5DB"
+                  />
                 </View>
-                <Switch
-                  value={isEnabled}
-                  onValueChange={handleToggleBiometric}
-                  disabled={isSwitchLoading}
-                  trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
-                  thumbColor={isEnabled ? '#4F46E5' : '#F3F4F6'}
-                  ios_backgroundColor="#D1D5DB"
-                />
               </View>
-            </View>
 
-            {isEnabled && (
-              <TouchableOpacity
-                style={styles.testButton}
-                onPress={handleTestBiometric}
-                activeOpacity={0.7}
-              >
-                <Icon name="shield-check" size={20} color="#FFFFFF" />
-                <Text style={styles.testButtonText}>Test {biometricType}</Text>
-              </TouchableOpacity>
-            )}
+              {isEnabled && (
+                <TouchableOpacity
+                  style={styles.testButton}
+                  onPress={handleTestBiometric}
+                  activeOpacity={0.7}
+                >
+                  <Icon name="shield-check" size={20} color="#FFFFFF" />
+                  <Text style={styles.testButtonText}>Test {biometricType}</Text>
+                </TouchableOpacity>
+              )}
 
-            {retryAttempts > 0 && (
-              <View style={styles.warningCard}>
-                <Icon name="alert" size={20} color="#F59E0B" />
-                <Text style={styles.warningText}>
-                  {remainingAttempts} attempt{remainingAttempts !== 1 ? 's' : ''}{' '}
-                  remaining before password fallback
-                </Text>
-              </View>
-            )}
-          </>
-        )}
-      </View>
-
-      {/* Additional Security Options Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Additional Security</Text>
-
-        <View style={styles.card}>
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => {
-              /* TODO: Navigate to Change Password */
-            }}
-            activeOpacity={0.7}
-          >
-            <View style={styles.iconTextContainer}>
-              <Icon name="key" size={24} color="#4F46E5" style={styles.settingIcon} />
-              <View style={styles.textContainer}>
-                <Text style={styles.settingLabel}>Change Password</Text>
-                <Text style={styles.settingDescription}>
-                  Update your account password
-                </Text>
-              </View>
-            </View>
-            <Icon name="chevron-right" size={24} color="#9CA3AF" />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => {
-              /* TODO: Navigate to Two-Factor Auth */
-            }}
-            activeOpacity={0.7}
-          >
-            <View style={styles.iconTextContainer}>
-              <Icon
-                name="two-factor-authentication"
-                size={24}
-                color="#4F46E5"
-                style={styles.settingIcon}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.settingLabel}>Two-Factor Authentication</Text>
-                <Text style={styles.settingDescription}>
-                  Add an extra layer of security
-                </Text>
-              </View>
-            </View>
-            <Icon name="chevron-right" size={24} color="#9CA3AF" />
-          </TouchableOpacity>
+              {retryAttempts > 0 && (
+                <View style={styles.warningCard}>
+                  <Icon name="alert" size={20} color="#F59E0B" />
+                  <Text style={styles.warningText}>
+                    {remainingAttempts} attempt{remainingAttempts !== 1 ? 's' : ''} remaining before
+                    password fallback
+                  </Text>
+                </View>
+              )}
+            </>
+          )}
         </View>
-      </View>
 
-      {/* Info Section */}
-      <View style={styles.infoSection}>
-        <Icon name="information" size={20} color="#6B7280" />
-        <Text style={styles.infoText}>
-          Biometric data is stored securely on your device and is never sent to our
-          servers.
-        </Text>
-      </View>
-    </ScrollView>
+        {/* Additional Security Options Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Additional Security</Text>
+
+          <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => {
+                /* TODO: Navigate to Change Password */
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.iconTextContainer}>
+                <Icon name="key" size={24} color="#4F46E5" style={styles.settingIcon} />
+                <View style={styles.textContainer}>
+                  <Text style={styles.settingLabel}>Change Password</Text>
+                  <Text style={styles.settingDescription}>Update your account password</Text>
+                </View>
+              </View>
+              <Icon name="chevron-right" size={24} color="#9CA3AF" />
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => {
+                /* TODO: Navigate to Two-Factor Auth */
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.iconTextContainer}>
+                <Icon
+                  name="two-factor-authentication"
+                  size={24}
+                  color="#4F46E5"
+                  style={styles.settingIcon}
+                />
+                <View style={styles.textContainer}>
+                  <Text style={styles.settingLabel}>Two-Factor Authentication</Text>
+                  <Text style={styles.settingDescription}>Add an extra layer of security</Text>
+                </View>
+              </View>
+              <Icon name="chevron-right" size={24} color="#9CA3AF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Info Section */}
+        <View style={styles.infoSection}>
+          <Icon name="information" size={20} color="#6B7280" />
+          <Text style={styles.infoText}>
+            Biometric data is stored securely on your device and is never sent to our servers.
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -273,6 +250,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  flex: {
+    flex: 1,
   },
   content: {
     padding: 16,

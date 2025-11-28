@@ -1,13 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  RefreshControl,
-  SafeAreaView,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../hooks';
@@ -69,7 +62,9 @@ export const TaskListScreen = () => {
 
   // Group tasks by priority
   const groupedTasks = {
-    high: filteredTasks.filter((t) => t.priority === TaskPriority.HIGH || t.priority === TaskPriority.URGENT),
+    high: filteredTasks.filter(
+      (t) => t.priority === TaskPriority.HIGH || t.priority === TaskPriority.URGENT
+    ),
     medium: filteredTasks.filter((t) => t.priority === TaskPriority.MEDIUM),
     low: filteredTasks.filter((t) => t.priority === TaskPriority.LOW),
   };
@@ -118,8 +113,8 @@ export const TaskListScreen = () => {
         <EmptyState
           icon="checkmark-done-circle-outline"
           title="No tasks found"
-          message={searchQuery ? "Try a different search term" : "Create your first task!"}
-          actionLabel={!searchQuery ? "Add Task" : undefined}
+          message={searchQuery ? 'Try a different search term' : 'Create your first task!'}
+          actionLabel={!searchQuery ? 'Add Task' : undefined}
           onAction={!searchQuery ? handleAddTask : undefined}
         />
       );
@@ -176,7 +171,7 @@ export const TaskListScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Tasks</Text>
         <TouchableOpacity onPress={handleAddTask}>
@@ -184,11 +179,7 @@ export const TaskListScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <SearchBar
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        placeholder="Search tasks..."
-      />
+      <SearchBar value={searchQuery} onChangeText={setSearchQuery} placeholder="Search tasks..." />
 
       <TaskFilters
         selectedStatus={filterStatus}
@@ -214,11 +205,7 @@ export const TaskListScreen = () => {
         contentContainerStyle={styles.listContent}
       />
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={handleAddTask}
-        activeOpacity={0.8}
-      >
+      <TouchableOpacity style={styles.fab} onPress={handleAddTask} activeOpacity={0.8}>
         <Ionicons name="add" size={28} color="#FFFFFF" />
       </TouchableOpacity>
     </SafeAreaView>

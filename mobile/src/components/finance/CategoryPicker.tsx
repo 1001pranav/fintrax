@@ -4,18 +4,9 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  FinanceCategory,
-  getCategoriesByType,
-} from '../../constants/financeCategories';
+import { FinanceCategory, getCategoriesByType } from '../../constants/financeCategories';
 import { TransactionType } from '../../constants/types';
 
 interface CategoryPickerProps {
@@ -60,11 +51,7 @@ interface CategoryItemProps {
   onPress: () => void;
 }
 
-const CategoryItem: React.FC<CategoryItemProps> = ({
-  category,
-  isSelected,
-  onPress,
-}) => {
+const CategoryItem: React.FC<CategoryItemProps> = ({ category, isSelected, onPress }) => {
   return (
     <TouchableOpacity
       style={[
@@ -77,19 +64,11 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View
-        style={[
-          styles.iconContainer,
-          { backgroundColor: category.color },
-        ]}
-      >
+      <View style={[styles.iconContainer, { backgroundColor: category.color }]}>
         <Ionicons name={category.icon as any} size={24} color="#FFFFFF" />
       </View>
       <Text
-        style={[
-          styles.categoryName,
-          isSelected && { color: category.color, fontWeight: '600' },
-        ]}
+        style={[styles.categoryName, isSelected && { color: category.color, fontWeight: '600' }]}
         numberOfLines={2}
       >
         {category.name}

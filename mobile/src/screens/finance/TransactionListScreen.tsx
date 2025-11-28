@@ -4,21 +4,12 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, FlatList, RefreshControl, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import {
-  fetchTransactions,
-  deleteTransaction,
-} from '../../store/slices/financeSlice';
+import { fetchTransactions, deleteTransaction } from '../../store/slices/financeSlice';
 import { TransactionCard } from '../../components/finance/TransactionCard';
 import { SearchBar } from '../../components/common/SearchBar';
 import {
@@ -81,8 +72,7 @@ export const TransactionListScreen: React.FC = () => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (t) =>
-          t.description.toLowerCase().includes(query) ||
-          t.category.toLowerCase().includes(query)
+          t.description.toLowerCase().includes(query) || t.category.toLowerCase().includes(query)
       );
     }
 
@@ -93,9 +83,7 @@ export const TransactionListScreen: React.FC = () => {
 
     // Category filter
     if (filters.categories.length > 0) {
-      filtered = filtered.filter((t) =>
-        filters.categories.includes(t.category)
-      );
+      filtered = filtered.filter((t) => filters.categories.includes(t.category));
     }
 
     // Date range filter
@@ -104,29 +92,21 @@ export const TransactionListScreen: React.FC = () => {
 
     switch (filters.dateRange) {
       case 'today':
-        filtered = filtered.filter(
-          (t) => new Date(t.date) >= today
-        );
+        filtered = filtered.filter((t) => new Date(t.date) >= today);
         break;
       case 'week':
         const weekAgo = new Date(today);
         weekAgo.setDate(weekAgo.getDate() - 7);
-        filtered = filtered.filter(
-          (t) => new Date(t.date) >= weekAgo
-        );
+        filtered = filtered.filter((t) => new Date(t.date) >= weekAgo);
         break;
       case 'month':
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        filtered = filtered.filter(
-          (t) => new Date(t.date) >= monthStart
-        );
+        filtered = filtered.filter((t) => new Date(t.date) >= monthStart);
         break;
     }
 
     // Sort by date (newest first)
-    filtered.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return filtered;
   }, [transactions, searchQuery, filters]);
@@ -198,7 +178,7 @@ export const TransactionListScreen: React.FC = () => {
   }, [groupedTransactions]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -206,11 +186,7 @@ export const TransactionListScreen: React.FC = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>All Transactions</Text>
         <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
-          <Ionicons
-            name={showFilters ? 'filter' : 'filter-outline'}
-            size={24}
-            color="#3B82F6"
-          />
+          <Ionicons name={showFilters ? 'filter' : 'filter-outline'} size={24} color="#3B82F6" />
         </TouchableOpacity>
       </View>
 
@@ -256,9 +232,7 @@ export const TransactionListScreen: React.FC = () => {
             )
           }
           contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
           showsVerticalScrollIndicator={false}
         />
       ) : (
@@ -272,7 +246,7 @@ export const TransactionListScreen: React.FC = () => {
           }
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

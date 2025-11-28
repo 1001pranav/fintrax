@@ -16,7 +16,7 @@ export const useOfflineSync = () => {
   // Monitor network status
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOnline(state.isConnected && state.isInternetReachable || false);
+      setIsOnline((state.isConnected && state.isInternetReachable) || false);
     });
 
     return () => {

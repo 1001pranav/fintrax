@@ -196,10 +196,7 @@ export class SQLiteService {
   /**
    * Insert a record
    */
-  async insert<T extends { id: string }>(
-    table: string,
-    record: T
-  ): Promise<void> {
+  async insert<T extends { id: string }>(table: string, record: T): Promise<void> {
     const keys = Object.keys(record);
     const values = Object.values(record).map((v) =>
       typeof v === 'object' ? JSON.stringify(v) : v
@@ -267,10 +264,7 @@ export class SQLiteService {
   /**
    * Get records by criteria
    */
-  async getWhere<T>(
-    table: string,
-    where: Record<string, any>
-  ): Promise<T[]> {
+  async getWhere<T>(table: string, where: Record<string, any>): Promise<T[]> {
     const keys = Object.keys(where);
     const values = Object.values(where);
     const whereClause = keys.map((k) => `${k} = ?`).join(' AND ');

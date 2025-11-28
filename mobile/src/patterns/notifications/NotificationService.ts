@@ -112,9 +112,7 @@ export class NotificationService {
   private async requestPermissions(): Promise<boolean> {
     try {
       // Check if already requested
-      const alreadyRequested = await AsyncStorage.getItem(
-        NOTIFICATION_PERMISSION_KEY
-      );
+      const alreadyRequested = await AsyncStorage.getItem(NOTIFICATION_PERMISSION_KEY);
 
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
@@ -192,8 +190,8 @@ export class NotificationService {
   ): Promise<void> {
     const notificationData: NotificationData = {
       id: notification.request.identifier,
-      type: (notification.request.content.data?.type as NotificationType) ||
-        NotificationType.SYSTEM,
+      type:
+        (notification.request.content.data?.type as NotificationType) || NotificationType.SYSTEM,
       title: notification.request.content.title || '',
       body: notification.request.content.body || '',
       data: notification.request.content.data,
@@ -210,7 +208,8 @@ export class NotificationService {
   ): Promise<void> {
     const notificationData: NotificationData = {
       id: response.notification.request.identifier,
-      type: (response.notification.request.content.data?.type as NotificationType) ||
+      type:
+        (response.notification.request.content.data?.type as NotificationType) ||
         NotificationType.SYSTEM,
       title: response.notification.request.content.title || '',
       body: response.notification.request.content.body || '',
@@ -250,10 +249,7 @@ export class NotificationService {
         try {
           await observer.update(notification);
         } catch (error) {
-          console.error(
-            `[NotificationService] Observer ${observer.id} error:`,
-            error
-          );
+          console.error(`[NotificationService] Observer ${observer.id} error:`, error);
         }
       }
     }
@@ -262,9 +258,7 @@ export class NotificationService {
   /**
    * Schedule a local notification
    */
-  public async scheduleNotification(
-    payload: NotificationPayload
-  ): Promise<NotificationResponse> {
+  public async scheduleNotification(payload: NotificationPayload): Promise<NotificationResponse> {
     try {
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
@@ -276,7 +270,7 @@ export class NotificationService {
           vibrate: payload.vibrate,
           badge: payload.badge,
         },
-        trigger: payload.trigger as Notifications.NotificationTriggerInput || null,
+        trigger: (payload.trigger as Notifications.NotificationTriggerInput) || null,
       });
 
       return {
@@ -321,9 +315,7 @@ export class NotificationService {
   /**
    * Get all scheduled notifications
    */
-  public async getScheduledNotifications(): Promise<
-    Notifications.NotificationRequest[]
-  > {
+  public async getScheduledNotifications(): Promise<Notifications.NotificationRequest[]> {
     try {
       return await Notifications.getAllScheduledNotificationsAsync();
     } catch (error) {

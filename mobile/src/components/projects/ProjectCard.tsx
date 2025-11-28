@@ -4,13 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Project } from '../../constants/types';
 import { projectRepository } from '../../database/helpers';
@@ -22,11 +16,7 @@ interface ProjectCardProps {
   style?: ViewStyle;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({
-  project,
-  onPress,
-  style,
-}) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onPress, style }) => {
   const [stats, setStats] = useState({ total: 0, completed: 0, percentage: 0 });
 
   useEffect(() => {
@@ -54,11 +44,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <Text style={styles.name} numberOfLines={1}>
           {project.name}
         </Text>
-        <Ionicons
-          name="chevron-forward"
-          size={20}
-          color={colors.textSecondary}
-        />
+        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
       </View>
 
       {/* Description */}
@@ -87,24 +73,14 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       {/* Stats */}
       <View style={styles.stats}>
         <View style={styles.stat}>
-          <Ionicons
-            name="list-outline"
-            size={16}
-            color={colors.textSecondary}
-          />
+          <Ionicons name="list-outline" size={16} color={colors.textSecondary} />
           <Text style={styles.statText}>
             {stats.total} {stats.total === 1 ? 'task' : 'tasks'}
           </Text>
         </View>
         <View style={styles.stat}>
-          <Ionicons
-            name="checkmark-circle-outline"
-            size={16}
-            color={colors.success}
-          />
-          <Text style={styles.statText}>
-            {stats.completed} completed
-          </Text>
+          <Ionicons name="checkmark-circle-outline" size={16} color={colors.success} />
+          <Text style={styles.statText}>{stats.completed} completed</Text>
         </View>
       </View>
 

@@ -5,11 +5,11 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -44,7 +44,7 @@ export const TaskDetailScreen = () => {
 
   if (!task) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text style={styles.loadingText}>Loading task...</Text>
@@ -115,7 +115,7 @@ export const TaskDetailScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -159,9 +159,7 @@ export const TaskDetailScreen = () => {
               textAlignVertical="top"
             />
           ) : (
-            <Text style={styles.value}>
-              {task.description || 'No description'}
-            </Text>
+            <Text style={styles.value}>{task.description || 'No description'}</Text>
           )}
         </View>
 
@@ -183,9 +181,7 @@ export const TaskDetailScreen = () => {
                   onPress={() => setPriority(option.value)}
                   activeOpacity={0.7}
                 >
-                  <View
-                    style={[styles.priorityDot, { backgroundColor: option.color }]}
-                  />
+                  <View style={[styles.priorityDot, { backgroundColor: option.color }]} />
                   <Text
                     style={[
                       styles.priorityLabel,
@@ -204,8 +200,7 @@ export const TaskDetailScreen = () => {
                   styles.priorityDot,
                   {
                     backgroundColor:
-                      priorityOptions.find((o) => o.value === task.priority)?.color ||
-                      '#10B981',
+                      priorityOptions.find((o) => o.value === task.priority)?.color || '#10B981',
                   },
                 ]}
               />
@@ -251,8 +246,8 @@ export const TaskDetailScreen = () => {
               {task.status === TaskStatus.TODO
                 ? 'To Do'
                 : task.status === TaskStatus.IN_PROGRESS
-                ? 'In Progress'
-                : 'Completed'}
+                  ? 'In Progress'
+                  : 'Completed'}
             </Text>
           )}
         </View>
@@ -286,9 +281,7 @@ export const TaskDetailScreen = () => {
               disabled={saving}
               activeOpacity={0.7}
             >
-              <Text style={styles.saveButtonText}>
-                {saving ? 'Saving...' : 'Save Changes'}
-              </Text>
+              <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save Changes'}</Text>
             </TouchableOpacity>
           </View>
         ) : (

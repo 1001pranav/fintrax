@@ -83,10 +83,7 @@ export const createProject = createAsyncThunk(
 
 export const updateProject = createAsyncThunk(
   'projects/updateProject',
-  async (
-    { id, updates }: { id: string; updates: Partial<Project> },
-    { rejectWithValue }
-  ) => {
+  async ({ id, updates }: { id: string; updates: Partial<Project> }, { rejectWithValue }) => {
     try {
       await sqliteService.update('projects', id, {
         ...updates,
@@ -114,12 +111,7 @@ export const deleteProject = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       await sqliteService.delete('projects', id);
-      await offlineManager.queueOperation(
-        SyncOperationType.DELETE,
-        SyncEntity.PROJECT,
-        id,
-        {}
-      );
+      await offlineManager.queueOperation(SyncOperationType.DELETE, SyncEntity.PROJECT, id, {});
 
       return id;
     } catch (error: any) {

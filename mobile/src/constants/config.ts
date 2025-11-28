@@ -4,6 +4,7 @@
  */
 
 import Constants from 'expo-constants';
+import { getApiHost, getApiTimeout } from '../utils/apiConfig';
 
 // ============================================================================
 // Environment Variables
@@ -11,8 +12,8 @@ import Constants from 'expo-constants';
 
 export const config = {
   // API Configuration
-  API_URL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080/api',
-  API_TIMEOUT: 30000, // 30 seconds
+  API_URL: getApiHost(),
+  API_TIMEOUT: getApiTimeout(),
 
   // Storage Keys
   STORAGE_KEYS: {

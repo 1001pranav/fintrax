@@ -11,10 +11,7 @@ export class E2ETestRunner extends TestRunner {
   private testFunction: (context: E2ETestContext) => Promise<void>;
   private context: E2ETestContext;
 
-  constructor(
-    testName: string,
-    testFunction: (context: E2ETestContext) => Promise<void>
-  ) {
+  constructor(testName: string, testFunction: (context: E2ETestContext) => Promise<void>) {
     super();
     this.testName = testName;
     this.testFunction = testFunction;
@@ -68,7 +65,7 @@ export class E2ETestRunner extends TestRunner {
     // Wait for app to be fully loaded
     // In real implementation:
     // await waitFor(element(by.id('dashboard-screen'))).toBeVisible().withTimeout(10000);
-    return new Promise(resolve => setTimeout(resolve, 2000));
+    return new Promise((resolve) => setTimeout(resolve, 2000));
   }
 }
 

@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { navigate } from '../../navigation/NavigationService';
 import { Task } from '../../types/models.types';
@@ -10,10 +17,7 @@ interface RecentTasksWidgetProps {
   loading?: boolean;
 }
 
-export const RecentTasksWidget: React.FC<RecentTasksWidgetProps> = ({
-  tasks,
-  loading = false,
-}) => {
+export const RecentTasksWidget: React.FC<RecentTasksWidgetProps> = ({ tasks, loading = false }) => {
   const getPriorityColor = (priority: number) => {
     if (priority <= 2) return '#EF4444'; // High priority (1-2)
     if (priority <= 4) return '#F59E0B'; // Medium priority (3-4)
@@ -23,15 +27,19 @@ export const RecentTasksWidget: React.FC<RecentTasksWidgetProps> = ({
   const renderTaskItem = ({ item }: { item: Task }) => (
     <TouchableOpacity
       style={styles.taskCard}
-      onPress={() => navigate('Tasks', {
-        screen: 'TaskDetail',
-        params: { taskId: item.id }
-      })}
+      onPress={() =>
+        navigate('Tasks', {
+          screen: 'TaskDetail',
+          params: { taskId: item.id },
+        })
+      }
       activeOpacity={0.7}
     >
       <View style={styles.taskHeader}>
         <View style={styles.taskTitleRow}>
-          <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(item.priority) }]} />
+          <View
+            style={[styles.priorityDot, { backgroundColor: getPriorityColor(item.priority) }]}
+          />
           <Text style={styles.taskTitle} numberOfLines={1}>
             {item.title}
           </Text>
@@ -40,11 +48,7 @@ export const RecentTasksWidget: React.FC<RecentTasksWidgetProps> = ({
           <Ionicons name="checkmark-circle-outline" size={24} color="#9CA3AF" />
         </TouchableOpacity>
       </View>
-      {item.end_date && (
-        <Text style={styles.dueDate}>
-          Due: {formatDate(item.end_date)}
-        </Text>
-      )}
+      {item.end_date && <Text style={styles.dueDate}>Due: {formatDate(item.end_date)}</Text>}
     </TouchableOpacity>
   );
 

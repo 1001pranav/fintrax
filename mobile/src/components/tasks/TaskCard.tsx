@@ -13,12 +13,7 @@ interface TaskCardProps {
   onDelete?: (taskId: string) => void;
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({
-  task,
-  onPress,
-  onComplete,
-  onDelete,
-}) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, onPress, onComplete, onDelete }) => {
   const getPriorityColor = (priority: TaskPriority) => {
     if (priority === TaskPriority.HIGH || priority === TaskPriority.URGENT) return '#EF4444';
     if (priority === TaskPriority.MEDIUM) return '#F59E0B';
@@ -40,37 +35,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
   const handleDelete = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    Alert.alert(
-      'Delete Task',
-      'Are you sure you want to delete this task?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => onDelete && onDelete(task.id),
-        },
-      ]
-    );
+    Alert.alert('Delete Task', 'Are you sure you want to delete this task?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => onDelete && onDelete(task.id),
+      },
+    ]);
   };
 
   const renderRightActions = () => (
-    <TouchableOpacity
-      style={styles.completeAction}
-      onPress={handleComplete}
-      activeOpacity={0.8}
-    >
+    <TouchableOpacity style={styles.completeAction} onPress={handleComplete} activeOpacity={0.8}>
       <Ionicons name="checkmark" size={24} color="#FFFFFF" />
       <Text style={styles.actionText}>Complete</Text>
     </TouchableOpacity>
   );
 
   const renderLeftActions = () => (
-    <TouchableOpacity
-      style={styles.deleteAction}
-      onPress={handleDelete}
-      activeOpacity={0.8}
-    >
+    <TouchableOpacity style={styles.deleteAction} onPress={handleDelete} activeOpacity={0.8}>
       <Ionicons name="trash" size={24} color="#FFFFFF" />
       <Text style={styles.actionText}>Delete</Text>
     </TouchableOpacity>
@@ -93,7 +76,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={styles.titleRow}>
-              <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(task.priority) }]} />
+              <View
+                style={[styles.priorityDot, { backgroundColor: getPriorityColor(task.priority) }]}
+              />
               <Text style={[styles.title, isCompleted && styles.completedText]} numberOfLines={2}>
                 {task.title}
               </Text>
@@ -115,7 +100,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
           <View style={styles.footer}>
             <View style={styles.badges}>
-              <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(task.priority) + '20' }]}>
+              <View
+                style={[
+                  styles.priorityBadge,
+                  { backgroundColor: getPriorityColor(task.priority) + '20' },
+                ]}
+              >
                 <Text style={[styles.priorityText, { color: getPriorityColor(task.priority) }]}>
                   {getPriorityLabel(task.priority)}
                 </Text>
@@ -127,11 +117,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 </View>
               )}
             </View>
-            {task.dueDate && (
-              <Text style={styles.dueDate}>
-                {formatDate(task.dueDate)}
-              </Text>
-            )}
+            {task.dueDate && <Text style={styles.dueDate}>{formatDate(task.dueDate)}</Text>}
           </View>
         </View>
       </TouchableOpacity>

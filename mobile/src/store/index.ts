@@ -18,20 +18,30 @@ import dashboardReducer from './slices/dashboardSlice';
 // Import middleware
 import { syncMiddleware } from './middleware/syncMiddleware';
 
+// Export hooks
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+
+// Auth persist configuration - exclude transient fields
+const authPersistConfig = {
+  key: 'auth',
+  storage: AsyncStorage,
+  blacklist: ['isLoading', 'error'], // Don't persist loading and error states
+};
+
 // Combine reducers
 const rootReducer = combineReducers({
-  auth: authReducer,
+  auth: persistReducer(authPersistConfig, authReducer),
   tasks: tasksReducer,
   projects: projectsReducer,
   finance: financeReducer,
   dashboard: dashboardReducer,
 });
 
-// Persist configuration
+// Root persist configuration
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth'], // Only persist auth state
+  whitelist: [], // Auth is already persisted with its own config above
   blacklist: ['tasks', 'projects', 'finance', 'dashboard'], // Don't persist these (use SQLite instead)
 };
 
@@ -54,8 +64,5 @@ export const persistor = persistStore(store);
 // Export types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
-// Export hooks
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

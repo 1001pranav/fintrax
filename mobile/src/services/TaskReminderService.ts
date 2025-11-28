@@ -49,9 +49,7 @@ export class TaskReminderService {
    * @param data - Task reminder data
    * @returns Promise<NotificationResponse[]>
    */
-  public async scheduleTaskReminders(
-    data: TaskReminderData
-  ): Promise<NotificationResponse[]> {
+  public async scheduleTaskReminders(data: TaskReminderData): Promise<NotificationResponse[]> {
     const responses: NotificationResponse[] = [];
 
     try {
@@ -71,9 +69,7 @@ export class TaskReminderService {
 
       // 1. Schedule main reminder (default 1 hour before)
       const reminderPayload = this.taskReminderFactory.createNotification(data);
-      const reminderResponse = await this.notificationService.scheduleNotification(
-        reminderPayload
-      );
+      const reminderResponse = await this.notificationService.scheduleNotification(reminderPayload);
       responses.push(reminderResponse);
       if (reminderResponse.success && reminderResponse.notificationId) {
         notificationIds.push(reminderResponse.notificationId);
@@ -91,9 +87,7 @@ export class TaskReminderService {
         };
 
         const dueSoonPayload = this.taskDueSoonFactory.createNotification(dueSoonData);
-        const dueSoonResponse = await this.notificationService.scheduleNotification(
-          dueSoonPayload
-        );
+        const dueSoonResponse = await this.notificationService.scheduleNotification(dueSoonPayload);
         responses.push(dueSoonResponse);
         if (dueSoonResponse.success && dueSoonResponse.notificationId) {
           notificationIds.push(dueSoonResponse.notificationId);
@@ -119,9 +113,7 @@ export class TaskReminderService {
    * @param data - Task overdue data
    * @returns Promise<NotificationResponse>
    */
-  public async scheduleOverdueNotification(
-    data: TaskOverdueData
-  ): Promise<NotificationResponse> {
+  public async scheduleOverdueNotification(data: TaskOverdueData): Promise<NotificationResponse> {
     try {
       const payload = this.taskOverdueFactory.createNotification(data);
       const response = await this.notificationService.scheduleNotification(payload);
@@ -177,9 +169,7 @@ export class TaskReminderService {
    * @param data - Updated task reminder data
    * @returns Promise<NotificationResponse[]>
    */
-  public async updateTaskReminders(
-    data: TaskReminderData
-  ): Promise<NotificationResponse[]> {
+  public async updateTaskReminders(data: TaskReminderData): Promise<NotificationResponse[]> {
     return await this.scheduleTaskReminders(data);
   }
 

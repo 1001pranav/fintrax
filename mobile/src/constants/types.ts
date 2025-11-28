@@ -35,12 +35,12 @@ export interface RegisterData {
 
 export interface OTPVerification {
   email: string;
-  otp: string;
+  otp: number;
 }
 
 export interface ResetPasswordData {
   email: string;
-  otp: string;
+  otp: number;
   newPassword: string;
 }
 

@@ -19,9 +19,7 @@ export const projectsApi = {
    * Get project by ID
    */
   getProject: async (id: string): Promise<Project> => {
-    const response = await apiClient.get<ApiResponse<Project>>(
-      `/projects/${id}`
-    );
+    const response = await apiClient.get<ApiResponse<Project>>(`/projects/${id}`);
     return response.data.data!;
   },
 
@@ -29,24 +27,15 @@ export const projectsApi = {
    * Create new project
    */
   createProject: async (project: Partial<Project>): Promise<Project> => {
-    const response = await apiClient.post<ApiResponse<Project>>(
-      '/projects',
-      project
-    );
+    const response = await apiClient.post<ApiResponse<Project>>('/projects', project);
     return response.data.data!;
   },
 
   /**
    * Update project
    */
-  updateProject: async (
-    id: string,
-    updates: Partial<Project>
-  ): Promise<Project> => {
-    const response = await apiClient.patch<ApiResponse<Project>>(
-      `/projects/${id}`,
-      updates
-    );
+  updateProject: async (id: string, updates: Partial<Project>): Promise<Project> => {
+    const response = await apiClient.patch<ApiResponse<Project>>(`/projects/${id}`, updates);
     return response.data.data!;
   },
 

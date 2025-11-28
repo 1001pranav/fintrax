@@ -63,9 +63,7 @@ export const fetchTransactions = createAsyncThunk(
 
           // Update local database with server data
           for (const serverTransaction of serverTransactions) {
-            const existing = await transactionRepository.getById(
-              serverTransaction.id
-            );
+            const existing = await transactionRepository.getById(serverTransaction.id);
             if (existing) {
               await transactionRepository.update(serverTransaction.id, {
                 ...serverTransaction,
@@ -124,10 +122,7 @@ export const createTransaction = createAsyncThunk(
 
 export const updateTransaction = createAsyncThunk(
   'finance/updateTransaction',
-  async (
-    { id, updates }: { id: string; updates: Partial<Transaction> },
-    { rejectWithValue }
-  ) => {
+  async ({ id, updates }: { id: string; updates: Partial<Transaction> }, { rejectWithValue }) => {
     try {
       // Update using repository (US-4.4)
       const transaction = await transactionRepository.update(id, {
@@ -155,12 +150,7 @@ export const deleteTransaction = createAsyncThunk(
     try {
       // Soft delete using repository (US-4.4)
       await transactionRepository.delete(id);
-      await offlineManager.queueOperation(
-        SyncOperationType.DELETE,
-        SyncEntity.TRANSACTION,
-        id,
-        {}
-      );
+      await offlineManager.queueOperation(SyncOperationType.DELETE, SyncEntity.TRANSACTION, id, {});
 
       return id;
     } catch (error: any) {
@@ -204,18 +194,14 @@ const financeSlice = createSlice({
     });
 
     builder.addCase(updateTransaction.fulfilled, (state, action) => {
-      const index = state.transactions.findIndex(
-        (t) => t.id === action.payload.id
-      );
+      const index = state.transactions.findIndex((t) => t.id === action.payload.id);
       if (index !== -1) {
         state.transactions[index] = action.payload;
       }
     });
 
     builder.addCase(deleteTransaction.fulfilled, (state, action) => {
-      state.transactions = state.transactions.filter(
-        (t) => t.id !== action.payload
-      );
+      state.transactions = state.transactions.filter((t) => t.id !== action.payload);
     });
   },
 });

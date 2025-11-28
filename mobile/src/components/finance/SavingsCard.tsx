@@ -41,11 +41,7 @@ export const SavingsCard: React.FC<SavingsCardProps> = ({ savings }) => {
               {
                 width: `${Math.min(progress, 100)}%`,
                 backgroundColor:
-                  progress >= 100
-                    ? '#10B981'
-                    : progress >= 50
-                    ? '#3B82F6'
-                    : '#F59E0B',
+                  progress >= 100 ? '#10B981' : progress >= 50 ? '#3B82F6' : '#F59E0B',
               },
             ]}
           />

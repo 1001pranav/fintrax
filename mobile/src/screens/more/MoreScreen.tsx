@@ -5,14 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../theme/ThemeContext';
@@ -179,75 +173,74 @@ export const MoreScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={dynamicStyles.container} contentContainerStyle={styles.content}>
-      {/* Profile Card */}
-      <TouchableOpacity
-        style={dynamicStyles.profileCard}
-        onPress={() => {
-          /* navigation.navigate('Profile') */
-        }}
-        activeOpacity={0.7}
-      >
-        <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={styles.avatarText}>{controller.getUserInitials()}</Text>
-        </View>
-        <View style={styles.profileInfo}>
-          <Text style={[styles.username, { color: colors.text }]}>{username}</Text>
-          <Text style={[styles.viewProfile, { color: colors.primary }]}>
-            View Profile
-          </Text>
-        </View>
-        <Icon name="chevron-right" size={24} color={colors.textTertiary} />
-      </TouchableOpacity>
-
-      {/* Settings Sections */}
-      {settingsSections.map((section, sectionIndex) => (
-        <View key={sectionIndex} style={styles.section}>
-          <Text style={dynamicStyles.sectionTitle}>{section.title}</Text>
-          <View style={dynamicStyles.settingsCard}>
-            {section.items.map((item, itemIndex) => (
-              <React.Fragment key={itemIndex}>
-                <TouchableOpacity
-                  style={styles.settingItem}
-                  onPress={item.onPress}
-                  activeOpacity={0.7}
-                >
-                  <Icon name={item.icon} size={24} color={colors.primary} />
-                  <View style={styles.settingContent}>
-                    <Text style={dynamicStyles.settingLabel}>{item.label}</Text>
-                    <Text style={dynamicStyles.settingSubtitle}>{item.subtitle}</Text>
-                  </View>
-                  <Icon name="chevron-right" size={24} color={colors.textTertiary} />
-                </TouchableOpacity>
-                {itemIndex < section.items.length - 1 && (
-                  <View style={dynamicStyles.divider} />
-                )}
-              </React.Fragment>
-            ))}
+    <SafeAreaView style={dynamicStyles.container} edges={['top', 'bottom']}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
+        {/* Profile Card */}
+        <TouchableOpacity
+          style={dynamicStyles.profileCard}
+          onPress={() => {
+            /* navigation.navigate('Profile') */
+          }}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
+            <Text style={styles.avatarText}>{controller.getUserInitials()}</Text>
           </View>
-        </View>
-      ))}
+          <View style={styles.profileInfo}>
+            <Text style={[styles.username, { color: colors.text }]}>{username}</Text>
+            <Text style={[styles.viewProfile, { color: colors.primary }]}>View Profile</Text>
+          </View>
+          <Icon name="chevron-right" size={24} color={colors.textTertiary} />
+        </TouchableOpacity>
 
-      {/* Logout Button */}
-      <TouchableOpacity
-        style={[styles.logoutButton, { borderColor: colors.error }]}
-        onPress={handleLogout}
-        activeOpacity={0.7}
-      >
-        <Icon name="logout" size={20} color={colors.error} />
-        <Text style={[styles.logoutText, { color: colors.error }]}>Logout</Text>
-      </TouchableOpacity>
+        {/* Settings Sections */}
+        {settingsSections.map((section, sectionIndex) => (
+          <View key={sectionIndex} style={styles.section}>
+            <Text style={dynamicStyles.sectionTitle}>{section.title}</Text>
+            <View style={dynamicStyles.settingsCard}>
+              {section.items.map((item, itemIndex) => (
+                <React.Fragment key={itemIndex}>
+                  <TouchableOpacity
+                    style={styles.settingItem}
+                    onPress={item.onPress}
+                    activeOpacity={0.7}
+                  >
+                    <Icon name={item.icon} size={24} color={colors.primary} />
+                    <View style={styles.settingContent}>
+                      <Text style={dynamicStyles.settingLabel}>{item.label}</Text>
+                      <Text style={dynamicStyles.settingSubtitle}>{item.subtitle}</Text>
+                    </View>
+                    <Icon name="chevron-right" size={24} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                  {itemIndex < section.items.length - 1 && <View style={dynamicStyles.divider} />}
+                </React.Fragment>
+              ))}
+            </View>
+          </View>
+        ))}
 
-      {/* App Version */}
-      <Text style={[styles.version, { color: colors.textTertiary }]}>
-        Fintrax v1.0.0
-      </Text>
-    </ScrollView>
+        {/* Logout Button */}
+        <TouchableOpacity
+          style={[styles.logoutButton, { borderColor: colors.error }]}
+          onPress={handleLogout}
+          activeOpacity={0.7}
+        >
+          <Icon name="logout" size={20} color={colors.error} />
+          <Text style={[styles.logoutText, { color: colors.error }]}>Logout</Text>
+        </TouchableOpacity>
+
+        {/* App Version */}
+        <Text style={[styles.version, { color: colors.textTertiary }]}>Fintrax v1.0.0</Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  flex: {
     flex: 1,
   },
   content: {

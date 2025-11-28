@@ -1,11 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { View, ScrollView, RefreshControl, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { fetchDashboardData } from '../../store/slices/dashboardSlice';
 import { WelcomeHeader } from '../../components/dashboard/WelcomeHeader';
@@ -19,8 +14,9 @@ export const DashboardScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { user } = useAppSelector((state) => state.auth);
-  const { balance, netWorth, recentTasks, recentTransactions, loading } =
-    useAppSelector((state) => state.dashboard);
+  const { balance, netWorth, recentTasks, recentTransactions, loading } = useAppSelector(
+    (state) => state.dashboard
+  );
 
   useEffect(() => {
     // Fetch dashboard data on mount
@@ -39,7 +35,7 @@ export const DashboardScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -56,23 +52,13 @@ export const DashboardScreen = () => {
           onNotificationPress={handleNotificationPress}
         />
 
-        <FinancialSummaryCard
-          balance={balance}
-          netWorth={netWorth}
-          loading={loading}
-        />
+        <FinancialSummaryCard balance={balance} netWorth={netWorth} loading={loading} />
 
         <QuickActions />
 
-        <RecentTasksWidget
-          tasks={recentTasks}
-          loading={loading}
-        />
+        <RecentTasksWidget tasks={recentTasks} loading={loading} />
 
-        <RecentTransactionsWidget
-          transactions={recentTransactions}
-          loading={loading}
-        />
+        <RecentTransactionsWidget transactions={recentTransactions} loading={loading} />
       </ScrollView>
     </SafeAreaView>
   );

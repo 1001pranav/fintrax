@@ -35,10 +35,7 @@ export const tasksApi = {
    * Update task
    */
   updateTask: async (id: string, updates: Partial<Task>): Promise<Task> => {
-    const response = await apiClient.patch<ApiResponse<Task>>(
-      `/todo/${id}`,
-      updates
-    );
+    const response = await apiClient.patch<ApiResponse<Task>>(`/todo/${id}`, updates);
     return response.data.data!;
   },
 

@@ -7,10 +7,7 @@
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Platform } from 'react-native';
-import {
-  AuthResult,
-  AuthenticationStrategy,
-} from './strategies/AuthenticationStrategy';
+import { AuthResult, AuthenticationStrategy } from './strategies/AuthenticationStrategy';
 import { FaceIDStrategy } from './strategies/FaceIDStrategy';
 import { TouchIDStrategy } from './strategies/TouchIDStrategy';
 import { FingerprintStrategy } from './strategies/FingerprintStrategy';
@@ -60,9 +57,7 @@ export class BiometricService {
   /**
    * Set password strategy (must be set from outside with validation function)
    */
-  public setPasswordStrategy(
-    validatePassword: (password: string) => Promise<boolean>,
-  ): void {
+  public setPasswordStrategy(validatePassword: (password: string) => Promise<boolean>): void {
     this.strategies.set('PASSWORD', new PasswordStrategy(validatePassword));
   }
 
@@ -158,9 +153,7 @@ export class BiometricService {
    * @param password - User password
    * @returns Promise<AuthResult>
    */
-  public async authenticateWithPassword(
-    password: string,
-  ): Promise<AuthResult> {
+  public async authenticateWithPassword(password: string): Promise<AuthResult> {
     const passwordStrategy = this.strategies.get('PASSWORD');
     if (!passwordStrategy) {
       return {

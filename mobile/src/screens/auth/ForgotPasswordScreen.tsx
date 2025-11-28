@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -77,82 +78,84 @@ export const ForgotPasswordScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <StatusBar style="dark" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        {/* Back Button */}
-        <TouchableOpacity style={styles.backButton} onPress={handleBackToLogin}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Ionicons name="lock-closed-outline" size={48} color={colors.primary} />
-          </View>
-          <Text style={styles.title}>Forgot Password?</Text>
-          <Text style={styles.subtitle}>
-            No worries! Enter your email address and we'll send you a code to reset your password.
-          </Text>
-        </View>
-
-        {/* Form */}
-        <View style={styles.form}>
-          <InputField
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setEmailError(null);
-            }}
-            error={emailError}
-            type="email"
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            leftIcon="mail-outline"
-            editable={!isLoading}
-            testID="email-input"
-          />
-        </View>
-
-        {/* Send OTP Button */}
-        <Button
-          title="Send Reset Code"
-          onPress={handleSendOTP}
-          loading={isLoading}
-          disabled={isLoading || !email}
-          fullWidth
-          testID="send-otp-button"
-        />
-
-        {/* Back to Login Link */}
-        <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>Remember your password? </Text>
-          <TouchableOpacity onPress={handleBackToLogin} disabled={isLoading}>
-            <Text style={styles.loginLink}>Sign In</Text>
+        <StatusBar style="dark" />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Back Button */}
+          <TouchableOpacity style={styles.backButton} onPress={handleBackToLogin}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-        </View>
 
-        {/* Help Text */}
-        <View style={styles.helpContainer}>
-          <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
-          <Text style={styles.helpText}>
-            If you don't receive the code within 5 minutes, please check your spam folder or try
-            again.
-          </Text>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="lock-closed-outline" size={48} color={colors.primary} />
+            </View>
+            <Text style={styles.title}>Forgot Password?</Text>
+            <Text style={styles.subtitle}>
+              No worries! Enter your email address and we'll send you a code to reset your password.
+            </Text>
+          </View>
+
+          {/* Form */}
+          <View style={styles.form}>
+            <InputField
+              label="Email"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailError(null);
+              }}
+              error={emailError}
+              type="email"
+              autoCapitalize="none"
+              autoComplete="email"
+              keyboardType="email-address"
+              leftIcon="mail-outline"
+              editable={!isLoading}
+              testID="email-input"
+            />
+          </View>
+
+          {/* Send OTP Button */}
+          <Button
+            title="Send Reset Code"
+            onPress={handleSendOTP}
+            loading={isLoading}
+            disabled={isLoading || !email}
+            fullWidth
+            testID="send-otp-button"
+          />
+
+          {/* Back to Login Link */}
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Remember your password? </Text>
+            <TouchableOpacity onPress={handleBackToLogin} disabled={isLoading}>
+              <Text style={styles.loginLink}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Help Text */}
+          <View style={styles.helpContainer}>
+            <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
+            <Text style={styles.helpText}>
+              If you don't receive the code within 5 minutes, please check your spam folder or try
+              again.
+            </Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -160,6 +163,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+
+  flex: {
+    flex: 1,
   },
 
   scrollContent: {

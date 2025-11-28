@@ -33,7 +33,7 @@ export class PriorityTestStrategy extends TestExecutionStrategy {
       results.push(result);
     }
 
-    const passedCount = results.filter(r => r.passed).length;
+    const passedCount = results.filter((r) => r.passed).length;
     console.log(`[Priority Strategy] Completed: ${passedCount}/${tests.length} passed`);
 
     return results;

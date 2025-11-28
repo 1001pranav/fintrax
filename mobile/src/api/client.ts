@@ -25,10 +25,10 @@ interface ApiErrorResponse {
 class ApiClient {
   private static instance: AxiosInstance;
   private static isRefreshing = false;
-  private static failedQueue: Array<{
+  private static failedQueue: {
     resolve: (token: string) => void;
     reject: (error: any) => void;
-  }> = [];
+  }[] = [];
 
   /**
    * Create axios instance with default configuration
@@ -57,10 +57,7 @@ class ApiClient {
       },
       retryCondition: (error) => {
         // Retry on network errors or 5xx server errors
-        return (
-          axiosRetry.isNetworkError(error) ||
-          (error.response?.status ?? 0) >= 500
-        );
+        return axiosRetry.isNetworkError(error) || (error.response?.status ?? 0) >= 500;
       },
     });
 
@@ -128,8 +125,16 @@ class ApiClient {
     };
 
     // Skip token refresh for auth endpoints (login, register, etc.)
-    const authEndpoints = ['/user/login', '/user/register', '/user/verify-email', '/user/forgot-password', '/user/reset-password'];
-    const isAuthEndpoint = authEndpoints.some(endpoint => originalRequest.url?.includes(endpoint));
+    const authEndpoints = [
+      '/user/login',
+      '/user/register',
+      '/user/verify-email',
+      '/user/forgot-password',
+      '/user/reset-password',
+    ];
+    const isAuthEndpoint = authEndpoints.some((endpoint) =>
+      originalRequest.url?.includes(endpoint)
+    );
 
     // Handle 401 Unauthorized - token expired (but not for auth endpoints)
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
@@ -154,26 +159,18 @@ class ApiClient {
 
       try {
         // Try to refresh token
-        const refreshToken = await secureStorage.getSecure(
-          appConfig.STORAGE_KEYS.REFRESH_TOKEN
-        );
+        const refreshToken = await secureStorage.getSecure(appConfig.STORAGE_KEYS.REFRESH_TOKEN);
 
         if (!refreshToken) {
           throw new Error('No refresh token available');
         }
 
-        const response = await axios.post(
-          `${appConfig.API_URL}/user/refresh`,
-          { refreshToken }
-        );
+        const response = await axios.post(`${appConfig.API_URL}/user/refresh`, { refreshToken });
 
         const { accessToken } = response.data.data;
 
         // Store new token
-        await secureStorage.setSecure(
-          appConfig.STORAGE_KEYS.AUTH_TOKEN,
-          accessToken
-        );
+        await secureStorage.setSecure(appConfig.STORAGE_KEYS.AUTH_TOKEN, accessToken);
 
         // Update Authorization header
         if (originalRequest.headers) {
@@ -204,10 +201,7 @@ class ApiClient {
     // Extract error message from response
     const errorData = error.response?.data as ApiErrorResponse;
     const errorMessage =
-      errorData?.message ||
-      errorData?.errors?.[0] ||
-      error.message ||
-      'An unknown error occurred';
+      errorData?.message || errorData?.errors?.[0] || error.message || 'An unknown error occurred';
 
     return Promise.reject({
       ...error,
@@ -223,9 +217,8 @@ class ApiClient {
       this.instance = this.createInstance();
 
       // Add request interceptor
-      this.instance.interceptors.request.use(
-        this.requestInterceptor.bind(this),
-        (error) => Promise.reject(error)
+      this.instance.interceptors.request.use(this.requestInterceptor.bind(this), (error) =>
+        Promise.reject(error)
       );
 
       // Add response interceptor

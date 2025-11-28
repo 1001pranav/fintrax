@@ -27,30 +27,15 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
       <Text style={styles.title}>{month}</Text>
 
       <View style={styles.row}>
-        <SummaryItem
-          icon="arrow-down-circle"
-          iconColor="#10B981"
-          label="Income"
-          amount={income}
-        />
-        <SummaryItem
-          icon="arrow-up-circle"
-          iconColor="#EF4444"
-          label="Expenses"
-          amount={expense}
-        />
+        <SummaryItem icon="arrow-down-circle" iconColor="#10B981" label="Income" amount={income} />
+        <SummaryItem icon="arrow-up-circle" iconColor="#EF4444" label="Expenses" amount={expense} />
       </View>
 
       <View style={styles.divider} />
 
       <View style={styles.netRow}>
         <Text style={styles.netLabel}>Net</Text>
-        <Text
-          style={[
-            styles.netAmount,
-            { color: isPositive ? '#10B981' : '#EF4444' },
-          ]}
-        >
+        <Text style={[styles.netAmount, { color: isPositive ? '#10B981' : '#EF4444' }]}>
           {isPositive ? '+' : '-'}
           {formatCurrency(Math.abs(net))}
         </Text>
@@ -66,21 +51,14 @@ interface SummaryItemProps {
   amount: number;
 }
 
-const SummaryItem: React.FC<SummaryItemProps> = ({
-  icon,
-  iconColor,
-  label,
-  amount,
-}) => {
+const SummaryItem: React.FC<SummaryItemProps> = ({ icon, iconColor, label, amount }) => {
   return (
     <View style={styles.summaryItem}>
       <View style={[styles.iconCircle, { backgroundColor: iconColor + '20' }]}>
         <Ionicons name={icon as any} size={24} color={iconColor} />
       </View>
       <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={[styles.summaryAmount, { color: iconColor }]}>
-        {formatCurrency(amount)}
-      </Text>
+      <Text style={[styles.summaryAmount, { color: iconColor }]}>{formatCurrency(amount)}</Text>
     </View>
   );
 };

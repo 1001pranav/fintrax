@@ -36,16 +36,10 @@ export class AuthManager {
    */
   async saveTokens(tokens: AuthTokens): Promise<void> {
     try {
-      await secureStorage.setSecure(
-        config.STORAGE_KEYS.AUTH_TOKEN,
-        tokens.accessToken
-      );
+      await secureStorage.setSecure(config.STORAGE_KEYS.AUTH_TOKEN, tokens.accessToken);
 
       if (tokens.refreshToken) {
-        await secureStorage.setSecure(
-          config.STORAGE_KEYS.REFRESH_TOKEN,
-          tokens.refreshToken
-        );
+        await secureStorage.setSecure(config.STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
       }
     } catch (error) {
       console.error('Error saving tokens:', error);
@@ -94,9 +88,7 @@ export class AuthManager {
    */
   async getUser(): Promise<User | null> {
     try {
-      return await secureStorage.getSecureJSON<User>(
-        config.STORAGE_KEYS.USER_DATA
-      );
+      return await secureStorage.getSecureJSON<User>(config.STORAGE_KEYS.USER_DATA);
     } catch (error) {
       console.error('Error getting user data:', error);
       return null;
@@ -140,9 +132,7 @@ export class AuthManager {
   /**
    * Get supported biometric types
    */
-  async getSupportedBiometrics(): Promise<
-    LocalAuthentication.AuthenticationType[]
-  > {
+  async getSupportedBiometrics(): Promise<LocalAuthentication.AuthenticationType[]> {
     try {
       return await this.biometricService.getSupportedTypes();
     } catch (error) {
@@ -181,9 +171,7 @@ export class AuthManager {
    */
   async authenticateWithPassword(password: string): Promise<boolean> {
     try {
-      const result = await this.biometricService.authenticateWithPassword(
-        password
-      );
+      const result = await this.biometricService.authenticateWithPassword(password);
       return result.success;
     } catch (error) {
       console.error('Error authenticating with password:', error);

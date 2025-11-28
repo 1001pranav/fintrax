@@ -39,7 +39,7 @@ export interface IStorageService {
    * Set multiple values in storage
    * @param keyValuePairs - Array of [key, value] pairs
    */
-  multiSet(keyValuePairs: Array<[string, any]>): Promise<void>;
+  multiSet(keyValuePairs: [string, any][]): Promise<void>;
 
   /**
    * Remove multiple values from storage

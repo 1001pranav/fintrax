@@ -15,6 +15,7 @@ import { store, persistor } from './src/store';
 
 // Import navigation
 import { AppNavigator } from './src/navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
  * Loading Screen Component
@@ -35,6 +36,8 @@ const LoadingScreen = () => (
  * - Presentation Layer (React Navigation and screens)
  */
 export default function App() {
+  // temp for clearing the storage
+  AsyncStorage.clear(); // Clear AsyncStorage for development purposes
   return (
     <GestureHandlerRootView style={styles.container}>
       <Provider store={store}>

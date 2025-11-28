@@ -21,11 +21,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry, style })
       <Text style={styles.title}>Oops! Something went wrong</Text>
       <Text style={styles.error}>{error}</Text>
       {onRetry && (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={onRetry}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity style={styles.button} onPress={onRetry} activeOpacity={0.7}>
           <Icon name="refresh" size={20} color="#FFFFFF" />
           <Text style={styles.buttonText}>Try Again</Text>
         </TouchableOpacity>

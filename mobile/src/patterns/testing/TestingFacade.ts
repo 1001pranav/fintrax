@@ -167,7 +167,7 @@ export class TestingFacade {
    */
   private generateReport(results: TestResult[], duration: number): TestReport {
     const totalTests = results.length;
-    const passedTests = results.filter(r => r.passed).length;
+    const passedTests = results.filter((r) => r.passed).length;
     const failedTests = totalTests - passedTests;
     const passed = failedTests === 0;
 
@@ -196,8 +196,12 @@ export class TestingFacade {
     console.log('='.repeat(60));
     console.log(`Status:       ${report.passed ? '✓ PASSED' : '✗ FAILED'}`);
     console.log(`Total Tests:  ${report.totalTests}`);
-    console.log(`Passed:       ${report.passedTests} (${this.getPercentage(report.passedTests, report.totalTests)}%)`);
-    console.log(`Failed:       ${report.failedTests} (${this.getPercentage(report.failedTests, report.totalTests)}%)`);
+    console.log(
+      `Passed:       ${report.passedTests} (${this.getPercentage(report.passedTests, report.totalTests)}%)`
+    );
+    console.log(
+      `Failed:       ${report.failedTests} (${this.getPercentage(report.failedTests, report.totalTests)}%)`
+    );
     console.log(`Duration:     ${this.formatDuration(report.duration)}`);
     if (report.coverage) {
       console.log(`Coverage:     ${report.coverage.toFixed(2)}%`);
@@ -207,10 +211,12 @@ export class TestingFacade {
 
     if (report.failedTests > 0) {
       console.log('\nFailed Tests:');
-      report.results.filter(r => !r.passed).forEach(r => {
-        console.log(`  ✗ ${r.name}`);
-        r.errors.forEach(error => console.log(`    - ${error}`));
-      });
+      report.results
+        .filter((r) => !r.passed)
+        .forEach((r) => {
+          console.log(`  ✗ ${r.name}`);
+          r.errors.forEach((error) => console.log(`    - ${error}`));
+        });
     }
   }
 

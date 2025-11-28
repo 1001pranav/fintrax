@@ -60,14 +60,17 @@ const dashboardSlice = createSlice({
       state.loading = true;
       state.error = null;
     });
-    builder.addCase(fetchDashboardData.fulfilled, (state, action: PayloadAction<DashboardSummary>) => {
-      state.loading = false;
-      state.balance = action.payload.total_balance || 0;
-      state.netWorth = action.payload.net_worth || 0;
-      state.recentTasks = action.payload.recent_tasks || [];
-      state.recentTransactions = action.payload.recent_transactions || [];
-      state.lastFetch = new Date().toISOString();
-    });
+    builder.addCase(
+      fetchDashboardData.fulfilled,
+      (state, action: PayloadAction<DashboardSummary>) => {
+        state.loading = false;
+        state.balance = action.payload.total_balance || 0;
+        state.netWorth = action.payload.net_worth || 0;
+        state.recentTasks = action.payload.recent_tasks || [];
+        state.recentTransactions = action.payload.recent_transactions || [];
+        state.lastFetch = new Date().toISOString();
+      }
+    );
     builder.addCase(fetchDashboardData.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
