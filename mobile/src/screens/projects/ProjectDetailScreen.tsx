@@ -13,7 +13,7 @@ import { fetchProjects } from '../../store/slices/projectsSlice';
 import { fetchTasks } from '../../store/slices/tasksSlice';
 import { KanbanColumn } from '../../components/projects/KanbanColumn';
 import { colors, spacing } from '../../theme';
-import { Project, Task } from '../../constants/types';
+import { Project, Task, TaskStatus } from '../../constants/types';
 
 export const ProjectDetailScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -47,7 +47,7 @@ export const ProjectDetailScreen: React.FC = () => {
     return tasks.filter((task) => task.projectId === projectId);
   };
 
-  const getTasksByStatus = (status: string): Task[] => {
+  const getTasksByStatus = (status: TaskStatus): Task[] => {
     return getProjectTasks().filter((task) => task.status === status);
   };
 
@@ -71,9 +71,9 @@ export const ProjectDetailScreen: React.FC = () => {
     );
   }
 
-  const todoTasks = getTasksByStatus('1');
-  const inProgressTasks = getTasksByStatus('2');
-  const doneTasks = getTasksByStatus('6');
+  const todoTasks = getTasksByStatus(TaskStatus.TODO);
+  const inProgressTasks = getTasksByStatus(TaskStatus.IN_PROGRESS);
+  const doneTasks = getTasksByStatus(TaskStatus.COMPLETED);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>

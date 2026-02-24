@@ -123,7 +123,7 @@ export default function AnalyticsPage() {
             </div>
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
                 onClick={() => setDateRange(range)}
                 className={`px-4 py-2 rounded-lg text-sm transition-colors ${
                   dateRange === range
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-blue-600 text-gray-900 dark:text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >

@@ -10,55 +10,49 @@ export default function FinanceOverview() {
         {
             label: 'Balance',
             value: balance,
-            icon: (
-                <SVGComponent svgType={"wallet_logo"} />
-            ),
-            color: 'text-blue-400',
+            icon: 'wallet_logo',
+            iconColor: 'text-blue-400',
+            bgColor: 'bg-blue-500/20',
             format: 'currency'
         },
         {
             label: 'Net Worth',
             value: netWorth,
-            icon: (
-                <SVGComponent svgType={"chart_logo"} />
-            ),
-            color: 'text-green-400',
+            icon: 'chart_logo',
+            iconColor: 'text-green-400',
+            bgColor: 'bg-green-500/20',
             format: 'currency'
         },
         {
             label: 'Total Income',
             value: financialData.income.total,
-            icon: (
-                <SVGComponent svgType={"income_logo"} />
-            ),
-            color: 'text-emerald-400',
+            icon: 'income_logo',
+            iconColor: 'text-emerald-400',
+            bgColor: 'bg-emerald-500/20',
             format: 'currency'
         },
         {
             label: 'Total Expenses',
             value: financialData.expenses.total,
-            icon: (
-                <SVGComponent svgType={"expense_logo"} />
-            ),
-            color: 'text-red-400',
+            icon: 'expense_logo',
+            iconColor: 'text-red-400',
+            bgColor: 'bg-red-500/20',
             format: 'currency'
         },
         {
             label: 'Total Savings',
             value: financialData.savings.total,
-            icon: (
-                <SVGComponent svgType={"savings_logo"} />
-            ),
-            color: 'text-yellow-400',
+            icon: 'savings_logo',
+            iconColor: 'text-yellow-400',
+            bgColor: 'bg-yellow-500/20',
             format: 'currency'
         },
         {
             label: 'Total Debts',
             value: financialData.debts.total,
-            icon: (
-                <SVGComponent svgType={"debt_logo"} />
-            ),
-            color: 'text-orange-400',
+            icon: 'debt_logo',
+            iconColor: 'text-orange-400',
+            bgColor: 'bg-orange-500/20',
             format: 'currency'
         }
     ];
@@ -77,16 +71,18 @@ export default function FinanceOverview() {
             {stats.map((stat) => (
                 <div
                     key={stat.label}
-                    className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl hover:bg-white/10 transition-all duration-200"
+                    className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 backdrop-blur-xl shadow-sm"
                 >
-                    <div className={`${stat.color} mb-4`}>
-                        {stat.icon}
-                    </div>
-                    <div className="text-2xl font-bold text-white mb-1">
-                        {stat.format === 'currency' ? formatCurrency(stat.value) : stat.value}
-                    </div>
-                    <div className="text-white/60 text-sm">
-                        {stat.label}
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-gray-600 dark:text-white/60 text-sm">{stat.label}</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                                {stat.format === 'currency' ? formatCurrency(stat.value) : stat.value}
+                            </p>
+                        </div>
+                        <div className={`w-12 h-12 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
+                            <SVGComponent svgType={stat.icon as any} className={`w-6 h-6 ${stat.iconColor}`} />
+                        </div>
                     </div>
                 </div>
             ))}

@@ -11,15 +11,45 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CustomDate type to handle multiple date formats
+type CustomDate struct {
+	time.Time
+}
+
+// UnmarshalJSON implements custom JSON unmarshaling for flexible date formats
+func (cd *CustomDate) UnmarshalJSON(b []byte) error {
+	s := string(b)
+	// Remove quotes
+	s = s[1 : len(s)-1]
+
+	// Try multiple date formats
+	formats := []string{
+		"2006-01-02",           // Date only (YYYY-MM-DD)
+		time.RFC3339,           // Full RFC3339
+		"2006-01-02T15:04:05Z", // RFC3339 without timezone
+		time.RFC3339Nano,       // RFC3339 with nanoseconds
+	}
+
+	var err error
+	for _, format := range formats {
+		cd.Time, err = time.Parse(format, s)
+		if err == nil {
+			return nil
+		}
+	}
+
+	return err
+}
+
 type transactionRequest struct {
-	Source          string    `json:"source" binding:"required"`
-	Amount          float64   `json:"amount" binding:"required,gt=0"`
-	Type            uint      `json:"type" binding:"required,gte=1,lte=2"` // 1 = income, 2 = expense
-	TransactionType uint      `json:"transaction_type" binding:"omitempty,gte=1,lte=5"`
-	Category        string    `json:"category" binding:"required"`
-	NotesID         *uint     `json:"notes_id"`
-	Date            time.Time `json:"date"`
-	Status          uint      `json:"status" binding:"omitempty,gte=1,lte=6"`
+	Source          string     `json:"source" binding:"required"`
+	Amount          float64    `json:"amount" binding:"required,gt=0"`
+	Type            uint       `json:"type" binding:"required,gte=1,lte=2"` // 1 = income, 2 = expense
+	TransactionType uint       `json:"transaction_type" binding:"omitempty,gte=1,lte=5"`
+	Category        string     `json:"category" binding:"required"`
+	NotesID         *uint      `json:"notes_id"`
+	Date            CustomDate `json:"date"`
+	Status          uint       `json:"status" binding:"omitempty,gte=1,lte=6"`
 }
 
 type transactionResponse struct {
@@ -56,7 +86,7 @@ func CreateTransaction(c *gin.Context) {
 		req.Status = constants.STATUS_NOT_STARTED
 	}
 	if req.Date.IsZero() {
-		req.Date = time.Now()
+		req.Date.Time = time.Now()
 	}
 
 	var transaction = models.Transactions{
@@ -66,7 +96,7 @@ func CreateTransaction(c *gin.Context) {
 		TransactionType: req.TransactionType,
 		Category:        req.Category,
 		NotesID:         req.NotesID,
-		Date:            req.Date,
+		Date:            req.Date.Time,
 		UserID:          uint(userID.(int)),
 		Status:          req.Status,
 	}
@@ -196,7 +226,7 @@ func UpdateTransaction(c *gin.Context) {
 	transaction.Category = req.Category
 	transaction.NotesID = req.NotesID
 	if !req.Date.IsZero() {
-		transaction.Date = req.Date
+		transaction.Date = req.Date.Time
 	}
 	if req.Status != 0 {
 		transaction.Status = req.Status

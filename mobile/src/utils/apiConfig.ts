@@ -13,6 +13,7 @@ import Constants from 'expo-constants';
  * 3. Fallback to localhost
  */
 export const getApiHost = (): string => {
+  const port: number = 8080;
   // Check if we have a hardcoded API URL in env
   if (process.env.EXPO_PUBLIC_API_URL) {
     console.log('📍 Using API URL from env:', process.env.EXPO_PUBLIC_API_URL);
@@ -26,7 +27,7 @@ export const getApiHost = (): string => {
   if (hostUri) {
     // hostUri format: "192.168.1.5:8081" - extract the IP part
     const host = hostUri.split(':')[0];
-    const apiUrl = `http://${host}:80/api/`;
+    const apiUrl = `http://${host}:${port}/api/`;
     console.log('📍 Auto-detected API URL:', apiUrl);
     return apiUrl;
   }

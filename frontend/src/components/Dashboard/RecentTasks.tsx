@@ -14,24 +14,25 @@ export default function RecentTasks() {
 
   if (recentTasks.length === 0) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
-        <h3 className="text-lg font-semibold text-white mb-4">Recent Tasks</h3>
+      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-8 backdrop-blur-xl mt-8 shadow-sm">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Recent Tasks</h3>
         <div className="text-center py-8">
-          <SVGComponent 
+          <SVGComponent
             svgType = {"task_logo"}
+            className="w-16 h-16 mx-auto text-gray-300 dark:text-white/20 mb-4"
           />
-          <p className="text-white/60">No tasks yet</p>
-          <p className="text-white/40 text-sm mt-1">Create your first task to get started</p>
+          <p className="text-gray-600 dark:text-white/60 text-lg">No tasks yet</p>
+          <p className="text-gray-500 dark:text-white/40 text-sm mt-1">Create your first task to get started</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+    <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 backdrop-blur-xl mt-8 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-white">Recent Tasks</h3>
-        <span className="px-3 py-1 bg-white/10 text-white/60 rounded-lg text-sm">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Tasks</h3>
+        <span className="px-3 py-1.5 bg-blue-500/20 text-blue-600 dark:text-blue-300 rounded-lg text-sm font-medium">
           {recentTasks.length} tasks
         </span>
       </div>

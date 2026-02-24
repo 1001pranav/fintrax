@@ -65,17 +65,19 @@ export interface Task {
 }
 
 export enum TaskStatus {
-  TODO = 'todo',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-  ARCHIVED = 'archived',
+  TODO = 1, // STATUS_NOT_STARTED
+  IN_PROGRESS = 2, // STATUS_IN_PROGRESS
+  ON_HOLD = 3, // STATUS_ON_HOLD
+  CANCELLED = 4, // STATUS_CANCELLED
+  DELETED = 5, // STATUS_DELETED
+  COMPLETED = 6, // STATUS_COMPLETED
 }
 
 export enum TaskPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  URGENT = 'urgent',
+  LOW = 1,
+  MEDIUM = 3,
+  HIGH = 4,
+  URGENT = 5,
 }
 
 // ============================================================================

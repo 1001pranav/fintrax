@@ -39,8 +39,8 @@ export default function ProjectCard({ project, isSelected, onClick }: ProjectCar
       onClick={onClick}
       className={`group min-h-[100px] p-3 sm:p-4 rounded-xl cursor-pointer transition-all duration-200 touch-manipulation ${
         isSelected
-          ? 'bg-white/15 border border-white/20 shadow-lg'
-          : 'bg-white/5 hover:bg-white/10 active:bg-white/15 border border-transparent'
+          ? 'bg-gray-100 dark:bg-white/15 border border-gray-300 dark:border-white/20 shadow-lg'
+          : 'bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 active:bg-gray-100 dark:active:bg-white/15 border border-gray-200 dark:border-transparent shadow-sm'
       }`}
     >
       <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
@@ -49,18 +49,18 @@ export default function ProjectCard({ project, isSelected, onClick }: ProjectCar
             className="w-4 h-4 rounded-full flex-shrink-0"
             style={{ backgroundColor: project.color }}
           />
-          <h3 className="font-semibold text-white text-sm sm:text-base truncate">{project.name}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base truncate">{project.name}</h3>
         </div>
 
         <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex space-x-1 flex-shrink-0">
           <button
             onClick={handleEdit}
-            className="min-w-[32px] min-h-[32px] p-1.5 sm:p-1 hover:bg-white/10 active:bg-white/20 rounded transition-colors touch-manipulation"
+            className="min-w-[32px] min-h-[32px] p-1.5 sm:p-1 hover:bg-gray-200 dark:hover:bg-white/10 active:bg-gray-300 dark:active:bg-white/20 rounded transition-colors touch-manipulation"
             aria-label="Edit project"
           >
             <SVGComponent
               svgType={"editWrite"}
-              className="w-4 h-4 text-white/60"
+              className="w-4 h-4 text-gray-600 dark:text-white/60"
             />
           </button>
           <button
@@ -76,9 +76,9 @@ export default function ProjectCard({ project, isSelected, onClick }: ProjectCar
         </div>
       </div>
 
-      <p className="text-white/60 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{project.description}</p>
+      <p className="text-gray-600 dark:text-white/60 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{project.description}</p>
 
-      <div className="flex items-center justify-between text-xs text-white/50">
+      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-white/50">
         <span>{project.taskCount || 0} tasks</span>
         <span>
           {date ? date: null}

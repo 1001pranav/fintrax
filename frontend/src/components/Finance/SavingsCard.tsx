@@ -24,7 +24,7 @@ export default function SavingsCard({ savings, onEdit, onDelete }: SavingsCardPr
   const progressColor = progress >= 100 ? 'bg-green-500' : progress >= 75 ? 'bg-blue-500' : progress >= 50 ? 'bg-yellow-500' : 'bg-orange-500';
 
   return (
-    <div className="bg-gradient-to-br from-green-500/10 to-emerald-600/5 border border-white/10 rounded-2xl p-5 backdrop-blur-xl hover:bg-white/5 transition-all duration-200 group">
+    <div className="bg-gradient-to-br from-green-500/10 to-emerald-600/5 border  border-gray-200 dark:border-white/10 rounded-2xl p-5 backdrop-blur-xl hover:bg-white/5 transition-all duration-200 group">
       <div className="flex items-start justify-between mb-4">
         {/* Left: Icon and Details */}
         <div className="flex items-start space-x-4 flex-1">

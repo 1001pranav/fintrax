@@ -6,7 +6,7 @@ export default function FormWrapper({ children }: FormWrapperProps) {
     return (
         <div className="relative">
             {/* Glass Card */}
-            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+            <div className="backdrop-blur-xl bg-white/10 border  border-gray-300 dark:border-white/20 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
                 {/* Glass Effect Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent pointer-events-none" />
                 

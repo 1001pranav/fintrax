@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getGreeting, formatDate } from '../../utils/dateUtils';
+import { getGreeting } from '../../utils/dateUtils';
 
 interface WelcomeHeaderProps {
   userName: string;

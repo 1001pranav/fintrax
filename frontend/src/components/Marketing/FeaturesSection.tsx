@@ -63,7 +63,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-20 bg-slate-50">
+    <section id="features" className="py-20 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -82,7 +82,7 @@ export default function FeaturesSection() {
               key={index}
               className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-200"
             >
-              <div className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${feature.color} text-white mb-4`}>
+              <div className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${feature.color} text-gray-900 dark:text-white mb-4`}>
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">

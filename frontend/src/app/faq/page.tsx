@@ -212,7 +212,7 @@ export default function FAQPage() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 selectedCategory === category
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-gray-900 dark:text-white shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
               }`}
             >
@@ -265,7 +265,7 @@ export default function FAQPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/help"
-                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-gray-900 dark:text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
               >
                 View Help Docs
               </Link>

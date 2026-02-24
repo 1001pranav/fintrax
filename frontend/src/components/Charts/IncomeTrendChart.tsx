@@ -65,13 +65,13 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
 
   return (
     <div
-      className="bg-black/90 border border-white/10 rounded-xl p-4 backdrop-blur-xl"
+      className="bg-white/95 dark:bg-black/90 border border-gray-200 dark:border-white/10 rounded-xl p-4 backdrop-blur-xl"
       style={{
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
       }}
     >
       {label && (
-        <p className="text-white font-semibold mb-3 text-sm border-b border-white/10 pb-2">
+        <p className="text-gray-900 dark:text-white font-semibold mb-3 text-sm border-b border-gray-200 dark:border-white/10 pb-2">
           {label}
         </p>
       )}
@@ -88,7 +88,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: entry.color }}
                 />
-                <span className="text-white/80 text-xs">
+                <span className="text-gray-600 dark:text-white/80 text-xs">
                   {entry.name === 'income' && 'Income'}
                   {entry.name === 'expense' && 'Expense'}
                   {entry.name === 'netSavings' && 'Net Savings'}
@@ -100,7 +100,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
                     ? isNegative
                       ? 'text-red-400'
                       : 'text-green-400'
-                    : 'text-white'
+                    : 'text-gray-900 dark:text-white'
                 }`}
               >
                 {formatCurrency(Math.abs(value))}
@@ -191,7 +191,7 @@ export const IncomeTrendChart: React.FC<IncomeTrendChartProps> = ({
       <select
         value={timePeriod}
         onChange={(e) => handleTimePeriodChange(e.target.value as TimePeriod)}
-        className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+        className="bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-1.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
       >
         <option value="last-3-months">Last 3 Months</option>
         <option value="last-6-months">Last 6 Months</option>
@@ -207,9 +207,9 @@ export const IncomeTrendChart: React.FC<IncomeTrendChartProps> = ({
               const endDate = customRange?.endDate || new Date().toISOString().split('T')[0];
               handleCustomDateChange(e.target.value, endDate);
             }}
-            className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
-          <span className="text-white/60 text-sm">to</span>
+          <span className="text-gray-600 dark:text-white/60 text-sm">to</span>
           <input
             type="date"
             onChange={(e) => {
@@ -218,7 +218,7 @@ export const IncomeTrendChart: React.FC<IncomeTrendChartProps> = ({
                 new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
               handleCustomDateChange(startDate, e.target.value);
             }}
-            className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
         </div>
       )}
@@ -400,26 +400,26 @@ export const IncomeTrendChart: React.FC<IncomeTrendChartProps> = ({
       {/* Summary Statistics */}
       {trendData.length > 0 && (
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Total Income</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Total Income</div>
             <div className="text-green-400 font-bold text-sm">
               {formatCurrency(summary.totalIncome)}
             </div>
-            <div className="text-white/40 text-xs mt-1">
+            <div className="text-gray-500 dark:text-white/40 text-xs mt-1">
               Avg: {formatCurrency(summary.avgIncome)}
             </div>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Total Expense</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Total Expense</div>
             <div className="text-red-400 font-bold text-sm">
               {formatCurrency(summary.totalExpense)}
             </div>
-            <div className="text-white/40 text-xs mt-1">
+            <div className="text-gray-500 dark:text-white/40 text-xs mt-1">
               Avg: {formatCurrency(summary.avgExpense)}
             </div>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Net Savings</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Net Savings</div>
             <div
               className={`font-bold text-sm ${
                 summary.totalNetSavings >= 0 ? 'text-green-400' : 'text-red-400'
@@ -429,26 +429,26 @@ export const IncomeTrendChart: React.FC<IncomeTrendChartProps> = ({
                 ? formatCurrency(summary.totalNetSavings)
                 : `-${formatCurrency(Math.abs(summary.totalNetSavings))}`}
             </div>
-            <div className="text-white/40 text-xs mt-1">
+            <div className="text-gray-500 dark:text-white/40 text-xs mt-1">
               {summary.totalNetSavings >= 0 ? 'Surplus' : 'Deficit'}
             </div>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Savings Rate</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Savings Rate</div>
             <div
               className={`font-bold text-sm ${
                 summary.totalIncome > 0
                   ? (summary.totalNetSavings / summary.totalIncome) * 100 >= 0
                     ? 'text-green-400'
                     : 'text-red-400'
-                  : 'text-white/60'
+                  : 'text-gray-600 dark:text-white/60'
               }`}
             >
               {summary.totalIncome > 0
                 ? `${((summary.totalNetSavings / summary.totalIncome) * 100).toFixed(1)}%`
                 : 'N/A'}
             </div>
-            <div className="text-white/40 text-xs mt-1">Of income</div>
+            <div className="text-gray-500 dark:text-white/40 text-xs mt-1">Of income</div>
           </div>
         </div>
       )}

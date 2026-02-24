@@ -27,7 +27,7 @@ import type { AuthStackParamList } from '../../navigation/types';
 type VerifyEmailScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'VerifyEmail'>;
 type VerifyEmailScreenRouteProp = RouteProp<AuthStackParamList, 'VerifyEmail'>;
 
-const OTP_LENGTH = 6;
+const OTP_LENGTH = 4; // Backend sends 4-digit OTP
 const RESEND_COOLDOWN = 60; // seconds
 
 export const VerifyEmailScreen: React.FC = () => {
@@ -37,7 +37,7 @@ export const VerifyEmailScreen: React.FC = () => {
   const { error: authError } = useAppSelector((state) => state.auth);
 
   const [email] = useState(route.params.email);
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(''));
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
@@ -45,6 +45,13 @@ export const VerifyEmailScreen: React.FC = () => {
 
   // Refs for OTP input fields
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  // Log OTP info when screen loads (OTP was sent during registration)
+  useEffect(() => {
+    console.log('📧 Email Verification Screen Loaded');
+    console.log('📧 OTP has been sent to:', email);
+    console.log('📧 Check your email for the 4-digit verification code');
+  }, [email]);
 
   // Clear auth error when component unmounts
   useEffect(() => {
@@ -119,14 +126,20 @@ export const VerifyEmailScreen: React.FC = () => {
     const otpString = otp.join('');
     const otpNumber = parseInt(otpString, 10);
 
+    console.log('🔐 Verifying OTP:', otpNumber);
+    console.log('📧 Email:', email);
+
     try {
       setIsVerifying(true);
 
       // Call verify email API
-      await authApi.verifyEmail({
+      const response = await authApi.verifyEmail({
         email,
         otp: otpNumber,
       });
+
+      console.log('✅ Email Verified Successfully');
+      console.log('📧 Response:', response);
 
       // Verification successful
       Alert.alert(
@@ -142,7 +155,7 @@ export const VerifyEmailScreen: React.FC = () => {
         ]
       );
     } catch (error: any) {
-      console.error('Verification error:', error);
+      console.error('❌ Verification error:', error);
       setOtpError(error.message || 'Verification failed. Please try again.');
     } finally {
       setIsVerifying(false);
@@ -158,8 +171,20 @@ export const VerifyEmailScreen: React.FC = () => {
       setIsResending(true);
       dispatch(clearError());
 
+      console.log('📧 Resending OTP to:', email);
+      console.log('📧 Request payload:', { email });
+
       // Call generate OTP API
-      await authApi.generateOTP({ email });
+      const response = await authApi.generateOTP({ email });
+
+      console.log('✅ OTP Resent Successfully');
+      console.log('📧 Full Response:', JSON.stringify(response, null, 2));
+
+      // Log the OTP if it's in the response (development mode)
+      if (response && 'otp' in response) {
+        console.log('🔑 OTP CODE:', (response as any).otp);
+        console.log('⏰ Enter this 4-digit code on the verification screen');
+      }
 
       // Show success message
       Alert.alert('OTP Sent', 'A new verification code has been sent to your email.', [
@@ -167,7 +192,7 @@ export const VerifyEmailScreen: React.FC = () => {
       ]);
 
       // Clear OTP inputs
-      setOtp(['', '', '', '', '', '']);
+      setOtp(Array(OTP_LENGTH).fill(''));
       setOtpError(null);
 
       // Start cooldown
@@ -176,7 +201,15 @@ export const VerifyEmailScreen: React.FC = () => {
       // Focus first input
       inputRefs.current[0]?.focus();
     } catch (error: any) {
-      console.error('Resend OTP error:', error);
+      console.error('❌ Resend OTP Error Caught');
+      console.error('📋 Error Type:', typeof error);
+      console.error('📋 Error Keys:', Object.keys(error));
+      console.error('📋 Error Message:', error?.message);
+      console.error('📋 Error Status:', error?.status);
+      console.error('📋 Error Response Status:', error?.response?.status);
+      console.error('📋 Error Response Data:', JSON.stringify(error?.response?.data, null, 2));
+      console.error('📋 Full Error Object:', JSON.stringify(error, null, 2));
+
       Alert.alert('Error', error.message || 'Failed to resend OTP. Please try again.', [
         { text: 'OK' },
       ]);

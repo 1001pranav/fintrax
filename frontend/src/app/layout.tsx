@@ -5,6 +5,9 @@ import "./globals.css";
 import ToastProvider from "@/components/Toast/ToastProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import OfflineBanner from "@/components/OfflineBanner";
+import ThemeProvider from "@/components/ThemeProvider";
+import QueryProvider from "@/components/QueryProvider";
+import ThemeScript from "@/components/ThemeScript";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,13 +45,49 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head />
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ErrorBoundary>
-          <OfflineBanner />
-          {children}
-          <ToastProvider />
-        </ErrorBoundary>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  let theme = localStorage.getItem('theme');
+                  if (!theme) {
+                    const stored = localStorage.getItem('preferences-storage');
+                    if (stored) {
+                      const parsed = JSON.parse(stored);
+                      theme = parsed.state?.preferences?.theme;
+                    }
+                  }
+                  theme = theme || 'light';
+                  const root = document.documentElement;
+
+                  // Remove both classes first to avoid conflicts
+                  root.classList.remove('light', 'dark');
+
+                  if (theme === 'system') {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    root.classList.add(prefersDark ? 'dark' : 'light');
+                  } else {
+                    root.classList.add(theme === 'dark' ? 'dark' : 'light');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+        <ThemeScript />
+        <QueryProvider>
+          <ThemeProvider>
+            <ErrorBoundary>
+              <OfflineBanner />
+              {children}
+              <ToastProvider />
+            </ErrorBoundary>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

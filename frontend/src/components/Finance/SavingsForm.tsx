@@ -199,7 +199,7 @@ export default function SavingsForm({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-3 px-6 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-xl border border-white/20 transition-all duration-200"
+            className="flex-1 py-3 px-6 bg-white/10 hover:bg-white/15 text-gray-900 dark:text-white font-semibold rounded-xl border  border-gray-300 dark:border-white/20 transition-all duration-200"
             disabled={isSubmitting}
           >
             Cancel

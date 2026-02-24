@@ -17,60 +17,48 @@ export default function ProjectStats() {
     {
       label: 'Total Projects',
       value: projects.length,
-      icon: (
-        <SVGComponent
-          svgType={"kanban_logo"}
-        />
-      ),
-      color: 'text-blue-400'
+      icon: 'kanban_logo',
+      iconColor: 'text-blue-400',
+      bgColor: 'bg-blue-500/20'
     },
     {
       label: 'Total Tasks',
       value: totalTasks,
-      icon: (
-        <SVGComponent
-          svgType={"task_logo"}
-        />
-      ),
-      color: 'text-purple-400'
+      icon: 'task_logo',
+      iconColor: 'text-purple-400',
+      bgColor: 'bg-purple-500/20'
     },
     {
       label: 'Completed',
       value: completedTasks,
-      icon: (
-        <SVGComponent
-          svgType={"completed_logo"}
-        />
-      ),
-      color: 'text-green-400'
+      icon: 'completed_logo',
+      iconColor: 'text-green-400',
+      bgColor: 'bg-green-500/20'
     },
     {
       label: 'Completion Rate',
       value: `${completionRate}%`,
-      icon: (
-        <SVGComponent
-          svgType={"completion_rate_logo"}
-        />
-      ),
-      color: 'text-yellow-400'
+      icon: 'completion_rate_logo',
+      iconColor: 'text-yellow-400',
+      bgColor: 'bg-yellow-500/20'
     }
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl"
+          className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 backdrop-blur-xl shadow-sm"
         >
-          <div className={`${stat.color} mb-4`}>
-            {stat.icon}
-          </div>
-          <div className="text-2xl font-bold text-white mb-1">
-            {stat.value}
-          </div>
-          <div className="text-white/60 text-sm">
-            {stat.label}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 dark:text-white/60 text-sm">{stat.label}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stat.value}</p>
+            </div>
+            <div className={`w-12 h-12 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
+              <SVGComponent svgType={stat.icon as any} className={`w-6 h-6 ${stat.iconColor}`} />
+            </div>
           </div>
         </div>
       ))}

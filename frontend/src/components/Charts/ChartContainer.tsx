@@ -71,8 +71,8 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   return (
     <div
       className={`
-        bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl
-        transition-all duration-300
+        bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6 backdrop-blur-xl
+        transition-all duration-300 shadow-sm
         ${isFullscreen ? 'fixed inset-4 z-50' : ''}
         ${className}
       `}
@@ -80,11 +80,11 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex-1">
-          <h3 className="text-white text-lg font-semibold">
+          <h3 className="text-gray-900 dark:text-white text-lg font-semibold">
             {title}
           </h3>
           {subtitle && (
-            <p className="text-white/60 text-sm mt-1">
+            <p className="text-gray-600 dark:text-white/60 text-sm mt-1">
               {subtitle}
             </p>
           )}
@@ -100,12 +100,12 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Refresh chart"
               title="Refresh"
             >
               <svg
-                className={`w-5 h-5 text-white/60 hover:text-white/80 ${
+                className={`w-5 h-5 text-gray-600 dark:text-white/60 hover:text-gray-900 dark:hover:text-white/80 ${
                   loading ? 'animate-spin' : ''
                 }`}
                 fill="none"
@@ -126,13 +126,13 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
           {showFullscreen && (
             <button
               onClick={toggleFullscreen}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors duration-200"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors duration-200"
               aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
               title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
             >
               {isFullscreen ? (
                 <svg
-                  className="w-5 h-5 text-white/60 hover:text-white/80"
+                  className="w-5 h-5 text-gray-600 dark:text-white/60 hover:text-gray-900 dark:hover:text-white/80"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -146,7 +146,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
                 </svg>
               ) : (
                 <svg
-                  className="w-5 h-5 text-white/60 hover:text-white/80"
+                  className="w-5 h-5 text-gray-600 dark:text-white/60 hover:text-gray-900 dark:hover:text-white/80"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -256,11 +256,11 @@ export const ChartHeader: React.FC<ChartHeaderProps> = ({
     <div className={`mb-6 ${className}`}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-white text-2xl font-bold">
+          <h1 className="text-gray-900 dark:text-white text-2xl font-bold">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-white/60 text-sm mt-1">
+            <p className="text-gray-600 dark:text-white/60 text-sm mt-1">
               {subtitle}
             </p>
           )}
@@ -301,7 +301,7 @@ export const ChartLegendItem: React.FC<ChartLegendItemProps> = ({
     <div
       className={`
         flex items-center justify-between space-x-2 px-3 py-2 rounded-lg
-        ${onClick ? 'cursor-pointer hover:bg-white/5 transition-colors' : ''}
+        ${onClick ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 transition-colors' : ''}
       `}
       onClick={onClick}
     >
@@ -310,12 +310,12 @@ export const ChartLegendItem: React.FC<ChartLegendItemProps> = ({
           className="w-3 h-3 rounded-full"
           style={{ backgroundColor: color }}
         />
-        <span className="text-white/80 text-sm">
+        <span className="text-gray-700 dark:text-white/80 text-sm">
           {label}
         </span>
       </div>
       {value !== undefined && (
-        <span className="text-white font-semibold text-sm">
+        <span className="text-gray-900 dark:text-white font-semibold text-sm">
           {value}
         </span>
       )}
@@ -362,20 +362,20 @@ export const ChartMetricCard: React.FC<ChartMetricCardProps> = ({
   return (
     <div
       className={`
-        bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-xl
+        bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 backdrop-blur-xl shadow-sm
         ${className}
       `}
     >
       {icon && (
-        <div className="text-blue-400 mb-2">
+        <div className="text-blue-500 dark:text-blue-400 mb-2">
           {icon}
         </div>
       )}
-      <div className="text-2xl font-bold text-white mb-1">
+      <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
         {value}
       </div>
       <div className="flex items-center justify-between">
-        <div className="text-white/60 text-sm">
+        <div className="text-gray-600 dark:text-white/60 text-sm">
           {label}
         </div>
         {trend && trendValue && (

@@ -50,14 +50,14 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">Financial Overview</h2>
-          <p className="text-white/60 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Financial Overview</h2>
+          <p className="text-gray-600 dark:text-white/60 text-sm mt-1">
             Key metrics and trends from your financial data
           </p>
         </div>
         <a
           href="/finance"
-          className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors flex items-center space-x-1"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors flex items-center space-x-1"
         >
           <span>View All</span>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +77,7 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
         {showNetWorth && (
           <Suspense
             fallback={
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+              <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6 backdrop-blur-xl">
                 <div className="mb-4">
                   <div className="h-6 w-48 bg-white/10 rounded animate-pulse mb-2" />
                   <div className="h-4 w-64 bg-white/10 rounded animate-pulse" />
@@ -96,7 +96,7 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
           {showIncomeTrend && (
             <Suspense
               fallback={
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+                <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6 backdrop-blur-xl">
                   <div className="mb-4">
                     <div className="h-6 w-48 bg-white/10 rounded animate-pulse mb-2" />
                     <div className="h-4 w-64 bg-white/10 rounded animate-pulse" />
@@ -113,7 +113,7 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
           {showExpenseBreakdown && (
             <Suspense
               fallback={
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+                <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6 backdrop-blur-xl">
                   <div className="mb-4">
                     <div className="h-6 w-48 bg-white/10 rounded animate-pulse mb-2" />
                     <div className="h-4 w-64 bg-white/10 rounded animate-pulse" />
@@ -129,14 +129,14 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
       </div>
 
       {/* Quick Stats Summary */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6 backdrop-blur-xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white font-semibold">Quick Actions</h3>
+          <h3 className="text-gray-900 dark:text-white font-semibold">Quick Actions</h3>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <a
             href="/finance"
-            className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-4 transition-all group"
+            className="bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl p-4 transition-all group shadow-sm"
           >
             <div className="text-green-400 mb-2">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -148,15 +148,15 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
                 />
               </svg>
             </div>
-            <div className="text-white text-sm font-medium group-hover:text-green-400 transition-colors">
+            <div className="text-gray-900 dark:text-white text-sm font-medium group-hover:text-green-400 transition-colors">
               Add Transaction
             </div>
-            <div className="text-white/60 text-xs mt-1">Record income/expense</div>
+            <div className="text-gray-600 dark:text-white/60 text-xs mt-1">Record income/expense</div>
           </a>
 
           <a
             href="/finance"
-            className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-4 transition-all group"
+            className="bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl p-4 transition-all group shadow-sm"
           >
             <div className="text-blue-400 mb-2">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,15 +168,15 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
                 />
               </svg>
             </div>
-            <div className="text-white text-sm font-medium group-hover:text-blue-400 transition-colors">
+            <div className="text-gray-900 dark:text-white text-sm font-medium group-hover:text-blue-400 transition-colors">
               View Reports
             </div>
-            <div className="text-white/60 text-xs mt-1">Detailed analytics</div>
+            <div className="text-gray-600 dark:text-white/60 text-xs mt-1">Detailed analytics</div>
           </a>
 
           <a
             href="/finance"
-            className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-4 transition-all group"
+            className="bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl p-4 transition-all group shadow-sm"
           >
             <div className="text-purple-400 mb-2">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -188,15 +188,15 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
                 />
               </svg>
             </div>
-            <div className="text-white text-sm font-medium group-hover:text-purple-400 transition-colors">
+            <div className="text-gray-900 dark:text-white text-sm font-medium group-hover:text-purple-400 transition-colors">
               Savings Goals
             </div>
-            <div className="text-white/60 text-xs mt-1">Track your targets</div>
+            <div className="text-gray-600 dark:text-white/60 text-xs mt-1">Track your targets</div>
           </a>
 
           <a
             href="/projects"
-            className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-4 transition-all group"
+            className="bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl p-4 transition-all group shadow-sm"
           >
             <div className="text-orange-400 mb-2">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -208,10 +208,10 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
                 />
               </svg>
             </div>
-            <div className="text-white text-sm font-medium group-hover:text-orange-400 transition-colors">
+            <div className="text-gray-900 dark:text-white text-sm font-medium group-hover:text-orange-400 transition-colors">
               Projects
             </div>
-            <div className="text-white/60 text-xs mt-1">Manage tasks</div>
+            <div className="text-gray-600 dark:text-white/60 text-xs mt-1">Manage tasks</div>
           </a>
         </div>
       </div>

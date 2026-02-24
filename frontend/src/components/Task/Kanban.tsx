@@ -43,14 +43,14 @@ export default function KanbanBoard() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <SVGComponent
               svgType={"kanban_logo"}
-              className="w-8 h-8 text-white/40"
+              className="w-8 h-8 text-gray-400 dark:text-white/40"
             />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Select a Project</h3>
-          <p className="text-white/60">Choose a project from the sidebar to view tasks</p>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Select a Project</h3>
+          <p className="text-gray-600 dark:text-white/60">Choose a project from the sidebar to view tasks</p>
         </div>
       </div>
     );
@@ -62,7 +62,7 @@ export default function KanbanBoard() {
       <div className="flex items-center justify-center h-full">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-          <p className="text-white/60">Loading tasks...</p>
+          <p className="text-gray-600 dark:text-white/60">Loading tasks...</p>
         </div>
       </div>
     );
@@ -126,15 +126,15 @@ export default function KanbanBoard() {
               style={{ backgroundColor: selectedProject.color }}
             />
             <div>
-              <h1 className="text-2xl font-bold text-white">{selectedProject.name}</h1>
-              <p className="text-white/60">{selectedProject.description}</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{selectedProject.name}</h1>
+              <p className="text-gray-600 dark:text-white/60">{selectedProject.description}</p>
             </div>
           </div>
 
           {/* Manage Tags Button */}
           <button
             onClick={() => setIsTagManagementOpen(true)}
-            className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-xl text-purple-300 hover:bg-purple-500/30 transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-xl text-purple-600 dark:text-purple-300 hover:bg-purple-500/30 transition-colors flex items-center space-x-2"
           >
             <SVGComponent svgType="settings" className="w-4 h-4" />
             <span>Manage Tags</span>
@@ -144,13 +144,13 @@ export default function KanbanBoard() {
         {/* Tag Filter */}
         {tags.length > 0 && (
           <div className="flex items-center space-x-2 overflow-x-auto pb-2">
-            <span className="text-sm text-white/60 whitespace-nowrap">Filter by tag:</span>
+            <span className="text-sm text-gray-600 dark:text-white/60 whitespace-nowrap">Filter by tag:</span>
             <button
               onClick={() => setSelectedTagFilter(null)}
               className={`px-3 py-1 rounded-lg text-sm transition-colors whitespace-nowrap ${
                 selectedTagFilter === null
-                  ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50'
-                  : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10'
+                  ? 'bg-blue-500/30 text-blue-600 dark:text-blue-300 border border-blue-500/50'
+                  : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-white/60 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/10'
               }`}
             >
               All Tasks
@@ -162,11 +162,11 @@ export default function KanbanBoard() {
                 className={`px-3 py-1 rounded-lg text-sm transition-colors whitespace-nowrap ${
                   selectedTagFilter === tag.id
                     ? 'border-2'
-                    : 'border border-white/20 hover:border-white/40'
+                    : 'border border-gray-300 dark:border-white/20 hover:border-gray-400 dark:hover:border-white/40'
                 }`}
                 style={{
-                  backgroundColor: selectedTagFilter === tag.id ? tag.color : 'rgba(255, 255, 255, 0.05)',
-                  color: selectedTagFilter === tag.id ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: selectedTagFilter === tag.id ? tag.color : undefined,
+                  color: selectedTagFilter === tag.id ? '#fff' : undefined,
                   borderColor: selectedTagFilter === tag.id ? tag.color : undefined,
                 }}
               >
@@ -214,27 +214,27 @@ export default function KanbanBoard() {
         {columns.map((column) => {
           const allTasks = getTasksByStatus(selectedProject.id, column.id as Task['status']);
           const tasks = filterTasksByTag(allTasks);
-          
+
           return (
             <div
               key={column.id}
-              className={`bg-white/5 border-2 ${column.color} rounded-2xl p-4 flex flex-col`}
+              className={`bg-gray-50 dark:bg-white/5 border-2 ${column.color} rounded-2xl p-4 flex flex-col shadow-sm`}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, column.id as Task['status'])}
             >
               {/* Column Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
-                  <h2 className="font-semibold text-white">{column.title}</h2>
-                  <span className="px-2 py-1 bg-white/10 text-white/60 rounded-lg text-xs">
+                  <h2 className="font-semibold text-gray-900 dark:text-white">{column.title}</h2>
+                  <span className="px-2 py-1 bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-white/60 rounded-lg text-xs">
                     {tasks.length}
                   </span>
                 </div>
                 <button
                   onClick={() => handleAddTask(column.id as Task['status'])}
-                  className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-white/10 rounded-lg transition-colors"
                 >
-                  <SVGComponent svgType="plus" className="w-4 h-4 text-white/60" />
+                  <SVGComponent svgType="plus" className="w-4 h-4 text-gray-600 dark:text-white/60" />
                 </button>
               </div>
 
@@ -247,20 +247,20 @@ export default function KanbanBoard() {
                     onDragStart={(e) => handleDragStart(e, task)}
                     onDragEnd={handleDragEnd}
                   >
-                    <TaskCard 
-                      task={task} 
+                    <TaskCard
+                      task={task}
                       isDragging={draggedTask?.id === task.id}
                     />
                   </div>
                 ))}
-                
+
                 {tasks.length === 0 && (
-                  <div className="text-center py-8 text-white/40">
+                  <div className="text-center py-8 text-gray-500 dark:text-white/40">
                     <SVGComponent svgType="task_logo" className="w-12 h-12 mx-auto mb-3" />
                     <p className="text-sm">No tasks yet</p>
                     <button
                       onClick={() => handleAddTask(column.id as Task['status'])}
-                      className="mt-2 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                      className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       Add your first task
                     </button>

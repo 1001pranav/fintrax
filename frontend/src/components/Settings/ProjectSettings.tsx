@@ -82,7 +82,7 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
           left: `${position.left}px`
         }}
       >
-        <div className="bg-slate-800/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+        <div className="bg-slate-800/95 backdrop-blur-xl border  border-gray-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="px-4 py-3 border-b border-white/10">
             <div className="flex items-center justify-between">

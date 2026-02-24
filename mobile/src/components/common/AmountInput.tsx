@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardType } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { formatCurrency } from '../../utils/formatters';
 
 interface AmountInputProps {

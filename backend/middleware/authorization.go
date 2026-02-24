@@ -11,6 +11,12 @@ import (
 
 func Authorization() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Skip authorization for OPTIONS requests (CORS preflight)
+		if c.Request.Method == "OPTIONS" {
+			c.Next()
+			return
+		}
+
 		authHeader := c.GetHeader("Authorization")
 		const bearerPrefix = "Bearer "
 

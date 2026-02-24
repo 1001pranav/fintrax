@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRoadmapStore } from '@/lib/roadmapStore';
+import AppNavbar from '@/components/Layout/AppNavbar';
+import Sidebar from '@/components/Layout/Sidebar';
 import RoadmapCard from '@/components/Roadmap/RoadmapCard';
 import RoadmapForm from '@/components/Roadmap/RoadmapForm';
+import SVGComponent from '@/components/svg';
 import { Roadmap, CreateRoadmapData } from '@/lib/api';
 
 export default function RoadmapsPage() {
@@ -13,6 +16,7 @@ export default function RoadmapsPage() {
   const [editingRoadmap, setEditingRoadmap] = useState<Roadmap | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'progress' | 'date'>('date');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchRoadmaps();
@@ -49,8 +53,16 @@ export default function RoadmapsPage() {
 
   // Filter roadmaps
   const filteredRoadmaps = roadmaps.filter((roadmap) => {
-    if (filterStatus === 'active') return roadmap.progress < 100;
-    if (filterStatus === 'completed') return roadmap.progress >= 100;
+    // Filter by status
+    if (filterStatus === 'active' && roadmap.progress >= 100) return false;
+    if (filterStatus === 'completed' && roadmap.progress < 100) return false;
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return roadmap.name.toLowerCase().includes(query);
+    }
+
     return true;
   });
 
@@ -67,176 +79,215 @@ export default function RoadmapsPage() {
     }
   });
 
+  // Stats
+  const stats = {
+    total: roadmaps.length,
+    active: roadmaps.filter(r => r.progress < 100).length,
+    completed: roadmaps.filter(r => r.progress >= 100).length,
+    avgProgress: roadmaps.length > 0
+      ? Math.round(roadmaps.reduce((sum, r) => sum + r.progress, 0) / roadmaps.length)
+      : 0,
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Roadmaps</h1>
-              <p className="text-gray-600 mt-1">Plan and track your long-term projects</p>
-            </div>
-            <button
-              onClick={handleCreateClick}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Create Roadmap
-            </button>
-          </div>
-
-          {/* Filters and Sort */}
-          <div className="flex flex-wrap gap-4 items-center">
-            {/* Filter by Status */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setFilterStatus('all')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  filterStatus === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setFilterStatus('active')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  filterStatus === 'active'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Active
-              </button>
-              <button
-                onClick={() => setFilterStatus('completed')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  filterStatus === 'completed'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Completed
-              </button>
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-slate-900">
+      <AppNavbar />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full p-6 overflow-y-auto">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-2">
+                <h1 className="text-3xl font-bold text-white">Roadmaps</h1>
+                <button
+                  onClick={handleCreateClick}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-gray-900 dark:text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 flex items-center space-x-2"
+                >
+                  <SVGComponent svgType="plus" className="w-5 h-5" />
+                  <span>Create Roadmap</span>
+                </button>
+              </div>
+              <p className="text-white/60">Plan and track your long-term projects</p>
             </div>
 
-            {/* Sort By */}
-            <div className="flex items-center gap-2">
-              <label htmlFor="sort" className="text-sm font-medium text-gray-700">
-                Sort by:
-              </label>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-4 backdrop-blur-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">Total Roadmaps</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.total}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <SVGComponent svgType="map" className="w-6 h-6 text-blue-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-4 backdrop-blur-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">Active</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.active}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <SVGComponent svgType="rightArrowHead" className="w-6 h-6 text-green-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-4 backdrop-blur-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">Completed</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.completed}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <SVGComponent svgType="check" className="w-6 h-6 text-purple-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-4 backdrop-blur-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">Avg Progress</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.avgProgress}%</p>
+                  </div>
+                  <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                    <SVGComponent svgType="completion_rate_logo" className="w-6 h-6 text-yellow-400" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filters and Search */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              {/* Search */}
+              <div className="flex-1">
+                <div className="relative">
+                  <SVGComponent
+                    svgType="search"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search roadmaps..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg text-gray-900 dark:text-white placeholder-white/40 focus:outline-none focus:border-blue-500/50"
+                  />
+                </div>
+              </div>
+
+              {/* Filter by Status */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setFilterStatus('all')}
+                  className={`px-4 py-2.5 rounded-lg font-medium transition-all ${
+                    filterStatus === 'all'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white/5 text-gray-600 dark:text-white/60 hover:bg-white/10'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilterStatus('active')}
+                  className={`px-4 py-2.5 rounded-lg font-medium transition-all ${
+                    filterStatus === 'active'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white/5 text-gray-600 dark:text-white/60 hover:bg-white/10'
+                  }`}
+                >
+                  Active
+                </button>
+                <button
+                  onClick={() => setFilterStatus('completed')}
+                  className={`px-4 py-2.5 rounded-lg font-medium transition-all ${
+                    filterStatus === 'completed'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white/5 text-gray-600 dark:text-white/60 hover:bg-white/10'
+                  }`}
+                >
+                  Completed
+                </button>
+              </div>
+
+              {/* Sort By */}
               <select
-                id="sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'name' | 'progress' | 'date')}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-blue-500/50"
               >
-                <option value="date">Date</option>
-                <option value="name">Name</option>
-                <option value="progress">Progress</option>
+                <option value="date">Sort by Date</option>
+                <option value="name">Sort by Name</option>
+                <option value="progress">Sort by Progress</option>
               </select>
             </div>
-          </div>
-        </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4 backdrop-blur-xl">
+                <div className="flex items-start space-x-3">
+                  <SVGComponent svgType="errorCircle" className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-medium text-red-400">Error</h3>
+                    <p className="mt-1 text-sm text-red-300/80">{error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
-        {/* Loading State */}
-        {isLoading && roadmaps.length === 0 && (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        )}
+            {/* Loading State */}
+            {isLoading && roadmaps.length === 0 && (
+              <div className="flex items-center justify-center py-16">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p className="text-white/60">Loading roadmaps...</p>
+                </div>
+              </div>
+            )}
 
-        {/* Empty State */}
-        {!isLoading && sortedRoadmaps.length === 0 && (
-          <div className="text-center py-12">
-            <svg
-              className="mx-auto h-24 w-24 text-gray-400 mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-              />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No roadmaps yet</h3>
-            <p className="text-gray-600 mb-4">
-              {filterStatus === 'all'
-                ? 'Create your first roadmap to start planning your projects'
-                : `No ${filterStatus} roadmaps found`}
-            </p>
-            {filterStatus === 'all' && (
-              <button
-                onClick={handleCreateClick}
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
+            {/* Empty State */}
+            {!isLoading && sortedRoadmaps.length === 0 && (
+              <div className="text-center py-16 bg-white/5 rounded-xl border border-white/10">
+                <SVGComponent svgType="map" className="w-16 h-16 mx-auto text-gray-300 dark:text-white/20 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No roadmaps found</h3>
+                <p className="text-white/60 mb-6">
+                  {searchQuery
+                    ? 'Try adjusting your search or filters'
+                    : filterStatus === 'all'
+                    ? 'Create your first roadmap to start planning your projects'
+                    : `No ${filterStatus} roadmaps found`}
+                </p>
+                {filterStatus === 'all' && !searchQuery && (
+                  <button
+                    onClick={handleCreateClick}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-gray-900 dark:text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105"
+                  >
+                    Create Roadmap
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Roadmap Grid */}
+            {!isLoading && sortedRoadmaps.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sortedRoadmaps.map((roadmap) => (
+                  <RoadmapCard
+                    key={roadmap.roadmap_id}
+                    roadmap={roadmap}
+                    onEdit={handleEditClick}
+                    onDelete={handleDelete}
                   />
-                </svg>
-                Create Roadmap
-              </button>
+                ))}
+              </div>
             )}
           </div>
-        )}
-
-        {/* Roadmap Grid */}
-        {!isLoading && sortedRoadmaps.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedRoadmaps.map((roadmap) => (
-              <RoadmapCard
-                key={roadmap.roadmap_id}
-                roadmap={roadmap}
-                onEdit={handleEditClick}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Stats Footer */}
-        {!isLoading && sortedRoadmaps.length > 0 && (
-          <div className="mt-8 flex justify-center gap-8 text-sm text-gray-600">
-            <span>
-              Total: <strong className="text-gray-900">{roadmaps.length}</strong>
-            </span>
-            <span>
-              Active:{' '}
-              <strong className="text-gray-900">
-                {roadmaps.filter((r) => r.progress < 100).length}
-              </strong>
-            </span>
-            <span>
-              Completed:{' '}
-              <strong className="text-gray-900">
-                {roadmaps.filter((r) => r.progress >= 100).length}
-              </strong>
-            </span>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Form Modal */}

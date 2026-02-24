@@ -6,6 +6,7 @@
  */
 
 import { Feedback } from '../../testing/types';
+import { getApiHost } from '../../../utils/apiConfig';
 
 export interface IFeedbackRepository {
   getAll(): Promise<Feedback[]>;
@@ -21,7 +22,7 @@ export interface IFeedbackRepository {
 export class FeedbackRepository implements IFeedbackRepository {
   private apiUrl: string;
 
-  constructor(apiUrl: string = 'http://localhost:80/api') {
+  constructor(apiUrl: string = getApiHost()) {
     this.apiUrl = apiUrl;
   }
 

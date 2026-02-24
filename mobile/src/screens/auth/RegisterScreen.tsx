@@ -94,7 +94,7 @@ export const RegisterScreen: React.FC = () => {
 
     try {
       // Dispatch register action
-      await dispatch(
+      const result = await dispatch(
         register({
           email,
           password,
@@ -103,11 +103,23 @@ export const RegisterScreen: React.FC = () => {
         })
       ).unwrap();
 
+      console.log('✅ Registration Successful');
+      console.log('📧 OTP has been sent to:', email);
+      console.log('📧 Registration response:', result);
+
+      // Log the OTP if it's in the response (development mode)
+      if (result && typeof result === 'string' && result.includes('OTP')) {
+        console.log('📧 Check the backend console for the OTP code');
+      } else if (result && typeof result === 'object' && 'otp' in result) {
+        console.log('🔑 OTP CODE:', (result as any).otp);
+        console.log('⏰ Enter this 4-digit code on the verification screen');
+      }
+
       // Registration successful - navigate to OTP verification
       navigation.navigate('VerifyEmail', { email });
     } catch (error: any) {
       // Error is handled by the useEffect above via authError
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
     }
   };
 

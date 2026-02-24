@@ -61,9 +61,9 @@ export default function SavingsModal({
       />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border  border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border-b border-white/10 backdrop-blur-xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border-b  border-gray-200 dark:border-white/10 backdrop-blur-xl">
           <h2 className="text-2xl font-bold text-white">{title}</h2>
           <button
             onClick={onClose}

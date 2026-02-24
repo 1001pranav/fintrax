@@ -314,7 +314,7 @@ export default function ShortcutsPage() {
           </p>
           <a
             href="/settings"
-            className="inline-block px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-gray-900 dark:text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
           >
             Send Feedback
           </a>

@@ -6,6 +6,7 @@
 
 import { TestRunner } from './TestRunner';
 import axios from 'axios';
+import { getApiHost } from '../../../utils/apiConfig';
 
 export class IntegrationTestRunner extends TestRunner {
   private testName: string;
@@ -17,7 +18,7 @@ export class IntegrationTestRunner extends TestRunner {
     this.testName = testName;
     this.testFunction = testFunction;
     this.context = {
-      api: axios.create({ baseURL: 'http://localhost:80/api' }),
+      api: axios.create({ baseURL: getApiHost() }),
       testData: {},
       createdRecords: [],
     };

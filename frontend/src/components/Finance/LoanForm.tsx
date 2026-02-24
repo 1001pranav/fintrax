@@ -201,7 +201,7 @@ export default function LoanForm({
         <select
           value={formData.term}
           onChange={(e) => updateField('term', e.target.value)}
-          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
+          className="w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
         >
           <option value="1">Monthly</option>
           <option value="2">Quarterly</option>
@@ -260,7 +260,7 @@ export default function LoanForm({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-3 px-6 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-xl border border-white/20 transition-all duration-200"
+            className="flex-1 py-3 px-6 bg-white/10 hover:bg-white/15 text-gray-900 dark:text-white font-semibold rounded-xl border  border-gray-300 dark:border-white/20 transition-all duration-200"
             disabled={isSubmitting}
           >
             Cancel

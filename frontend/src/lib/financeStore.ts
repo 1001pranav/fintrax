@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { api, FinanceSummary, Transaction, Savings, Loan, CreateTransactionData, CreateSavingsData, CreateLoanData } from './api';
 import { toast } from './useToast';
+import { apiCache, cacheKeys } from './apiCache';
 
 interface FinancialItem {
     name: string;
@@ -126,11 +127,48 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         financialData: { ...state.financialData, ...data }
     })),
 
-    // Fetch comprehensive finance summary from backend
-    fetchFinanceSummary: async () => {
+    // Fetch comprehensive finance summary from backend with caching
+    fetchFinanceSummary: async (options: { forceRefresh?: boolean } = {}) => {
+        // Check if we have cached data for immediate display (stale-while-revalidate)
+        const cachedSummary = apiCache.getStale<{ data: FinanceSummary }>(cacheKeys.financeSummary());
+        if (cachedSummary && !options.forceRefresh) {
+            const summary = cachedSummary.data;
+            set({
+                balance: summary.balance,
+                netWorth: summary.net_worth,
+                financialData: {
+                    income: {
+                        total: summary.total_income,
+                        growth: 0,
+                        sources: get().financialData.income.sources // Keep existing sources
+                    },
+                    expenses: {
+                        total: summary.total_expense,
+                        growth: 0,
+                        items: get().financialData.expenses.items // Keep existing items
+                    },
+                    savings: {
+                        total: summary.total_savings,
+                        growth: 0,
+                        goals: get().financialData.savings.goals // Keep existing goals
+                    },
+                    debts: {
+                        total: summary.total_debt + summary.total_loans,
+                        growth: 0,
+                        items: get().financialData.debts.items // Keep existing items
+                    }
+                },
+                isLoading: false
+            });
+        }
+
         set({ isLoading: true, error: null });
         try {
-            const response = await api.finance.getSummary();
+            const response = await apiCache.get(
+                cacheKeys.financeSummary(),
+                () => api.finance.getSummary(),
+                { ttl: 2 * 60 * 1000, forceRefresh: options.forceRefresh } // 2 minutes cache
+            );
             const summary: FinanceSummary = response.data;
 
             set({
@@ -139,34 +177,41 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 financialData: {
                     income: {
                         total: summary.total_income,
-                        growth: 0, // Calculate growth separately if needed
-                        sources: [] // Populate from transactions if needed
+                        growth: 0,
+                        sources: get().financialData.income.sources // Keep existing sources
                     },
                     expenses: {
                         total: summary.total_expense,
                         growth: 0,
-                        items: []
+                        items: get().financialData.expenses.items // Keep existing items
                     },
                     savings: {
                         total: summary.total_savings,
                         growth: 0,
-                        goals: []
+                        goals: get().financialData.savings.goals // Keep existing goals
                     },
                     debts: {
                         total: summary.total_debt + summary.total_loans,
                         growth: 0,
-                        items: []
+                        items: get().financialData.debts.items // Keep existing items
                     }
                 },
                 isLoading: false
             });
 
-            // Fetch detailed data
-            await Promise.all([
-                get().fetchTransactions(),
-                get().fetchSavings(),
-                get().fetchLoans()
-            ]);
+            // Fetch detailed data only if not already loaded or forced refresh
+            const hasDetailedData =
+                get().financialData.income.sources.length > 0 ||
+                get().financialData.savings.goals.length > 0 ||
+                get().loans.length > 0;
+
+            if (!hasDetailedData || options.forceRefresh) {
+                await Promise.all([
+                    get().fetchTransactions(),
+                    get().fetchSavings(),
+                    get().fetchLoans()
+                ]);
+            }
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to fetch finance summary';
             set({ error: errorMessage, isLoading: false });
@@ -174,10 +219,14 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         }
     },
 
-    // Fetch transactions and categorize as income/expenses
-    fetchTransactions: async () => {
+    // Fetch transactions and categorize as income/expenses with caching
+    fetchTransactions: async (options: { forceRefresh?: boolean } = {}) => {
         try {
-            const response = await api.transactions.getAll();
+            const response = await apiCache.get(
+                cacheKeys.transactions(),
+                () => api.transactions.getAll(),
+                { ttl: 2 * 60 * 1000, forceRefresh: options.forceRefresh } // 2 minutes cache
+            );
             const transactions: Transaction[] = response.data;
 
             const incomeSources: FinancialItem[] = [];
@@ -216,10 +265,14 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         }
     },
 
-    // Fetch savings goals
-    fetchSavings: async () => {
+    // Fetch savings goals with caching
+    fetchSavings: async (options: { forceRefresh?: boolean } = {}) => {
         try {
-            const response = await api.savings.getAll();
+            const response = await apiCache.get(
+                cacheKeys.savings(),
+                () => api.savings.getAll(),
+                { ttl: 2 * 60 * 1000, forceRefresh: options.forceRefresh } // 2 minutes cache
+            );
             const savingsList: Savings[] = response.data;
 
             const savingsGoals: SavingsGoal[] = savingsList.map(saving => ({
@@ -245,10 +298,14 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         }
     },
 
-    // Fetch loans and add to debts
-    fetchLoans: async () => {
+    // Fetch loans and add to debts with caching
+    fetchLoans: async (options: { forceRefresh?: boolean } = {}) => {
         try {
-            const response = await api.loans.getAll();
+            const response = await apiCache.get(
+                cacheKeys.loans(),
+                () => api.loans.getAll(),
+                { ttl: 2 * 60 * 1000, forceRefresh: options.forceRefresh } // 2 minutes cache
+            );
             const loansList: Loan[] = response.data;
 
             const loanItems: FinancialItem[] = loansList.map(loan => ({
@@ -288,8 +345,8 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
                 },
                 isLoading: false
             });
-            // Refresh summary after update
-            await get().fetchFinanceSummary();
+            // Invalidate summary cache
+            apiCache.invalidate(cacheKeys.financeSummary());
         } catch (error) {
             set({
                 error: error instanceof Error ? error.message : 'Failed to update balance',
@@ -304,9 +361,12 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.transactions.create(data);
-            // Refresh all financial data after creating transaction
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.transactions());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch transactions and summary (not all detailed data)
             await Promise.all([
-                get().fetchTransactions(),
+                get().fetchTransactions({ forceRefresh: true }),
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
@@ -324,9 +384,12 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.transactions.delete(id);
-            // Refresh all financial data after deleting transaction
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.transactions());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch transactions and summary
             await Promise.all([
-                get().fetchTransactions(),
+                get().fetchTransactions({ forceRefresh: true }),
                 get().fetchFinanceSummary()
             ]);
             set({ isLoading: false });
@@ -344,11 +407,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.savings.create(data);
-            // Refresh all financial data after creating savings
-            await Promise.all([
-                get().fetchSavings(),
-                get().fetchFinanceSummary()
-            ]);
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.savings());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch savings (summary will be fetched from cache or on next dashboard visit)
+            await get().fetchSavings({ forceRefresh: true });
             set({ isLoading: false });
             toast.success(`Savings goal "${data.name}" created successfully`);
         } catch (error) {
@@ -364,11 +427,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.savings.update(id, data);
-            // Refresh all financial data after updating savings
-            await Promise.all([
-                get().fetchSavings(),
-                get().fetchFinanceSummary()
-            ]);
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.savings());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch savings
+            await get().fetchSavings({ forceRefresh: true });
             set({ isLoading: false });
             toast.success(`Savings goal "${data.name || 'Savings'}" updated successfully`);
         } catch (error) {
@@ -384,11 +447,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.savings.delete(id);
-            // Refresh all financial data after deleting savings
-            await Promise.all([
-                get().fetchSavings(),
-                get().fetchFinanceSummary()
-            ]);
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.savings());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch savings
+            await get().fetchSavings({ forceRefresh: true });
             set({ isLoading: false });
             toast.success('Savings goal deleted successfully');
         } catch (error) {
@@ -404,11 +467,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.loans.create(data);
-            // Refresh all financial data after creating loan
-            await Promise.all([
-                get().fetchLoans(),
-                get().fetchFinanceSummary()
-            ]);
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.loans());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch loans
+            await get().fetchLoans({ forceRefresh: true });
             set({ isLoading: false });
             toast.success(`Loan "${data.name}" created successfully`);
         } catch (error) {
@@ -424,11 +487,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.loans.update(id, data);
-            // Refresh all financial data after updating loan
-            await Promise.all([
-                get().fetchLoans(),
-                get().fetchFinanceSummary()
-            ]);
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.loans());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch loans
+            await get().fetchLoans({ forceRefresh: true });
             set({ isLoading: false });
             toast.success(`Loan "${data.name || 'Loan'}" updated successfully`);
         } catch (error) {
@@ -444,11 +507,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await api.loans.delete(id);
-            // Refresh all financial data after deleting loan
-            await Promise.all([
-                get().fetchLoans(),
-                get().fetchFinanceSummary()
-            ]);
+            // Invalidate caches
+            apiCache.invalidate(cacheKeys.loans());
+            apiCache.invalidate(cacheKeys.financeSummary());
+            // Only refetch loans
+            await get().fetchLoans({ forceRefresh: true });
             set({ isLoading: false });
             toast.success('Loan deleted successfully');
         } catch (error) {

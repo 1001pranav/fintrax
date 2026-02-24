@@ -143,7 +143,7 @@ export default function TransactionForm({
             className={`flex-1 min-h-[44px] py-3 px-4 rounded-lg transition-all duration-200 touch-manipulation ${
               formData.type === TRANSACTION_TYPES.INCOME
                 ? 'bg-green-500/20 border-2 border-green-400 text-green-300'
-                : 'bg-white/10 border border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
+                : 'bg-white/10 border  border-gray-300 dark:border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
             }`}
           >
             Income
@@ -154,7 +154,7 @@ export default function TransactionForm({
             className={`flex-1 min-h-[44px] py-3 px-4 rounded-lg transition-all duration-200 touch-manipulation ${
               formData.type === TRANSACTION_TYPES.EXPENSE
                 ? 'bg-red-500/20 border-2 border-red-400 text-red-300'
-                : 'bg-white/10 border border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
+                : 'bg-white/10 border  border-gray-300 dark:border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
             }`}
           >
             Expense
@@ -200,7 +200,7 @@ export default function TransactionForm({
         <select
           value={formData.category}
           onChange={(e) => updateField('category', e.target.value)}
-          className="w-full min-h-[44px] px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 touch-manipulation text-base"
+          className="w-full min-h-[44px] px-4 py-3 bg-white/10 border  border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 touch-manipulation text-base"
           required
         >
           <option value="" className="bg-gray-800">Select a category</option>
@@ -240,7 +240,7 @@ export default function TransactionForm({
           onChange={(e) => updateField('notes', e.target.value)}
           placeholder="Add any additional notes..."
           rows={3}
-          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 resize-none touch-manipulation text-base"
+          className="w-full px-4 py-3 bg-white/10 border  border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white placeholder-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 resize-none touch-manipulation text-base"
         />
       </div>
 
@@ -257,7 +257,7 @@ export default function TransactionForm({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 min-h-[48px] py-3 px-6 bg-white/10 hover:bg-white/15 active:bg-white/20 text-white font-semibold rounded-xl border border-white/20 transition-all duration-200 touch-manipulation"
+            className="flex-1 min-h-[48px] py-3 px-6 bg-white/10 hover:bg-white/15 active:bg-white/20 text-gray-900 dark:text-white font-semibold rounded-xl border  border-gray-300 dark:border-white/20 transition-all duration-200 touch-manipulation"
             disabled={isSubmitting}
           >
             Cancel

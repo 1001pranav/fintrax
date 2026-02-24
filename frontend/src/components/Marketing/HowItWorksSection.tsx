@@ -33,7 +33,7 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section id="how-it-works" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -53,7 +53,7 @@ export default function HowItWorksSection() {
           {steps.map((step, index) => (
             <div key={index} className="relative text-center">
               {/* Number Badge */}
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white font-bold text-2xl mb-6 shadow-lg">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-gray-900 dark:text-white font-bold text-2xl mb-6 shadow-lg">
                 {step.number}
               </div>
 

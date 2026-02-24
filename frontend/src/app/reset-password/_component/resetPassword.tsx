@@ -199,7 +199,7 @@ export default function ResetComponent() {
             {/* OTP Verification Section */}
             <div className="space-y-4">
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold text-white mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                   {isOtpVerified ? "OTP Verified ✓" : "Verify Your OTP"}
                 </h3>
                 <p className="text-white/70 text-sm">
@@ -225,11 +225,11 @@ export default function ResetComponent() {
                       type="button"
                       onClick={handleVerifyOtp}
                       disabled={!otpComplete || isVerifyingOtp}
-                      className="flex-1 py-2.5 px-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-[1.02] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      className="flex-1 py-2.5 px-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-gray-900 dark:text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-[1.02] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       {isVerifyingOtp ? (
                         <div className="flex items-center justify-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <div className="w-4 h-4 border-2  border-gray-400 dark:border-white/30 border-t-white rounded-full animate-spin"></div>
                           <span>Verifying...</span>
                         </div>
                       ) : (
@@ -241,11 +241,11 @@ export default function ResetComponent() {
                       type="button"
                       onClick={handleResendOtp}
                       disabled={isResendingOtp || resendCooldown > 0}
-                      className="flex-1 py-2.5 px-4 bg-white/10 border border-white/20 hover:bg-white/15 text-white font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 py-2.5 px-4 bg-white/10 border  border-gray-300 dark:border-white/20 hover:bg-white/15 text-gray-900 dark:text-white font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isResendingOtp ? (
                         <div className="flex items-center justify-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <div className="w-4 h-4 border-2  border-gray-400 dark:border-white/30 border-t-white rounded-full animate-spin"></div>
                           <span>Sending...</span>
                         </div>
                       ) : resendCooldown > 0 ? (
@@ -265,8 +265,8 @@ export default function ResetComponent() {
                 isOtpVerified ? "opacity-100" : "opacity-50 pointer-events-none"
               }`}
             >
-              <div className="border-t border-white/10 pt-4">
-                <h3 className="text-lg font-semibold text-white mb-4 text-center">
+              <div className="border-t  border-gray-200 dark:border-white/10 pt-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
                   Set New Password
                 </h3>
               </div>

@@ -25,11 +25,11 @@ export default function InputField({
     const inputType = isPasswordField && showPassword ? 'text' : type
     return (
         <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/90">
+            <label className="block text-sm font-medium text-gray-900 dark:text-white/90">
                 {label}
                 {required && <span className="text-red-400 ml-1">*</span>}
             </label>
-        
+
         <div className="relative">
             <input
                 type={inputType}
@@ -38,9 +38,9 @@ export default function InputField({
                 onChange={(e) => onChange(e.target.value)}
                 required={required}
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-white/15 shadow-sm"
             />
-            
+
             {/* Input Icon */}
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 {
@@ -55,7 +55,7 @@ export default function InputField({
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="text-white/60 hover:text-white/90 transition-colors focus:outline-none"
+                            className="text-gray-600 dark:text-white/60 hover:text-gray-900 dark:hover:text-white/90 transition-colors focus:outline-none"
                             aria-label={showPassword ? "Hide password" : "Show password"}
                         >
                             <SVGComponent

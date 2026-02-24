@@ -6,7 +6,6 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { useAnimatedStyle, withSpring, interpolateColor } from 'react-native-reanimated';
 import { Task, TaskPriority } from '../../constants/types';
 import { colors, spacing } from '../../theme';
 

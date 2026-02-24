@@ -58,7 +58,15 @@ module.exports = [
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'no-unused-vars': 'off', // Turn off base rule as TypeScript handles this
       'react-native/no-inline-styles': 'warn',
       'react-native/no-color-literals': 'warn',
       'prettier/prettier': 'error',

@@ -29,7 +29,7 @@ export default function CalendarViewComponent() {
               className="w-8 h-8 text-white/40"
             />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Select a Project</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Select a Project</h3>
           <p className="text-white/60">Choose a project from the sidebar to view calendar</p>
         </div>
       </div>
@@ -108,7 +108,7 @@ export default function CalendarViewComponent() {
               style={{ backgroundColor: selectedProject.color }}
             />
             <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{selectedProject.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">{selectedProject.name}</h1>
               <p className="text-white/60 text-sm sm:text-base">Calendar View</p>
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function CalendarViewComponent() {
             />
           </button>
 
-          <h2 className="text-base sm:text-xl font-semibold text-white whitespace-nowrap">
+          <h2 className="text-base sm:text-xl font-semibold text-gray-900 dark:text-white whitespace-nowrap">
             {monthNames[month]} {year}
           </h2>
 
@@ -154,11 +154,11 @@ export default function CalendarViewComponent() {
       </div>
 
       {/* Calendar Grid */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-2 sm:p-4">
+      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-2 sm:p-4">
         {/* Week Headers */}
         <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-2">
           {weekDays.map((day, index) => (
-            <div key={index} className="p-1 sm:p-3 text-center text-white/60 font-medium text-xs sm:text-sm">
+            <div key={index} className="p-1 sm:p-3 text-center text-gray-600 dark:text-white/60 font-medium text-xs sm:text-sm">
               <span className="hidden sm:inline">{day}</span>
               <span className="sm:hidden">{day.slice(0, 1)}</span>
             </div>
@@ -200,7 +200,7 @@ export default function CalendarViewComponent() {
                   ))}
 
                   {dayTasks.length > (window.innerWidth < 640 ? 1 : 2) && (
-                    <div className="px-1 sm:px-2 py-0.5 sm:py-1 bg-white/10 text-white/60 rounded text-[10px] sm:text-xs">
+                    <div className="px-1 sm:px-2 py-0.5 sm:py-1 bg-white/10 text-gray-600 dark:text-white/60 rounded text-[10px] sm:text-xs">
                       +{dayTasks.length - (window.innerWidth < 640 ? 1 : 2)}
                     </div>
                   )}

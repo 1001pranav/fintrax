@@ -55,31 +55,26 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
   const data = payload[0].payload;
 
   return (
-    <div
-      className="bg-black/90 border border-white/10 rounded-xl p-4 backdrop-blur-xl"
-      style={{
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-      }}
-    >
+    <div className="bg-white/95 dark:bg-black/90 border border-gray-200 dark:border-white/10 rounded-xl p-4 backdrop-blur-xl shadow-xl">
       <div className="flex items-center space-x-2 mb-2">
         <div
           className="w-3 h-3 rounded-full"
           style={{ backgroundColor: data.color }}
         />
-        <p className="text-white font-semibold text-sm">{data.category}</p>
+        <p className="text-gray-900 dark:text-white font-semibold text-sm">{data.category}</p>
       </div>
       <div className="space-y-1 text-xs">
         <div className="flex justify-between space-x-6">
-          <span className="text-white/60">Amount:</span>
-          <span className="text-white font-semibold">{formatCurrency(data.amount)}</span>
+          <span className="text-gray-600 dark:text-white/60">Amount:</span>
+          <span className="text-gray-900 dark:text-white font-semibold">{formatCurrency(data.amount)}</span>
         </div>
         <div className="flex justify-between space-x-6">
-          <span className="text-white/60">Percentage:</span>
-          <span className="text-white font-semibold">{formatPercentage(data.percentage)}</span>
+          <span className="text-gray-600 dark:text-white/60">Percentage:</span>
+          <span className="text-gray-900 dark:text-white font-semibold">{formatPercentage(data.percentage)}</span>
         </div>
         <div className="flex justify-between space-x-6">
-          <span className="text-white/60">Transactions:</span>
-          <span className="text-white font-semibold">{data.count}</span>
+          <span className="text-gray-600 dark:text-white/60">Transactions:</span>
+          <span className="text-gray-900 dark:text-white font-semibold">{data.count}</span>
         </div>
       </div>
     </div>
@@ -165,7 +160,7 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
       <select
         value={timePeriod}
         onChange={(e) => handleTimePeriodChange(e.target.value as TimePeriod)}
-        className="min-h-[44px] bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all touch-manipulation"
+        className="min-h-[44px] bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all touch-manipulation"
       >
         <option value="this-month">This Month</option>
         <option value="last-month">Last Month</option>
@@ -183,16 +178,16 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
               const endDate = customRange?.endDate || new Date().toISOString().split('T')[0];
               handleCustomDateChange(e.target.value, endDate);
             }}
-            className="flex-1 min-h-[44px] bg-white/10 border border-white/20 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 touch-manipulation"
+            className="flex-1 min-h-[44px] bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 touch-manipulation"
           />
-          <span className="text-white/60 text-sm">to</span>
+          <span className="text-gray-600 dark:text-white/60 text-sm">to</span>
           <input
             type="date"
             onChange={(e) => {
               const startDate = customRange?.startDate || new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
               handleCustomDateChange(startDate, e.target.value);
             }}
-            className="flex-1 min-h-[44px] bg-white/10 border border-white/20 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 touch-manipulation"
+            className="flex-1 min-h-[44px] bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 touch-manipulation"
           />
         </div>
       )}
@@ -255,19 +250,19 @@ export const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
           {expenseData.map((item, index) => (
             <div
               key={index}
-              className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 active:bg-white/15 transition-all touch-manipulation"
+              className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 active:bg-gray-100 dark:active:bg-white/15 transition-all touch-manipulation shadow-sm"
             >
               <div className="flex items-center space-x-2 mb-1">
                 <div
                   className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-white/80 text-xs font-medium truncate">{item.category}</span>
+                <span className="text-gray-700 dark:text-white/80 text-xs font-medium truncate">{item.category}</span>
               </div>
-              <div className="text-white font-bold text-sm">
+              <div className="text-gray-900 dark:text-white font-bold text-sm">
                 {formatCurrency(item.amount)}
               </div>
-              <div className="text-white/60 text-xs">
+              <div className="text-gray-600 dark:text-white/60 text-xs">
                 {formatPercentage(item.percentage)} • {item.count} {item.count === 1 ? 'transaction' : 'transactions'}
               </div>
             </div>

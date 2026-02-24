@@ -61,14 +61,9 @@ export const CustomTooltip: React.FC<CustomTooltipProps> = ({
   }
 
   return (
-    <div
-      className="bg-black/90 border border-white/10 rounded-xl p-3 backdrop-blur-xl"
-      style={{
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-      }}
-    >
+    <div className="bg-white/95 dark:bg-black/90 border border-gray-200 dark:border-white/10 rounded-xl p-3 backdrop-blur-xl shadow-xl">
       {label && (
-        <p className="text-white font-semibold mb-2 text-sm">
+        <p className="text-gray-900 dark:text-white font-semibold mb-2 text-sm">
           {label}
         </p>
       )}
@@ -80,11 +75,11 @@ export const CustomTooltip: React.FC<CustomTooltipProps> = ({
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-white/80 text-xs">
+              <span className="text-gray-600 dark:text-white/80 text-xs">
                 {entry.name}
               </span>
             </div>
-            <span className="text-white font-semibold text-xs">
+            <span className="text-gray-900 dark:text-white font-semibold text-xs">
               {formatter ? formatter(entry.value, entry.name) : entry.value}
             </span>
           </div>
@@ -215,11 +210,11 @@ export const ChartEmpty: React.FC<{ message?: string; height?: number }> = ({
   height = 300,
 }) => (
   <div
-    className="w-full bg-white/5 border border-white/10 rounded-2xl flex flex-col items-center justify-center"
+    className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl flex flex-col items-center justify-center"
     style={{ height: `${height}px` }}
   >
     <svg
-      className="w-12 h-12 text-white/40 mb-2"
+      className="w-12 h-12 text-gray-500 dark:text-white/40 mb-2"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"

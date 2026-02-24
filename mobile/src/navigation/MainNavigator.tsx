@@ -11,17 +11,11 @@ import { MainTabParamList } from './types';
 import { DashboardScreen } from '../screens/dashboard/DashboardScreen';
 import { TasksNavigator } from './TasksNavigator';
 import { FinanceNavigator } from './FinanceNavigator';
+import { ProjectsNavigator } from './ProjectsNavigator';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-// Placeholder screens (will be implemented in Sprint 4 & 5)
-
-const ProjectsScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Projects Screen</Text>
-    <Text style={styles.placeholderSubtext}>Coming in Sprint 4</Text>
-  </View>
-);
+// Placeholder screens (will be implemented in Sprint 5)
 
 const MoreScreen = () => (
   <View style={styles.placeholder}>
@@ -68,7 +62,7 @@ export const MainNavigator = () => {
       />
       <Tab.Screen
         name="Projects"
-        component={ProjectsScreen}
+        component={ProjectsNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="folder-outline" size={size} color={color} />

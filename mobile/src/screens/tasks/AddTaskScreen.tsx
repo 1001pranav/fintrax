@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { Button } from '@components/common/Button';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { createTask } from '../../store/slices/tasksSlice';
 import { formatDateForAPI } from '../../utils/dateUtils';
@@ -52,16 +53,12 @@ export const AddTaskScreen = () => {
           userId: user?.id || '',
           createdAt: formatDateForAPI(new Date()),
         } as any)
-      );
+      ).unwrap();
 
-      Alert.alert('Success', 'Task created successfully', [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ]);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to create task. Please try again.');
+      // Task created successfully, navigate back
+      navigation.goBack();
+    } catch (error: any) {
+      Alert.alert('Error', error?.message || 'Failed to create task. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -79,14 +76,10 @@ export const AddTaskScreen = () => {
             <Ionicons name="close" size={28} color="#1F2937" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Add Task</Text>
-          <TouchableOpacity onPress={handleSave} disabled={saving}>
-            <Text style={[styles.saveButton, saving && styles.saveButtonDisabled]}>
-              {saving ? 'Saving...' : 'Save'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Title Input */}
           <View style={styles.section}>
             <Text style={styles.label}>Title *</Text>
@@ -194,6 +187,16 @@ export const AddTaskScreen = () => {
               You can add due dates and assign projects after creating the task.
             </Text>
           </View>
+
+          {/* Save Button */}
+          <Button
+            title="Save Task"
+            onPress={handleSave}
+            loading={saving}
+            disabled={saving || !title.trim()}
+            fullWidth
+            testID="save-task-button"
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -222,17 +225,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1F2937',
   },
-  saveButton: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#3B82F6',
-  },
-  saveButtonDisabled: {
-    color: '#9CA3AF',
+  headerSpacer: {
+    width: 28,
   },
   content: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 16,
+    paddingBottom: 32,
   },
   section: {
     marginBottom: 24,

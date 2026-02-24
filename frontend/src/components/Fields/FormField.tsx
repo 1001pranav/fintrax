@@ -29,7 +29,7 @@ export default function FormField(props: FormFieldProps) {
   const baseInputClasses = `
     w-full min-h-[44px] px-4 py-3
     bg-white/5 border rounded-xl
-    text-white placeholder-white/50
+    text-gray-900 dark:text-white placeholder-white/50
     focus:outline-none focus:ring-2
     transition-all duration-200
     touch-manipulation text-base

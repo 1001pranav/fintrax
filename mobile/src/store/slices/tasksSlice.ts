@@ -72,27 +72,72 @@ export const createTask = createAsyncThunk(
   'tasks/createTask',
   async (taskData: Partial<Task>, { rejectWithValue }) => {
     try {
-      // Create task using repository (US-4.3)
-      const task = await taskRepository.create({
-        title: taskData.title || '',
-        description: taskData.description || '',
-        status: taskData.status!,
-        priority: taskData.priority!,
-        dueDate: taskData.dueDate,
-        projectId: taskData.projectId,
-        userId: taskData.userId!,
-        syncStatus: SyncStatus.PENDING,
-      });
+      let createdTask: Task;
 
-      // Queue for sync
-      await offlineManager.queueOperation(
-        SyncOperationType.CREATE,
-        SyncEntity.TASK,
-        task.id,
-        taskData
-      );
+      // If online, create on server first
+      if (offlineManager.isConnected()) {
+        try {
+          // Call API to create task on server
+          const serverTask = await tasksApi.createTask({
+            title: taskData.title || '',
+            description: taskData.description || '',
+            status: taskData.status!,
+            priority: taskData.priority!,
+            dueDate: taskData.dueDate,
+            projectId: taskData.projectId,
+            userId: taskData.userId!,
+          });
 
-      return task;
+          // Save to local database with SYNCED status
+          createdTask = await taskRepository.create({
+            ...serverTask,
+            syncStatus: SyncStatus.SYNCED,
+          });
+        } catch (apiError: any) {
+          console.warn('API call failed, saving locally:', apiError);
+          // If API fails, create locally and queue for sync
+          createdTask = await taskRepository.create({
+            title: taskData.title || '',
+            description: taskData.description || '',
+            status: taskData.status!,
+            priority: taskData.priority!,
+            dueDate: taskData.dueDate,
+            projectId: taskData.projectId,
+            userId: taskData.userId!,
+            syncStatus: SyncStatus.PENDING,
+          });
+
+          // Queue for sync
+          await offlineManager.queueOperation(
+            SyncOperationType.CREATE,
+            SyncEntity.TASK,
+            createdTask.id,
+            taskData
+          );
+        }
+      } else {
+        // If offline, create locally and queue for sync
+        createdTask = await taskRepository.create({
+          title: taskData.title || '',
+          description: taskData.description || '',
+          status: taskData.status!,
+          priority: taskData.priority!,
+          dueDate: taskData.dueDate,
+          projectId: taskData.projectId,
+          userId: taskData.userId!,
+          syncStatus: SyncStatus.PENDING,
+        });
+
+        // Queue for sync
+        await offlineManager.queueOperation(
+          SyncOperationType.CREATE,
+          SyncEntity.TASK,
+          createdTask.id,
+          taskData
+        );
+      }
+
+      return createdTask;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to create task');
     }

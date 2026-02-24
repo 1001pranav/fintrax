@@ -154,7 +154,7 @@ export default function OTPField({
                         ${error ? 'border-red-400/50' : 'border-white/20'} 
                         rounded-xl 
                         text-center 
-                        text-white 
+                        text-gray-900 dark:text-white 
                         font-semibold 
                         backdrop-blur-sm 
                         focus:outline-none 

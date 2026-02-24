@@ -32,7 +32,7 @@ export const QuickActions: React.FC = () => {
       icon: 'folder',
       label: 'Add Project',
       color: '#F59E0B',
-      onPress: () => navigate('Projects'),
+      onPress: () => navigate('Projects', { screen: 'AddProject' }),
     },
   ];
 

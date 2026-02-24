@@ -158,7 +158,7 @@ export default function RoadmapCard({ roadmap, onEdit, onDelete }: RoadmapCardPr
             <div className="flex gap-3 justify-center">
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="px-4 py-2 bg-red-600 text-gray-900 dark:text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 Delete
               </button>

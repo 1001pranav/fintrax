@@ -79,7 +79,7 @@ export default function Toast({ toast }: ToastProps) {
       </div>
 
       {/* Message */}
-      <p className="flex-1 text-white text-sm font-medium leading-relaxed">
+      <p className="flex-1 text-gray-900 dark:text-white text-sm font-medium leading-relaxed">
         {toast.message}
       </p>
 

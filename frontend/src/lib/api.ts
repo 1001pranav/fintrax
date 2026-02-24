@@ -1,6 +1,64 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
-type RequestOptions = RequestInit & { skipJsonParse?: boolean; maxRetries?: number };
+type RequestOptions = RequestInit & { skipJsonParse?: boolean; maxRetries?: number; skipAuthHandler?: boolean };
+
+// Token refresh handler
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onTokenRefreshed(token: string) {
+  refreshSubscribers.forEach(cb => cb(token));
+  refreshSubscribers = [];
+}
+
+async function handleRefreshToken(): Promise<string | null> {
+  const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+
+  if (!refreshToken) {
+    // No refresh token, redirect to login
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+      window.location.href = '/login';
+    }
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/refresh-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh token');
+    }
+
+    const data = await response.json();
+    const newToken = data.data.token;
+    const newRefreshToken = data.data.refresh_token;
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+    }
+
+    return newToken;
+  } catch (error) {
+    // Refresh failed, redirect to login
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+      window.location.href = '/login';
+    }
+    return null;
+  }
+}
 
 // Utility function to delay execution
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -9,13 +67,50 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 async function fetchWithRetry<T>(
   url: string,
   options: RequestInit,
-  maxRetries: number = 3
+  maxRetries: number = 3,
+  skipAuthHandler: boolean = false
 ): Promise<Response> {
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const res = await fetch(url, options);
+
+      // Handle 401 Unauthorized - try to refresh token
+      if (res.status === 401 && !skipAuthHandler) {
+        if (!isRefreshing) {
+          isRefreshing = true;
+          const newToken = await handleRefreshToken();
+          isRefreshing = false;
+
+          if (newToken) {
+            onTokenRefreshed(newToken);
+            // Retry the original request with new token
+            const newOptions = {
+              ...options,
+              headers: {
+                ...options.headers,
+                'Authorization': `Bearer ${newToken}`,
+              },
+            };
+            return fetchWithRetry(url, newOptions, maxRetries, skipAuthHandler);
+          }
+        } else {
+          // Wait for the token refresh to complete
+          return new Promise((resolve) => {
+            subscribeTokenRefresh((newToken) => {
+              const newOptions = {
+                ...options,
+                headers: {
+                  ...options.headers,
+                  'Authorization': `Bearer ${newToken}`,
+                },
+              };
+              resolve(fetchWithRetry(url, newOptions, maxRetries, skipAuthHandler));
+            });
+          });
+        }
+      }
 
       // If successful or client error (4xx), return immediately
       if (res.ok || (res.status >= 400 && res.status < 500)) {
@@ -46,7 +141,7 @@ async function fetchWithRetry<T>(
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { skipJsonParse, maxRetries = 3, headers, ...rest } = options;
+  const { skipJsonParse, maxRetries = 3, skipAuthHandler = false, headers, ...rest } = options;
 
   // Get token from localStorage
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -61,7 +156,8 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       },
       ...rest,
     },
-    maxRetries
+    maxRetries,
+    skipAuthHandler
   );
 
   if (!res.ok) {
@@ -121,6 +217,7 @@ export interface CreateProjectData {
   description?: string;
   color?: string;
   cover_image?: string;
+  status?: number; // 1=Active, 2=Archived, 3=Deleted
 }
 
 // Todo
@@ -310,6 +407,67 @@ export interface Dashboard {
   active_roadmaps: number;
 }
 
+// User Preferences
+export interface UserPreferences {
+  id: number;
+  user_id: number;
+  // Appearance
+  theme: 'light' | 'dark' | 'system';
+  color_scheme: string;
+  font_size: 'small' | 'medium' | 'large';
+  // Language & Localization
+  language: string;
+  timezone: string;
+  date_format: string;
+  time_format: '12h' | '24h';
+  currency: string;
+  // Notifications
+  email_notifications: boolean;
+  push_notifications: boolean;
+  task_reminders: boolean;
+  project_updates: boolean;
+  finance_alerts: boolean;
+  weekly_digest: boolean;
+  // Privacy
+  profile_visibility: 'public' | 'private' | 'friends';
+  show_online_status: boolean;
+  allow_data_collection: boolean;
+  // Finance Settings
+  default_transaction_type: number;
+  show_balance: boolean;
+  budget_warnings: boolean;
+  // Dashboard & Display
+  default_dashboard_view: string;
+  tasks_per_page: number;
+  compact_mode: boolean;
+}
+
+export interface UpdatePreferencesData {
+  theme?: 'light' | 'dark' | 'system';
+  color_scheme?: string;
+  font_size?: 'small' | 'medium' | 'large';
+  language?: string;
+  timezone?: string;
+  date_format?: string;
+  time_format?: '12h' | '24h';
+  currency?: string;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  task_reminders?: boolean;
+  project_updates?: boolean;
+  finance_alerts?: boolean;
+  weekly_digest?: boolean;
+  profile_visibility?: 'public' | 'private' | 'friends';
+  show_online_status?: boolean;
+  allow_data_collection?: boolean;
+  default_transaction_type?: number;
+  show_balance?: boolean;
+  budget_warnings?: boolean;
+  default_dashboard_view?: string;
+  tasks_per_page?: number;
+  compact_mode?: boolean;
+}
+
 // ============================================
 // API Functions
 // ============================================
@@ -319,16 +477,19 @@ export const api = {
   // Authentication
   // ============================================
   login: (data: LoginData) =>
-    request('/user/login', { method: 'POST', body: JSON.stringify(data) }),
+    request('/user/login', { method: 'POST', body: JSON.stringify(data), skipAuthHandler: true }),
 
   register: (data: RegisterData) =>
-    request('/user/register', { method: 'POST', body: JSON.stringify(data) }),
+    request('/user/register', { method: 'POST', body: JSON.stringify(data), skipAuthHandler: true }),
 
   generateOtp: (email: string) =>
-    request('/user/generate-otp', { method: 'POST', body: JSON.stringify({ email }) }),
+    request('/user/generate-otp', { method: 'POST', body: JSON.stringify({ email }), skipAuthHandler: true }),
 
   resetPassword: (data: ResetPasswordData) =>
-    request('/user/forgot-password', { method: 'POST', body: JSON.stringify(data) }),
+    request('/user/forgot-password', { method: 'POST', body: JSON.stringify(data), skipAuthHandler: true }),
+
+  refreshToken: (refreshToken: string) =>
+    request('/user/refresh-token', { method: 'POST', body: JSON.stringify({ refresh_token: refreshToken }), skipAuthHandler: true }),
 
   // ============================================
   // Projects
@@ -552,5 +713,19 @@ export const api = {
   dashboard: {
     get: () =>
       request<{ data: Dashboard }>('/dashboard'),
+  },
+
+  // ============================================
+  // User Preferences
+  // ============================================
+  preferences: {
+    get: () =>
+      request<{ data: UserPreferences }>('/preferences'),
+
+    update: (data: UpdatePreferencesData) =>
+      request<{ data: UserPreferences }>('/preferences', { method: 'PATCH', body: JSON.stringify(data) }),
+
+    reset: () =>
+      request<{ data: UserPreferences }>('/preferences/reset', { method: 'POST' }),
   },
 };

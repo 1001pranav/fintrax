@@ -71,12 +71,12 @@ export default function DashboardPreview() {
   const maxValue = Math.max(...mockFinanceData.flatMap(d => [d.income, d.expense]));
 
   return (
-    <div className="w-full rounded-xl overflow-hidden border border-white/10 bg-gradient-to-br from-slate-900/90 via-purple-900/30 to-slate-900/90 backdrop-blur-sm">
+    <div className="w-full rounded-xl overflow-hidden border  border-gray-200 dark:border-white/10 bg-gradient-to-br from-slate-900/90 via-purple-900/30 to-slate-900/90 backdrop-blur-sm">
       {/* Dashboard Header */}
-      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-b border-white/10 p-6">
+      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-b  border-gray-200 dark:border-white/10 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white mb-1">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
               Welcome to Fintrax 👋
             </h2>
             <p className="text-white/70 text-sm">
@@ -98,12 +98,12 @@ export default function DashboardPreview() {
           {mockStats.map((stat) => (
             <div
               key={stat.label}
-              className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-xl hover:bg-white/10 transition-all"
+              className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-4 backdrop-blur-xl hover:bg-white/10 transition-all"
             >
               <div className={`${stat.color} mb-3`}>
                 {stat.icon}
               </div>
-              <div className="text-xl font-bold text-white mb-1">
+              <div className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                 {stat.value}
               </div>
               <div className="text-white/60 text-xs">
@@ -116,7 +116,7 @@ export default function DashboardPreview() {
         {/* Content Grid - Charts and Tasks */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Financial Chart Preview */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5 backdrop-blur-xl">
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-5 backdrop-blur-xl">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-white font-semibold text-sm mb-1">Financial Overview</h3>
@@ -160,7 +160,7 @@ export default function DashboardPreview() {
           </div>
 
           {/* Recent Tasks Preview */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5 backdrop-blur-xl">
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-5 backdrop-blur-xl">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-white font-semibold text-sm mb-1">Recent Tasks</h3>
@@ -172,7 +172,7 @@ export default function DashboardPreview() {
               {mockTasks.map((task, idx) => (
                 <div
                   key={idx}
-                  className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all"
+                  className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-white/10 transition-all"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="text-white text-sm font-medium flex-1">{task.title}</h4>
@@ -203,7 +203,7 @@ export default function DashboardPreview() {
         </div>
 
         {/* Quick Actions Preview */}
-        <div className="mt-6 bg-white/5 border border-white/10 rounded-xl p-5 backdrop-blur-xl">
+        <div className="mt-6 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl p-5 backdrop-blur-xl">
           <h3 className="text-white font-semibold text-sm mb-3">Quick Actions</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
@@ -214,7 +214,7 @@ export default function DashboardPreview() {
             ].map((action, idx) => (
               <div
                 key={idx}
-                className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all cursor-pointer group"
+                className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-white/10 transition-all cursor-pointer group"
               >
                 <div className="text-2xl mb-2">{action.icon}</div>
                 <div className="text-white text-xs font-medium group-hover:text-blue-400 transition-colors">

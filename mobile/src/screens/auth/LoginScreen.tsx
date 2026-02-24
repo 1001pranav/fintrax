@@ -21,6 +21,7 @@ import { getEmailError, getPasswordError } from '@utils/validators';
 import { asyncStorage, STORAGE_KEYS } from '@utils/storage';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { login, clearError } from '@store/slices/authSlice';
+import { authApi } from '@api/auth.api';
 import type { AuthStackParamList } from '../../navigation/types';
 
 type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
@@ -102,9 +103,98 @@ export const LoginScreen: React.FC = () => {
 
       // Login successful - Redux will handle navigation via App.tsx
     } catch (error: any) {
-      // Error is handled by the useEffect above via authError
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
+
+      // Check if error is related to email verification
+      const errorMessage = error?.message || error || '';
+      const needsVerification =
+        errorMessage.toLowerCase().includes('verify') ||
+        errorMessage.toLowerCase().includes('not verified') ||
+        errorMessage.toLowerCase().includes('email verification');
+
+      if (needsVerification) {
+        // Email needs verification - send OTP and navigate to verify screen
+        console.log('📧 Email verification required');
+        await handleEmailVerification();
+      }
+      // Other errors will be handled by the useEffect above via authError
     }
+  };
+
+  const handleEmailVerification = async () => {
+    let otpAlreadySent = false;
+
+    try {
+      console.log('📧 Sending OTP to:', email);
+      console.log('📧 Request payload:', { email });
+
+      // Generate and send OTP
+      const response = await authApi.generateOTP({ email });
+
+      console.log('✅ OTP sent successfully');
+      console.log('📧 Full Response:', JSON.stringify(response, null, 2));
+
+      // Log the OTP if it's in the response (development mode)
+      if (response && 'otp' in response) {
+        console.log('🔑 OTP CODE:', (response as any).otp);
+        console.log('⏰ Enter this 4-digit code on the verification screen');
+      }
+    } catch (error: any) {
+      console.error('❌ Generate OTP Error Caught');
+      console.error('📋 Error Type:', typeof error);
+      console.error('📋 Error Keys:', Object.keys(error));
+      console.error('📋 Error Message:', error?.message);
+      console.error('📋 Error Status:', error?.status);
+      console.error('📋 Error Response:', error?.response);
+      console.error('📋 Error Response Status:', error?.response?.status);
+      console.error('📋 Error Response Data:', JSON.stringify(error?.response?.data, null, 2));
+      console.error('📋 Full Error Object:', JSON.stringify(error, null, 2));
+
+      // Check if error is due to OTP already being sent (429 - Too Many Requests)
+      const is429Error = error?.status === 429 || error?.response?.status === 429;
+      const isRateLimitError =
+        error?.message?.toLowerCase().includes('already generated') ||
+        error?.message?.toLowerCase().includes('wait before generating');
+
+      if (is429Error || isRateLimitError) {
+        console.log('ℹ️ OTP was already sent recently (Rate Limited)');
+        otpAlreadySent = true;
+      } else {
+        console.error('❌ Unexpected error - showing alert to user');
+        Alert.alert(
+          'Error',
+          error?.message || 'Failed to send verification code. Please try again.',
+          [{ text: 'OK' }]
+        );
+        return; // Exit if there's a real error
+      }
+    }
+
+    // Clear the auth error before navigating
+    dispatch(clearError());
+
+    // Show appropriate alert based on whether OTP was already sent
+    const alertTitle = 'Email Verification Required';
+    const alertMessage = otpAlreadySent
+      ? `An OTP was already sent to ${email}. Please check your email and enter the verification code. You can request a new code on the verification screen if needed.`
+      : `Please verify your email address. We've sent a verification code to ${email}`;
+
+    Alert.alert(
+      alertTitle,
+      alertMessage,
+      [
+        {
+          text: 'Verify Now',
+          onPress: () => {
+            navigation.navigate('VerifyEmail', { email });
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
   };
 
   const handleForgotPassword = () => {

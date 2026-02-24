@@ -98,7 +98,7 @@ export default function SavingsList() {
         </div>
         <button
           onClick={handleAddClick}
-          className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105"
+          className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-gray-900 dark:text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105"
         >
           + Add Goal
         </button>
@@ -116,7 +116,7 @@ export default function SavingsList() {
 
       {/* Empty State */}
       {!isLoading && savingsGoals.length === 0 && (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-12 backdrop-blur-xl text-center">
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-12 backdrop-blur-xl text-center">
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-white/10 rounded-full">
               <svg className="w-12 h-12 text-green-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +124,7 @@ export default function SavingsList() {
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 No savings goals yet
               </h3>
               <p className="text-white/60">
@@ -133,7 +133,7 @@ export default function SavingsList() {
             </div>
             <button
               onClick={handleAddClick}
-              className="mt-4 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200"
+              className="mt-4 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-gray-900 dark:text-white font-semibold rounded-xl transition-all duration-200"
             >
               Create Savings Goal
             </button>
@@ -186,7 +186,7 @@ export default function SavingsList() {
           />
 
           {/* Modal Content */}
-          <div className="relative w-full max-w-md bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6">
+          <div className="relative w-full max-w-md bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border  border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl p-6">
             <div className="flex flex-col items-center space-y-4">
               {/* Warning Icon */}
               <div className="p-3 bg-red-500/20 rounded-full">
@@ -197,7 +197,7 @@ export default function SavingsList() {
 
               {/* Content */}
               <div className="text-center">
-                <h3 className="text-xl font-bold text-white mb-2">Delete Savings Goal?</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Savings Goal?</h3>
                 <p className="text-white/60">
                   Are you sure you want to delete this savings goal? This action cannot be undone.
                 </p>
@@ -207,13 +207,13 @@ export default function SavingsList() {
               <div className="flex gap-3 w-full mt-4">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="flex-1 py-3 px-6 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-xl border border-white/20 transition-all duration-200"
+                  className="flex-1 py-3 px-6 bg-white/10 hover:bg-white/15 text-gray-900 dark:text-white font-semibold rounded-xl border  border-gray-300 dark:border-white/20 transition-all duration-200"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 py-3 px-6 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-200"
+                  className="flex-1 py-3 px-6 bg-red-600 hover:bg-red-700 text-gray-900 dark:text-white font-semibold rounded-xl transition-all duration-200"
                 >
                   Delete
                 </button>

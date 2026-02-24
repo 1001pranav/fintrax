@@ -9,6 +9,8 @@ import axiosRetry from 'axios-retry';
 import { config as appConfig } from '../constants/config';
 import { secureStorage } from '../services/storage';
 import NetInfo from '@react-native-community/netinfo';
+import { store } from '../store';
+import { logout } from '../store/slices/authSlice';
 
 /**
  * API Error Response Type
@@ -120,6 +122,13 @@ class ApiClient {
    * Response error interceptor - handles token refresh
    */
   private static async responseErrorInterceptor(error: AxiosError) {
+    console.error('🚨 API Response Error Interceptor');
+    console.error('📍 URL:', error.config?.url);
+    console.error('📍 Method:', error.config?.method);
+    console.error('📍 Status:', error.response?.status);
+    console.error('📍 Status Text:', error.response?.statusText);
+    console.error('📍 Response Data:', JSON.stringify(error.response?.data, null, 2));
+
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
@@ -162,6 +171,14 @@ class ApiClient {
         const refreshToken = await secureStorage.getSecure(appConfig.STORAGE_KEYS.REFRESH_TOKEN);
 
         if (!refreshToken) {
+          // Clear auth data and redirect to login
+          await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.AUTH_TOKEN);
+          await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.REFRESH_TOKEN);
+          await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.USER_DATA);
+
+          // Dispatch logout to update Redux state and trigger navigation
+          store.dispatch(logout());
+
           throw new Error('No refresh token available');
         }
 
@@ -189,8 +206,8 @@ class ApiClient {
         await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.REFRESH_TOKEN);
         await secureStorage.deleteSecure(appConfig.STORAGE_KEYS.USER_DATA);
 
-        // Emit logout event (will be handled by navigation)
-        // This is where you'd dispatch a Redux action or emit an event
+        // Dispatch logout to update Redux state and trigger navigation to login screen
+        store.dispatch(logout());
 
         return Promise.reject(refreshError);
       } finally {
@@ -223,7 +240,15 @@ class ApiClient {
 
       // Add response interceptor
       this.instance.interceptors.response.use(
-        (response) => response,
+        (response) => {
+          // Log successful responses for debugging
+          console.log('✅ API Response Success');
+          console.log('📍 URL:', response.config.url);
+          console.log('📍 Method:', response.config.method);
+          console.log('📍 Status:', response.status);
+          console.log('📍 Response Data:', JSON.stringify(response.data, null, 2));
+          return response;
+        },
         this.responseErrorInterceptor.bind(this)
       );
     }

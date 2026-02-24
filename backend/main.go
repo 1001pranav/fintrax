@@ -40,8 +40,23 @@ func main() {
 	}
 	// Create router
 	r := gin.Default()
-	// CORS setup for React frontend
-	r.Use(cors.Default())
+
+	// CORS setup - Allow all origins for development
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001", "*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Content-Length", "Accept", "Authorization", "X-Requested-With"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: false,
+		AllowWildcard:    true,
+		MaxAge:           12 * 3600, // 12 hours
+	}))
+
+	// Debug middleware to log all requests
+	r.Use(func(c *gin.Context) {
+		fmt.Printf("[DEBUG] %s %s - Origin: %s\n", c.Request.Method, c.Request.URL.Path, c.Request.Header.Get("Origin"))
+		c.Next()
+	})
 
 	// Handle panic globally
 	r.Use(middleware.RecoveryMiddleware())
@@ -63,6 +78,7 @@ func main() {
 	routes.TagRoute(r.Group("/api"))
 	routes.ResourceRoute(r.Group("/api"))
 	routes.NoteRoute(r.Group("/api"))
+	routes.PreferencesRoute(r.Group("/api"))
 
 	// Run server
 	r.Run(constants.APP_PORT)

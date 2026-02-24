@@ -156,7 +156,7 @@ export default function NoteEditor({ todoId, noteId, onSave, onCancel }: NoteEdi
         <button
           onClick={handleSave}
           disabled={isSaving || !content.trim()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-blue-600 text-gray-900 dark:text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {isSaving ? 'Saving...' : 'Save Note'}
         </button>

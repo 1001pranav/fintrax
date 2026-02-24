@@ -23,7 +23,7 @@ export default function CTASection() {
             </Link>
             <Link
               href="/help"
-              className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-lg border border-white/30 transition-all duration-200"
+              className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white font-semibold rounded-lg border  border-gray-400 dark:border-white/30 transition-all duration-200"
             >
               Learn More
             </Link>

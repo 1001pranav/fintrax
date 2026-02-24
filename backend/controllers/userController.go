@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,10 +21,11 @@ type loginRequest struct {
 	Password string `json:"password"  binding:"required"`
 }
 type loginResponse struct {
-	Token    string `json:"token"`
-	UserID   uint   `json:"user_id"`
-	Email    string `json:"email"`
-	UserName string `json:"username"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	UserID       uint   `json:"user_id"`
+	Email        string `json:"email"`
+	UserName     string `json:"username"`
 }
 
 type registerRequest struct {
@@ -35,10 +35,12 @@ type registerRequest struct {
 }
 
 type registerResponse struct {
-	ID       uint   `json:"user_id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Token    string `json:"token"`
+	ID           uint   `json:"user_id"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	OTP          uint   `json:"otp"` // For development - remove in production
 }
 type generateOTPRequest struct {
 	Email string `json:"email" binding:"required"`
@@ -132,11 +134,21 @@ func Register(c *gin.Context) {
 		tx.Rollback()
 		return
 	}
+
+	refreshToken, err := helper.CreateRefreshToken(newUser.ID)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to create refresh token", nil, err)
+		tx.Rollback()
+		return
+	}
+
 	response := registerResponse{
-		ID:       newUser.ID,
-		Username: newUser.Username,
-		Email:    newUser.Email,
-		Token:    token,
+		ID:           newUser.ID,
+		Username:     newUser.Username,
+		Email:        newUser.Email,
+		Token:        token,
+		RefreshToken: refreshToken,
+		OTP:          uint(otp), // For development - shows OTP in response
 	}
 	// This defer function is used to handle any panic that may occur during the transaction.
 	// If a panic occurs, the transaction will be rolled back.
@@ -190,11 +202,18 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	refreshToken, err := helper.CreateRefreshToken(user.ID)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to create refresh token", nil, err.Error())
+		return
+	}
+
 	var loginResponseHandler = loginResponse{
-		Token:    token,
-		UserID:   user.ID,
-		Email:    user.Email,
-		UserName: user.Username,
+		Token:        token,
+		RefreshToken: refreshToken,
+		UserID:       user.ID,
+		Email:        user.Email,
+		UserName:     user.Username,
 	}
 
 	helper.Response(c, http.StatusOK, "Login successful", loginResponseHandler, nil)
@@ -231,16 +250,18 @@ func GenerateOTP(c *gin.Context) {
 	database.DB.Save(&user)
 
 	// Send OTP via email
-	emailBody := "Your OTP for password reset is: " + strconv.Itoa(otp) + "\n\nThis OTP is valid for " + strconv.Itoa(constants.MAX_OTP_TIME) + " minutes.\n\nIf you did not request this, please ignore this email."
-	err := helper.SendEmail(user.Email, "Fintrax - OTP for Password Reset", emailBody)
-	if err != nil {
-		helper.Response(c, http.StatusInternalServerError, "Failed to send OTP email", nil, err.Error())
-		return
-	}
+	// emailBody := "Your OTP for password reset is: " + strconv.Itoa(otp) + "\n\nThis OTP is valid for " + strconv.Itoa(constants.MAX_OTP_TIME) + " minutes.\n\nIf you did not request this, please ignore this email."
+	// err := helper.SendEmail(user.Email, "Fintrax - OTP for Password Reset", emailBody)
+	// if err != nil {
+	// 	helper.Response(c, http.StatusInternalServerError, "Failed to send OTP email", nil, err.Error())
+	// 	return
+	// }
 
 	response := generateOTPResponse{
 		OTP: uint(otp),
 	}
+	fmt.Println("OTP sent to ", user.Email, " with OTP:", otp)
+
 	helper.Response(c, http.StatusOK, "OTP sent to your email successfully", response, nil)
 }
 
@@ -336,4 +357,53 @@ func VerifyEmail(c *gin.Context) {
 	database.DB.Save(&user)
 
 	helper.Response(c, http.StatusOK, "Email verified successfully", nil, nil)
+}
+
+func RefreshToken(c *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.Response(c, http.StatusBadRequest, "Invalid request", nil, err.Error())
+		return
+	}
+
+	// Verify the refresh token
+	userID, err := helper.VerifyToken(req.RefreshToken)
+	if err != nil {
+		helper.Response(c, http.StatusUnauthorized, "Invalid refresh token", nil, err.Error())
+		return
+	}
+
+	// Check if user exists
+	var user models.Users
+	database.DB.First(&user, userID)
+	if user.ID == 0 {
+		helper.Response(c, http.StatusNotFound, "User not found", nil, nil)
+		return
+	}
+
+	// Generate new access token
+	newToken, err := helper.CreateToken(user.ID)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to create token", nil, err.Error())
+		return
+	}
+
+	// Generate new refresh token
+	newRefreshToken, err := helper.CreateRefreshToken(user.ID)
+	if err != nil {
+		helper.Response(c, http.StatusInternalServerError, "Failed to create refresh token", nil, err.Error())
+		return
+	}
+
+	response := loginResponse{
+		Token:        newToken,
+		RefreshToken: newRefreshToken,
+		UserID:       user.ID,
+		Email:        user.Email,
+		UserName:     user.Username,
+	}
+
+	helper.Response(c, http.StatusOK, "Token refreshed successfully", response, nil)
 }

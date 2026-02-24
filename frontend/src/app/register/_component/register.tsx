@@ -69,8 +69,20 @@ const RegisterComponent: React.FC = () => {
                 password: formData.password, // Don't sanitize password
             };
 
-            const data = await api.register(sanitizedData);
-            console.log('Registration successful:', data);
+            const response: any = await api.register(sanitizedData);
+            console.log('Registration successful:', response);
+
+            // Store tokens in localStorage
+            if (response.data) {
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('refreshToken', response.data.refresh_token);
+                localStorage.setItem('email', response.data.email);
+                localStorage.setItem('username', response.data.username);
+                localStorage.setItem('user_id', response.data.user_id.toString());
+
+                // Redirect to verify email page (or wherever appropriate)
+                window.location.href = '/verify-email';
+            }
         } catch (_error: unknown) {
             console.error('Registration failed:', _error);
             const message = _error instanceof Error ? _error.message : 'Registration failed. Please check your credentials and try again.';

@@ -69,7 +69,7 @@ export default function TaskStatusChart({ tasks, type }: TaskStatusChartProps) {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-gray-900 border border-white/20 rounded-lg p-3 shadow-xl backdrop-blur-xl">
+        <div className="bg-gray-900 border  border-gray-300 dark:border-white/20 rounded-lg p-3 shadow-xl backdrop-blur-xl">
           <p className="text-white font-medium">{payload[0].name}</p>
           <p className="text-white/80 text-sm">Tasks: {payload[0].value}</p>
           <p className="text-white/60 text-xs">

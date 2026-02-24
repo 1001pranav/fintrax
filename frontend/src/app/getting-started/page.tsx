@@ -122,7 +122,7 @@ export default function GettingStartedPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-16 px-4">
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-gray-900 dark:text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-6">
             <Rocket className="w-10 h-10" />
@@ -146,7 +146,7 @@ export default function GettingStartedPage() {
                 <div className="flex items-start gap-4">
                   {/* Step Icon */}
                   <div className="flex-shrink-0">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white font-bold text-xl">
                       {step.number}
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export default function GettingStartedPage() {
                     {step.cta && (
                       <Link
                         href={step.cta.link}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-gray-900 dark:text-white font-semibold rounded-lg hover:shadow-lg transition-all"
                       >
                         {step.cta.text}
                         <ArrowRight className="w-4 h-4" />
@@ -219,7 +219,7 @@ export default function GettingStartedPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/help"
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-gray-900 dark:text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
             >
               View Full Documentation
             </Link>

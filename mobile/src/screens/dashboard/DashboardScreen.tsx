@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, ScrollView, RefreshControl, StyleSheet } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { ScrollView, RefreshControl, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { fetchDashboardData } from '../../store/slices/dashboardSlice';
 import { WelcomeHeader } from '../../components/dashboard/WelcomeHeader';
@@ -18,10 +19,12 @@ export const DashboardScreen = () => {
     (state) => state.dashboard
   );
 
-  useEffect(() => {
-    // Fetch dashboard data on mount
-    dispatch(fetchDashboardData());
-  }, [dispatch]);
+  // Refresh dashboard when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchDashboardData());
+    }, [dispatch])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

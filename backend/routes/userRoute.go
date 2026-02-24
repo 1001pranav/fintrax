@@ -21,6 +21,9 @@ func UserRoute(router *gin.RouterGroup) {
 		// Apply auth rate limiting to password endpoints
 		uRoute.POST("/forgot-password", middleware.RateLimitAuth(), controllers.ForgotPassword)
 		uRoute.POST("/reset-password", middleware.RateLimitAuth(), controllers.ResetPassword)
+
+		// Refresh token endpoint
+		uRoute.POST("/refresh-token", middleware.RateLimitAuth(), controllers.RefreshToken)
 	}
 
 }

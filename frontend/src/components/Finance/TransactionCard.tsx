@@ -77,26 +77,26 @@ export default function TransactionCard({ transaction, onEdit, onDelete }: Trans
     : 'from-red-500/10 to-red-600/5';
 
   return (
-    <div className={`bg-gradient-to-br ${bgGradient} border border-white/10 rounded-2xl p-3 sm:p-4 backdrop-blur-xl hover:bg-white/5 active:bg-white/10 transition-all duration-200 group touch-manipulation`}>
+    <div className={`bg-gradient-to-br ${bgGradient} border border-gray-200 dark:border-white/10 rounded-2xl p-3 sm:p-4 backdrop-blur-xl hover:bg-gray-50 dark:hover:bg-white/5 active:bg-gray-100 dark:active:bg-white/10 transition-all duration-200 group touch-manipulation shadow-sm`}>
       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-0">
         {/* Top/Left: Icon and Details */}
         <div className="flex items-start space-x-3 sm:space-x-4 flex-1 w-full sm:w-auto">
           {/* Icon */}
-          <div className={`p-2.5 sm:p-3 bg-white/10 rounded-xl ${iconColor} flex-shrink-0`}>
+          <div className={`p-2.5 sm:p-3 bg-gray-100 dark:bg-white/10 rounded-xl ${iconColor} flex-shrink-0`}>
             {getCategoryIcon(transaction.category || 'other', transaction.type)}
           </div>
 
           {/* Details */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-white font-semibold text-base sm:text-lg truncate">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-base sm:text-lg truncate">
               {transaction.source}
             </h3>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-              <span className="text-white/60 text-xs sm:text-sm capitalize">
+              <span className="text-gray-600 dark:text-white/60 text-xs sm:text-sm capitalize">
                 {transaction.category}
               </span>
-              <span className="text-white/40 hidden sm:inline">•</span>
-              <span className="text-white/60 text-xs sm:text-sm">
+              <span className="text-gray-400 dark:text-white/40 hidden sm:inline">•</span>
+              <span className="text-gray-600 dark:text-white/60 text-xs sm:text-sm">
                 {formatDate(transaction.date)}
               </span>
             </div>
@@ -115,10 +115,10 @@ export default function TransactionCard({ transaction, onEdit, onDelete }: Trans
             {/* Edit Button */}
             <button
               onClick={() => onEdit(transaction)}
-              className="min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:p-2 p-2.5 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors duration-200 touch-manipulation"
+              className="min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:p-2 p-2.5 hover:bg-gray-200 dark:hover:bg-white/10 active:bg-gray-300 dark:active:bg-white/20 rounded-lg transition-colors duration-200 touch-manipulation"
               aria-label="Edit transaction"
             >
-              <svg className="w-5 h-5 sm:w-4 sm:h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
@@ -126,7 +126,7 @@ export default function TransactionCard({ transaction, onEdit, onDelete }: Trans
             {/* Delete Button */}
             <button
               onClick={() => onDelete(transaction.id)}
-              className="min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:p-2 p-2.5 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors duration-200 touch-manipulation"
+              className="min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:p-2 p-2.5 hover:bg-gray-200 dark:hover:bg-white/10 active:bg-gray-300 dark:active:bg-white/20 rounded-lg transition-colors duration-200 touch-manipulation"
               aria-label="Delete transaction"
             >
               <svg className="w-5 h-5 sm:w-4 sm:h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

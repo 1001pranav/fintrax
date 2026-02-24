@@ -109,8 +109,8 @@ export default function TransactionList() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Transaction History</h2>
-          <p className="text-white/60 text-xs sm:text-sm mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Transaction History</h2>
+          <p className="text-gray-600 dark:text-white/60 text-xs sm:text-sm mt-1">
             {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''} found
           </p>
         </div>
@@ -124,25 +124,25 @@ export default function TransactionList() {
         <div className="flex items-center justify-center h-64">
           <div className="flex flex-col items-center space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
-            <p className="text-white/60">Loading transactions...</p>
+            <p className="text-gray-600 dark:text-white/60">Loading transactions...</p>
           </div>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && filteredTransactions.length === 0 && (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 sm:p-12 backdrop-blur-xl text-center">
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-8 sm:p-12 backdrop-blur-xl text-center shadow-sm">
           <div className="flex flex-col items-center space-y-4">
-            <div className="p-3 sm:p-4 bg-white/10 rounded-full">
-              <svg className="w-10 h-10 sm:w-12 sm:h-12 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-3 sm:p-4 bg-gray-100 dark:bg-white/10 rounded-full">
+              <svg className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div>
-              <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {transactions.length === 0 ? 'No transactions yet' : 'No transactions match your filters'}
               </h3>
-              <p className="text-white/60 text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-white/60 text-sm sm:text-base">
                 {transactions.length === 0
                   ? 'Start tracking your finances by adding your first transaction.'
                   : 'Try adjusting your filters to see more transactions.'}
@@ -154,7 +154,7 @@ export default function TransactionList() {
                   setEditingTransaction(null);
                   setIsModalOpen(true);
                 }}
-                className="mt-4 min-h-[48px] px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:from-blue-800 active:to-purple-800 text-white font-semibold rounded-xl transition-all duration-200 touch-manipulation"
+                className="mt-4 min-h-[48px] px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:from-blue-800 active:to-purple-800 text-gray-900 dark:text-white font-semibold rounded-xl transition-all duration-200 touch-manipulation"
               >
                 Add Transaction
               </button>
@@ -209,7 +209,7 @@ export default function TransactionList() {
           />
 
           {/* Modal Content */}
-          <div className="relative w-full max-w-md bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6">
+          <div className="relative w-full max-w-md bg-white dark:bg-gradient-to-br dark:from-gray-900/95 dark:to-gray-800/95 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl p-6">
             <div className="flex flex-col items-center space-y-4">
               {/* Warning Icon */}
               <div className="p-3 bg-red-500/20 rounded-full">
@@ -220,8 +220,8 @@ export default function TransactionList() {
 
               {/* Content */}
               <div className="text-center">
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Delete Transaction?</h3>
-                <p className="text-white/60 text-sm sm:text-base">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Transaction?</h3>
+                <p className="text-gray-600 dark:text-white/60 text-sm sm:text-base">
                   Are you sure you want to delete this transaction? This action cannot be undone.
                 </p>
               </div>
@@ -230,13 +230,13 @@ export default function TransactionList() {
               <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="flex-1 min-h-[48px] py-3 px-6 bg-white/10 hover:bg-white/15 active:bg-white/20 text-white font-semibold rounded-xl border border-white/20 transition-all duration-200 touch-manipulation"
+                  className="flex-1 min-h-[48px] py-3 px-6 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 active:bg-gray-300 dark:active:bg-white/20 text-gray-900 dark:text-white font-semibold rounded-xl border border-gray-300 dark:border-white/20 transition-all duration-200 touch-manipulation"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 min-h-[48px] py-3 px-6 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold rounded-xl transition-all duration-200 touch-manipulation"
+                  className="flex-1 min-h-[48px] py-3 px-6 bg-red-600 hover:bg-red-700 active:bg-red-800 text-gray-900 dark:text-white font-semibold rounded-xl transition-all duration-200 touch-manipulation"
                 >
                   Delete
                 </button>

@@ -103,7 +103,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/10 backdrop-blur-xl border  border-gray-300 dark:border-white/20 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-white">Manage Tags</h2>
@@ -123,7 +123,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
         )}
 
         {/* Create New Tag */}
-        <div className="mb-6 p-4 bg-white/5 border border-white/10 rounded-xl">
+        <div className="mb-6 p-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl">
           <h3 className="text-sm font-medium text-white/90 mb-3">Create New Tag</h3>
           <div className="flex space-x-2">
             <input
@@ -131,7 +131,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleCreateTag()}
-              className="flex-1 px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
+              className="flex-1 px-4 py-2 bg-white/5 border  border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50"
               placeholder="Tag name"
             />
 
@@ -140,7 +140,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
               <button
                 type="button"
                 onClick={() => setShowColorPicker(!showColorPicker)}
-                className="flex items-center justify-center w-12 h-10 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 transition-colors"
+                className="flex items-center justify-center w-12 h-10 bg-white/5 border  border-gray-300 dark:border-white/20 rounded-xl hover:bg-white/10 transition-colors"
               >
                 <div
                   className="w-6 h-6 rounded-full border-2 border-white/40"
@@ -149,7 +149,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
               </button>
 
               {showColorPicker && (
-                <div className="absolute top-12 right-0 z-10 p-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl">
+                <div className="absolute top-12 right-0 z-10 p-3 bg-white/10 backdrop-blur-xl border  border-gray-300 dark:border-white/20 rounded-xl shadow-xl">
                   <div className="grid grid-cols-4 gap-2">
                     {TASK_TAG_COLORS.map((color, idx) => (
                       <button
@@ -196,7 +196,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
               {tags.map((tag) => (
                 <div
                   key={tag.id}
-                  className="flex items-center space-x-3 p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
+                  className="flex items-center space-x-3 p-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl hover:bg-white/10 transition-colors"
                 >
                   {editingTag?.id === tag.id ? (
                     // Edit Mode
@@ -217,7 +217,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
                           setEditingTag({ ...editingTag, name: e.target.value })
                         }
                         onKeyPress={(e) => e.key === 'Enter' && handleUpdateTag()}
-                        className="flex-1 px-3 py-1 bg-white/5 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        className="flex-1 px-3 py-1 bg-white/5 border  border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                       <div className="flex space-x-2">
                         <button
@@ -268,7 +268,7 @@ export default function TagManagement({ isOpen, onClose }: TagManagementProps) {
         <div className="mt-6 flex justify-end">
           <button
             onClick={handleClose}
-            className="px-6 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors"
+            className="px-6 py-2 bg-white/5 border  border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white hover:bg-white/10 transition-colors"
           >
             Close
           </button>

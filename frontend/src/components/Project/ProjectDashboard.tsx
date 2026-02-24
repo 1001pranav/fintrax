@@ -76,7 +76,7 @@ export default function ProjectDashboard({ project }: ProjectDashboardProps) {
       <div className="mb-8">
         <button
           onClick={handleBackToProjects}
-          className="mb-4 px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-colors flex items-center space-x-2"
+          className="mb-4 px-4 py-2 bg-white/5 border  border-gray-300 dark:border-white/20 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-colors flex items-center space-x-2"
         >
           <SVGComponent svgType="arrow-left" className="w-4 h-4" />
           <span>Back to Projects</span>
@@ -102,7 +102,7 @@ export default function ProjectDashboard({ project }: ProjectDashboardProps) {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white/60 text-sm">Total Tasks</span>
             <div className="p-2 bg-blue-500/20 rounded-lg">
@@ -112,7 +112,7 @@ export default function ProjectDashboard({ project }: ProjectDashboardProps) {
           <div className="text-3xl font-bold text-white">{stats.total}</div>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white/60 text-sm">To Do</span>
             <div className="p-2 bg-gray-500/20 rounded-lg">
@@ -122,7 +122,7 @@ export default function ProjectDashboard({ project }: ProjectDashboardProps) {
           <div className="text-3xl font-bold text-white">{stats.byStatus.todo}</div>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white/60 text-sm">In Progress</span>
             <div className="p-2 bg-blue-500/20 rounded-lg">
@@ -132,7 +132,7 @@ export default function ProjectDashboard({ project }: ProjectDashboardProps) {
           <div className="text-3xl font-bold text-white">{stats.byStatus.inProgress}</div>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white/60 text-sm">Done</span>
             <div className="p-2 bg-green-500/20 rounded-lg">
@@ -146,27 +146,27 @@ export default function ProjectDashboard({ project }: ProjectDashboardProps) {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Status Distribution */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Task Status Distribution</h2>
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Task Status Distribution</h2>
           <TaskStatusChart tasks={tasks} type="status" />
         </div>
 
         {/* Priority Distribution */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Priority Distribution</h2>
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Priority Distribution</h2>
           <TaskStatusChart tasks={tasks} type="priority" />
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <h2 className="text-xl font-semibold text-white mb-4">Recent Tasks</h2>
+      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Recent Tasks</h2>
         {recentTasks.length > 0 ? (
           <div className="space-y-3">
             {recentTasks.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
+                className="flex items-center justify-between p-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-center space-x-4 flex-1">
                   <div

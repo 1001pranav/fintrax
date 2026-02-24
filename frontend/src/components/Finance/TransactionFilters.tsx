@@ -59,7 +59,7 @@ export default function TransactionFiltersComponent({
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl overflow-hidden">
+    <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl backdrop-blur-xl overflow-hidden">
       {/* Filter Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -89,7 +89,7 @@ export default function TransactionFiltersComponent({
             </button>
           )}
           <svg
-            className={`w-5 h-5 text-white/60 transition-transform duration-200 ${
+            className={`w-5 h-5 text-gray-600 dark:text-white/60 transition-transform duration-200 ${
               isExpanded ? 'rotate-180' : ''
             }`}
             fill="none"
@@ -115,7 +115,7 @@ export default function TransactionFiltersComponent({
                 className={`min-h-[44px] py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${
                   filters.type === null
                     ? 'bg-blue-500/20 border-2 border-blue-400 text-blue-300'
-                    : 'bg-white/10 border border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
+                    : 'bg-white/10 border  border-gray-300 dark:border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
                 }`}
               >
                 All
@@ -125,7 +125,7 @@ export default function TransactionFiltersComponent({
                 className={`min-h-[44px] py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${
                   filters.type === TRANSACTION_TYPES.INCOME
                     ? 'bg-green-500/20 border-2 border-green-400 text-green-300'
-                    : 'bg-white/10 border border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
+                    : 'bg-white/10 border  border-gray-300 dark:border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
                 }`}
               >
                 Income
@@ -135,7 +135,7 @@ export default function TransactionFiltersComponent({
                 className={`min-h-[44px] py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${
                   filters.type === TRANSACTION_TYPES.EXPENSE
                     ? 'bg-red-500/20 border-2 border-red-400 text-red-300'
-                    : 'bg-white/10 border border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
+                    : 'bg-white/10 border  border-gray-300 dark:border-white/20 text-white/70 hover:bg-white/15 active:bg-white/20'
                 }`}
               >
                 Expense
@@ -151,7 +151,7 @@ export default function TransactionFiltersComponent({
             <select
               value={filters.category}
               onChange={(e) => updateFilter('category', e.target.value)}
-              className="w-full min-h-[44px] px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 touch-manipulation text-base"
+              className="w-full min-h-[44px] px-4 py-2.5 bg-white/10 border  border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 touch-manipulation text-base"
             >
               <option value="" className="bg-gray-800">All Categories</option>
               {getAvailableCategories().map((cat) => (
@@ -174,7 +174,7 @@ export default function TransactionFiltersComponent({
                   type="date"
                   value={filters.startDate}
                   onChange={(e) => updateFilter('startDate', e.target.value)}
-                  className="w-full min-h-[44px] px-3 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 text-sm touch-manipulation"
+                  className="w-full min-h-[44px] px-3 py-2.5 bg-white/10 border  border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 text-sm touch-manipulation"
                 />
               </div>
               <div className="space-y-1">
@@ -183,7 +183,7 @@ export default function TransactionFiltersComponent({
                   type="date"
                   value={filters.endDate}
                   onChange={(e) => updateFilter('endDate', e.target.value)}
-                  className="w-full min-h-[44px] px-3 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 text-sm touch-manipulation"
+                  className="w-full min-h-[44px] px-3 py-2.5 bg-white/10 border  border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 hover:bg-white/15 text-sm touch-manipulation"
                 />
               </div>
             </div>

@@ -3,7 +3,7 @@ package constants
 const (
 	APP_NAME    = "Fintrax"
 	APP_VERSION = "0.0.1"
-	APP_PORT    = ":80"
+	APP_PORT    = ":8080"
 )
 
 const (
@@ -38,7 +38,7 @@ const (
 const (
 	MIN_OTP_LENGTH        = 1000
 	MAX_OTP_LENGTH        = 9999
-	MAX_OTP_TIME          = 5 // in minutes
+	MAX_OTP_TIME          = 1 // in minutes
 	OTP_REGENERATION_TIME = 1 // in minutes
 )
 

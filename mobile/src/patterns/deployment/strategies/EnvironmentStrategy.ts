@@ -6,6 +6,7 @@
  */
 
 import { AppConfig } from '../../testing/types';
+import { getApiHost } from '../../../utils/apiConfig';
 
 export interface IEnvironmentStrategy {
   getConfig(): AppConfig;
@@ -17,7 +18,7 @@ export class DevelopmentEnvironment implements IEnvironmentStrategy {
   getConfig(): AppConfig {
     return {
       environment: 'development',
-      apiUrl: 'http://localhost:80/api',
+      apiUrl: getApiHost(),
       debugMode: true,
       analyticsEnabled: false,
       crashReportingEnabled: false,

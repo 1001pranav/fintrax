@@ -60,6 +60,7 @@ export default function LoginComponent() {
             // Store user data in localStorage
             if (response.data) {
                 localStorage.setItem('token', response.data.token)
+                localStorage.setItem('refreshToken', response.data.refresh_token)
                 localStorage.setItem('email', response.data.email)
                 localStorage.setItem('username', response.data.username)
                 localStorage.setItem('user_id', response.data.user_id.toString())

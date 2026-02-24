@@ -10,7 +10,10 @@ import (
 func LoansRoute(router *gin.RouterGroup) {
 	lRoute := router.Group("/loans", middleware.RateLimitGeneral(), middleware.Authorization())
 	{
+		// Register routes with and without trailing slash to avoid redirect issues with CORS
+		lRoute.POST("", controllers.CreateLoan)
 		lRoute.POST("/", controllers.CreateLoan)
+		lRoute.GET("", controllers.GetAllLoans)
 		lRoute.GET("/", controllers.GetAllLoans)
 		lRoute.GET("/:id", controllers.GetLoan)
 		lRoute.PATCH("/:id", controllers.UpdateLoan)

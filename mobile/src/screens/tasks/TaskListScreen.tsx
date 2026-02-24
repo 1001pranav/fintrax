@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { fetchTasks, updateTask, deleteTask } from '../../store/slices/tasksSlice';
 import { TaskCard } from '../../components/tasks/TaskCard';
@@ -22,9 +22,12 @@ export const TaskListScreen = () => {
   const [filterPriority, setFilterPriority] = useState<TaskPriority | null>(null);
   const [filterProject, setFilterProject] = useState<string | null>(null);
 
-  useEffect(() => {
-    dispatch(fetchTasks());
-  }, [dispatch]);
+  // Refresh tasks when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchTasks());
+    }, [dispatch])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -34,8 +37,8 @@ export const TaskListScreen = () => {
 
   // Filter tasks based on criteria
   const filteredTasks = tasks.filter((task) => {
-    // Exclude archived tasks
-    if (task.status === TaskStatus.ARCHIVED) return false;
+    // Exclude deleted tasks
+    if (task.status === TaskStatus.DELETED) return false;
 
     // Search filter
     if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {

@@ -67,13 +67,13 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
 
   return (
     <div
-      className="bg-black/90 border border-white/10 rounded-xl p-4 backdrop-blur-xl"
+      className="bg-white/95 dark:bg-black/90 border border-gray-200 dark:border-white/10 rounded-xl p-4 backdrop-blur-xl"
       style={{
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
       }}
     >
       {label && (
-        <p className="text-white font-semibold mb-3 text-sm border-b border-white/10 pb-2">
+        <p className="text-gray-900 dark:text-white font-semibold mb-3 text-sm border-b border-gray-200 dark:border-white/10 pb-2">
           {label}
         </p>
       )}
@@ -88,7 +88,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: entry.color }}
                 />
-                <span className="text-white/80 text-xs">
+                <span className="text-gray-600 dark:text-white/80 text-xs">
                   {entry.name === 'assets' && 'Assets'}
                   {entry.name === 'liabilities' && 'Liabilities'}
                   {entry.name === 'netWorth' && 'Net Worth'}
@@ -96,7 +96,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
               </div>
               <span
                 className={`font-semibold text-xs ${
-                  isNetWorth ? (isPositive ? 'text-green-400' : 'text-red-400') : 'text-white'
+                  isNetWorth ? (isPositive ? 'text-green-400' : 'text-red-400') : 'text-gray-900 dark:text-white'
                 }`}
               >
                 {formatCurrency(entry.value)}
@@ -204,7 +204,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
       <select
         value={timePeriod}
         onChange={(e) => handleTimePeriodChange(e.target.value as TimePeriod)}
-        className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+        className="bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-1.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
       >
         <option value="last-3-months">Last 3 Months</option>
         <option value="last-6-months">Last 6 Months</option>
@@ -220,9 +220,9 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
               const endDate = customRange?.endDate || new Date().toISOString().split('T')[0];
               handleCustomDateChange(e.target.value, endDate);
             }}
-            className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
-          <span className="text-white/60 text-sm">to</span>
+          <span className="text-gray-600 dark:text-white/60 text-sm">to</span>
           <input
             type="date"
             onChange={(e) => {
@@ -231,7 +231,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
                 new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
               handleCustomDateChange(startDate, e.target.value);
             }}
-            className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
         </div>
       )}
@@ -350,8 +350,8 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
       {netWorthData.length > 0 && (
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
           {/* Current Net Worth */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Net Worth</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Net Worth</div>
             <div
               className={`font-bold text-sm ${
                 currentNetWorth >= 0 ? 'text-green-400' : 'text-red-400'
@@ -388,30 +388,30 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
           </div>
 
           {/* Total Assets */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Total Assets</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Total Assets</div>
             <div className="text-green-400 font-bold text-sm">
               {formatCurrency(currentAssets)}
             </div>
-            <div className="text-white/40 text-xs mt-1">
+            <div className="text-gray-500 dark:text-white/40 text-xs mt-1">
               Balance + Savings
             </div>
           </div>
 
           {/* Total Liabilities */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Total Liabilities</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Total Liabilities</div>
             <div className="text-red-400 font-bold text-sm">
               {formatCurrency(currentLiabilities)}
             </div>
-            <div className="text-white/40 text-xs mt-1">
+            <div className="text-gray-500 dark:text-white/40 text-xs mt-1">
               Debts + Loans
             </div>
           </div>
 
           {/* Growth Rate */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
-            <div className="text-white/60 text-xs mb-1">Period Growth</div>
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">
+            <div className="text-gray-600 dark:text-white/60 text-xs mb-1">Period Growth</div>
             <div
               className={`font-bold text-sm ${
                 growthMetrics.netWorthGrowth >= 0 ? 'text-green-400' : 'text-red-400'
@@ -419,7 +419,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
             >
               {formatGrowthPercentage(growthMetrics.netWorthGrowth)}
             </div>
-            <div className="text-white/40 text-xs mt-1">
+            <div className="text-gray-500 dark:text-white/40 text-xs mt-1">
               {growthMetrics.endNetWorth >= growthMetrics.startNetWorth
                 ? 'Increasing'
                 : 'Decreasing'}
@@ -432,23 +432,23 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
       {netWorthData.length > 0 && (
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Assets Breakdown */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-white font-semibold text-sm">Assets Breakdown</h4>
+              <h4 className="text-gray-900 dark:text-white font-semibold text-sm">Assets Breakdown</h4>
               <span className="text-green-400 font-bold text-sm">
                 {formatCurrency(currentAssets)}
               </span>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-white/60 text-xs">Balance</span>
-                <span className="text-white text-xs font-medium">
+                <span className="text-gray-600 dark:text-white/60 text-xs">Balance</span>
+                <span className="text-gray-900 dark:text-white text-xs font-medium">
                   {formatCurrency(balance)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-white/60 text-xs">Savings</span>
-                <span className="text-white text-xs font-medium">
+                <span className="text-gray-600 dark:text-white/60 text-xs">Savings</span>
+                <span className="text-gray-900 dark:text-white text-xs font-medium">
                   {formatCurrency(currentSavings)}
                 </span>
               </div>
@@ -456,23 +456,23 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
           </div>
 
           {/* Liabilities Breakdown */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-white font-semibold text-sm">Liabilities Breakdown</h4>
+              <h4 className="text-gray-900 dark:text-white font-semibold text-sm">Liabilities Breakdown</h4>
               <span className="text-red-400 font-bold text-sm">
                 {formatCurrency(currentLiabilities)}
               </span>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-white/60 text-xs">Debts</span>
-                <span className="text-white text-xs font-medium">
+                <span className="text-gray-600 dark:text-white/60 text-xs">Debts</span>
+                <span className="text-gray-900 dark:text-white text-xs font-medium">
                   {formatCurrency(financialData.debts.total)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-white/60 text-xs">Loans</span>
-                <span className="text-white text-xs font-medium">
+                <span className="text-gray-600 dark:text-white/60 text-xs">Loans</span>
+                <span className="text-gray-900 dark:text-white text-xs font-medium">
                   {formatCurrency(financialData.debts.total - financialData.debts.total)}
                 </span>
               </div>

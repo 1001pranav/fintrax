@@ -34,13 +34,13 @@ export default function TaskCard({ task, isDragging }: TaskCardProps) {
   return (
     <div
       onClick={handleClick}
-      className={`group min-h-[88px] p-3 sm:p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/10 active:bg-white/15 hover:border-white/20 hover:shadow-lg touch-manipulation ${
+      className={`group min-h-[88px] p-3 sm:p-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/10 active:bg-gray-100 dark:active:bg-white/15 hover:border-gray-300 dark:hover:border-white/20 hover:shadow-lg touch-manipulation ${
         isDragging ? 'opacity-50 rotate-3 scale-105' : ''
       }`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
-        <h3 className="font-semibold text-white text-sm sm:text-sm line-clamp-2 flex-1">
+        <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-sm line-clamp-2 flex-1">
           {task.title}
         </h3>
         <div className={`flex-shrink-0 px-2 py-1 rounded-lg text-xs font-medium ${priorityColors[task.priority]}`}>
@@ -50,7 +50,7 @@ export default function TaskCard({ task, isDragging }: TaskCardProps) {
 
       {/* Description */}
       {task.description && (
-        <p className="text-white/60 text-xs mb-2 sm:mb-3 line-clamp-2">
+        <p className="text-gray-600 dark:text-white/60 text-xs mb-2 sm:mb-3 line-clamp-2">
           {task.description}
         </p>
       )}
@@ -61,14 +61,14 @@ export default function TaskCard({ task, isDragging }: TaskCardProps) {
           {task.tags.slice(0, 3).map((tag) => (
             <span
               key={tag.name}
-              className="px-2 py-1 text-white rounded-lg text-xs"
+              className="px-2 py-1 text-gray-900 dark:text-white rounded-lg text-xs"
               style={{ backgroundColor: tag.color || TASK_TAG_COLORS[0] }} // Default to blue if no color
             >
               {tag.name}
             </span>
           ))}
           {task.tags.length > 3 && (
-            <span className="px-2 py-1 bg-white/10 text-white/60 rounded-lg text-xs">
+            <span className="px-2 py-1 bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-white/60 rounded-lg text-xs">
               +{task.tags.length - 3}
             </span>
           )}
@@ -76,7 +76,7 @@ export default function TaskCard({ task, isDragging }: TaskCardProps) {
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-white/50">
+      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-white/50">
         {task.endDate && (
           <div className="flex items-center space-x-1">
             <SVGComponent svgType="calender" className="w-3 h-3" />
